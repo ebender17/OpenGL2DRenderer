@@ -13,7 +13,7 @@ namespace GLCore {
 		void Run();
 	};
 
-	// To be define in client
+	// To be defined in client
 	Application* CreateApplication();
 
 }
