@@ -5,7 +5,8 @@ class Sandbox : public GLCore::Application
 public: 
 	Sandbox()
 	{
-
+		int a = 5;
+		LOG_INFO("Hello! Var={0}", a);
 	}
 
 	~Sandbox()
