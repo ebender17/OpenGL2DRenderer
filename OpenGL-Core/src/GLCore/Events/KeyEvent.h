@@ -2,8 +2,6 @@
 
 #include "Event.h"
 
-#include <sstream>
-
 namespace GLCore {
 
 	// Acts as an abstract class. Cannot instantiate this outside

@@ -19,6 +19,9 @@ project "OpenGL-Core"
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
+	pchheader "glpch.h"
+	pchsource "src/glpch.cpp"
+
 	files
 	{
 		"%{prj.name}/src/**.h",

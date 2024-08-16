@@ -1,3 +1,4 @@
+#include "glpch.h"
 #include "Application.h"
 
 #include "GLCore/Events/ApplicationEvent.h"

@@ -2,8 +2,6 @@
 
 #include "Event.h"
 
-#include <sstream>
-
 namespace GLCore {
 
 	class GLCORE_API WindowResizeEvent : public Event

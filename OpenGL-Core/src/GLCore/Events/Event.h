@@ -1,9 +1,7 @@
 #pragma once
 
+#include "glpch.h"
 #include "GLCore/Core/Core.h"
-
-#include <string>
-#include <functional>
 
 namespace GLCore {
 
