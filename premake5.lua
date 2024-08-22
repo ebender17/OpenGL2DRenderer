@@ -66,14 +66,17 @@ project "OpenGL-Core"
 
 	filter "configurations:Debug"
 		defines "GLCORE_DEBUG"
+		buildoptions "/MDd"
 		symbols "On"
 
 	filter "configurations:Release"
 		defines "GLCORE_RELEASE"
+		buildoptions "/MD"
 		optimize "On"
 
 	filter "configurations:Dist"
 		defines "GLCORE_DIST"
+		buildoptions "/MD"
 		optimize "On"
 
 project "OpenGL-Sandbox"
@@ -113,12 +116,15 @@ project "OpenGL-Sandbox"
 
 	filter "configurations:Debug"
 		defines "GLCORE_DEBUG"
+		buildoptions "/MDd"
 		symbols "On"
 
 	filter "configurations:Release"
 		defines "GLCORE_RELEASE"
+		buildoptions "/MD"
 		optimize "On"
 
 	filter "configurations:Dist"
 		defines "GLCORE_DIST"
+		buildoptions "/MD"
 		optimize "On"

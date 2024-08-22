@@ -1,9 +1,11 @@
 #pragma once
 
 #include "Core.h"
+
+#include "Window.h"
+#include "LayerStack.h"
 #include "GLCore/Events/Event.h"
 #include "GLCore/Events/ApplicationEvent.h"
-#include "GLCore/Core/Window.h"
 
 namespace GLCore {
 
@@ -16,11 +18,15 @@ namespace GLCore {
 		void Run();
 
 		void OnEvent(Event& event);
+
+		void PushLayer(Layer* layer);
+		void PushOverlay(Layer* layer);
 	private:
 		bool OnWindowClose(WindowCloseEvent& event);
 
 		std::unique_ptr<Window> m_Window;
 		bool m_Running = true;
+		LayerStack m_LayerStack;
 	};
 
 	// To be defined in client

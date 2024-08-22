@@ -1,12 +1,30 @@
 #include <GLCore.h>
 
+class ExampleLayer : public GLCore::Layer
+{
+public:
+	ExampleLayer()
+		: Layer("Example")
+	{
+	}
+
+	void OnUpdate() override
+	{
+		LOG_INFO("ExampleLayer::OnUpdate");
+	}
+
+	void OnEvent(GLCore::Event& event) override
+	{
+		LOG_INFO("{0}", event.ToString());
+	}
+};
+
 class Sandbox : public GLCore::Application
 {
 public: 
 	Sandbox()
 	{
-		int a = 5;
-		LOG_INFO("Hello from Sandbox! Var={0}", a);
+		PushLayer(new ExampleLayer());
 	}
 
 	~Sandbox()
