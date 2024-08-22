@@ -2,6 +2,7 @@
 
 #include "Core.h"
 #include "GLCore/Events/Event.h"
+#include "GLCore/Events/ApplicationEvent.h"
 #include "GLCore/Core/Window.h"
 
 namespace GLCore {
@@ -13,7 +14,11 @@ namespace GLCore {
 		virtual ~Application();
 
 		void Run();
+
+		void OnEvent(Event& event);
 	private:
+		bool OnWindowClose(WindowCloseEvent& event);
+
 		std::unique_ptr<Window> m_Window;
 		bool m_Running = true;
 	};
