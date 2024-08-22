@@ -6,7 +6,7 @@ public:
 	Sandbox()
 	{
 		int a = 5;
-		LOG_INFO("Hello! Var={0}", a);
+		LOG_INFO("Hello from Sandbox! Var={0}", a);
 	}
 
 	~Sandbox()

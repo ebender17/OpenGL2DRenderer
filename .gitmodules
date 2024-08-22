@@ -1,3 +1,6 @@
 [submodule "OpenGL-Core/vendor/spdlog"]
 	path = OpenGL-Core/vendor/spdlog
 	url = https://github.com/gabime/spdlog.git
+[submodule "OpenGL-Core/vendor/GLFW"]
+	path = OpenGL-Core/vendor/GLFW
+	url = https://github.com/ebender17/glfw.git

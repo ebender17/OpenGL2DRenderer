@@ -11,6 +11,12 @@ workspace "OpenGL-Core"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+-- Include directories relative to root folder (solution directory)
+IncludeDir = {}
+IncludeDir["GLFW"] = "OpenGL-Core/vendor/GLFW/include"
+
+include "OpenGL-Core/vendor/GLFW"
+
 project "OpenGL-Core"
 	location "OpenGL-Core"
 	kind "SharedLib"
@@ -20,7 +26,7 @@ project "OpenGL-Core"
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
 	pchheader "glpch.h"
-	pchsource "src/glpch.cpp"
+	pchsource "OpenGL-Core/src/glpch.cpp"
 
 	files
 	{
@@ -31,12 +37,20 @@ project "OpenGL-Core"
 	includedirs
 	{
 		"%{prj.name}/src",
-		"%{prj.name}/vendor/spdlog/include"
+		"%{prj.name}/vendor/spdlog/include",
+		"%{IncludeDir.GLFW}"
+	}
+
+	links
+	{
+		"GLFW",
+		"opengl32.lib"
 	}
 
 	filter "system:windows"
 		cppdialect "C++20"
-		staticruntime "On"
+		staticruntime "off"
+		runtime "Debug"
 		systemversion "latest"
 
 		defines
