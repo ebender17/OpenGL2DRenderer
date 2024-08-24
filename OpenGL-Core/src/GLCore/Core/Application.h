@@ -6,6 +6,8 @@
 #include "LayerStack.h"
 #include "GLCore/Events/Event.h"
 #include "GLCore/Events/ApplicationEvent.h"
+#include "GLCore/Events/KeyEvent.h"
+#include "GLCore/Events/MouseEvent.h"
 
 namespace GLCore {
 
