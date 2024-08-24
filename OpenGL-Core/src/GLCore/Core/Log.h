@@ -6,17 +6,17 @@
 
 namespace GLCore {
 
-	class GLCORE_API Log
-	{
-	public:
-		static void Init();
+    class GLCORE_API Log
+    {
+    public:
+        static void Init();
 
-		inline static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return s_CoreLogger; }
-		inline static std::shared_ptr<spdlog::logger>& GetClientLogger() { return s_ClientLogger; }
-	private:
-		static std::shared_ptr<spdlog::logger> s_CoreLogger;
-		static std::shared_ptr<spdlog::logger> s_ClientLogger;
-	};
+        inline static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return s_CoreLogger; }
+        inline static std::shared_ptr<spdlog::logger>& GetClientLogger() { return s_ClientLogger; }
+    private:
+        static std::shared_ptr<spdlog::logger> s_CoreLogger;
+        static std::shared_ptr<spdlog::logger> s_ClientLogger;
+    };
 
 }
 
@@ -36,4 +36,3 @@ namespace GLCore {
 #define LOG_WARN(...)          ::GLCore::Log::GetClientLogger()->warn(__VA_ARGS__)
 #define LOG_ERROR(...)         ::GLCore::Log::GetClientLogger()->error(__VA_ARGS__)
 #define LOG_CRITICAL(...)      ::GLCore::Log::GetClientLogger()->critical(__VA_ARGS__)
-
