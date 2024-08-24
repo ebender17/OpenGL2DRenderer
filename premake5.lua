@@ -23,6 +23,7 @@ project "OpenGL-Core"
     location "OpenGL-Core"
     kind "SharedLib"
     language "C++"
+    staticruntime "off"
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -44,8 +45,8 @@ project "OpenGL-Core"
         "%{IncludeDir.Glad}"
     }
 
-    links
-    {
+    links 
+    { 
         "GLFW",
         "Glad",
         "opengl32.lib"
@@ -53,8 +54,6 @@ project "OpenGL-Core"
 
     filter "system:windows"
         cppdialect "C++20"
-        staticruntime "off"
-        runtime "Debug"
         systemversion "latest"
 
         defines
@@ -66,28 +65,29 @@ project "OpenGL-Core"
 
         postbuildcommands
         {
-            ("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/OpenGL-Sandbox")
+            ("{COPY} %{cfg.buildtarget.relpath} \"../bin/" .. outputdir .. "/OpenGL-Sandbox/\"")
         }
 
     filter "configurations:Debug"
         defines "GLCORE_DEBUG"
-        buildoptions "/MDd"
+        runtime "Debug"
         symbols "On"
 
     filter "configurations:Release"
         defines "GLCORE_RELEASE"
-        buildoptions "/MD"
+        runtime "Release"
         optimize "On"
 
     filter "configurations:Dist"
         defines "GLCORE_DIST"
-        buildoptions "/MD"
+        runtime "Release"
         optimize "On"
 
 project "OpenGL-Sandbox"
     location "OpenGL-Sandbox"
     kind "ConsoleApp"
     language "C++"
+    staticruntime "off"
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -111,7 +111,6 @@ project "OpenGL-Sandbox"
 
     filter "system:windows"
         cppdialect "C++20"
-        staticruntime "On"
         systemversion "latest"
 
         defines
@@ -121,15 +120,15 @@ project "OpenGL-Sandbox"
 
     filter "configurations:Debug"
         defines "GLCORE_DEBUG"
-        buildoptions "/MDd"
+        runtime "Debug"
         symbols "On"
 
     filter "configurations:Release"
         defines "GLCORE_RELEASE"
-        buildoptions "/MD"
+        runtime "Release"
         optimize "On"
 
     filter "configurations:Dist"
         defines "GLCORE_DIST"
-        buildoptions "/MD"
+        runtime "Release"
         optimize "On"
