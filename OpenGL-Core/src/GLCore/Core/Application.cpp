@@ -1,8 +1,9 @@
 #include "glpch.h"
 #include "Application.h"
 
-#include "GLCore/Events/ApplicationEvent.h"
-#include "GLCore/Core/Log.h"
+#include "../Events/ApplicationEvent.h"
+#include "Log.h"
+#include "Input.h"
 
 #include <glad/glad.h>
 
@@ -10,8 +11,13 @@ namespace GLCore {
 
 #define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
 
+    Application* Application::s_Instance = nullptr;
+
     Application::Application(const std::string& name, uint32_t width, uint32_t height)
     {
+        GLCORE_ASSERT(!s_Instance, "Application already exists!");
+        s_Instance = this;
+
         m_Window = std::unique_ptr<Window>(Window::Create({ name, width, height }));
         m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent)); // sets up OnEvent to be called when OnEventCallback is called
     }
@@ -29,6 +35,9 @@ namespace GLCore {
 
             for (Layer* layer : m_LayerStack)
                 layer->OnUpdate();
+
+            auto [x, y] = Input::GetMousePosition();
+            GLCORE_LOG_INFO("{0}, {1}", x, y);
 
             m_Window->OnUpdate();
         }

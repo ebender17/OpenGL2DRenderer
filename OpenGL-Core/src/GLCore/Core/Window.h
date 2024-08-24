@@ -40,6 +40,7 @@ namespace GLCore {
         virtual void SetVSync(bool enabled) = 0;
         virtual bool IsVSync() const = 0;
 
+        // void* bc we do not want to tie the window to a specify library, for example a GLFWwindow
         virtual void* GetNativeWindow() const = 0;
 
         static Window* Create(const WindowProps& props = WindowProps());
