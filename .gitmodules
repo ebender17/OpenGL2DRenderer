@@ -4,3 +4,6 @@
 [submodule "OpenGL-Core/vendor/GLFW"]
 	path = OpenGL-Core/vendor/GLFW
 	url = https://github.com/ebender17/glfw.git
+[submodule "OpenGL-Core/vendor/glm"]
+	path = OpenGL-Core/vendor/glm
+	url = https://github.com/icaven/glm.git
