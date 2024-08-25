@@ -20,6 +20,9 @@ namespace GLCore {
 
         m_Window = std::unique_ptr<Window>(Window::Create({ name, width, height }));
         m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent)); // sets up OnEvent to be called when OnEventCallback is called
+        
+        m_ImGuiLayer = new ImGuiLayer();
+        PushOverlay(m_ImGuiLayer);
     }
 
     Application::~Application()
@@ -36,8 +39,13 @@ namespace GLCore {
             for (Layer* layer : m_LayerStack)
                 layer->OnUpdate();
 
-            auto [x, y] = Input::GetMousePosition();
-            GLCORE_LOG_INFO("{0}, {1}", x, y);
+            m_ImGuiLayer->Begin();
+            for (Layer* layer : m_LayerStack)
+                layer->OnImGuiRender();
+            m_ImGuiLayer->End();
+
+            // auto [x, y] = Input::GetMousePosition();
+            // GLCORE_LOG_INFO("{0}, {1}", x, y);
 
             m_Window->OnUpdate();
         }
@@ -47,7 +55,7 @@ namespace GLCore {
     {
         EventDispatcher dispatcher(event);
         dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose)); // call OnWindowClose on WindowCloseEvents
-        GLCORE_LOG_INFO("{0}", event.ToString());
+        // GLCORE_LOG_INFO("{0}", event.ToString());
 
         // iterate backwards to handle events
         for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();)

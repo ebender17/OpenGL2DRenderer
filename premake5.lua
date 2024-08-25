@@ -15,10 +15,12 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 IncludeDir = {}
 IncludeDir["GLFW"] = "OpenGL-Core/vendor/GLFW/include"
 IncludeDir["Glad"] = "OpenGL-Core/vendor/Glad/include"
+IncludeDir["ImGui"] = "OpenGL-Core/vendor/imgui"
 IncludeDir["glm"] = "OpenGL-Core/vendor/glm"
 
 include "OpenGL-Core/vendor/GLFW"
 include "OpenGL-Core/vendor/Glad"
+include "OpenGL-Core/vendor/imgui"
 
 project "OpenGL-Core"
     location "OpenGL-Core"
@@ -46,6 +48,7 @@ project "OpenGL-Core"
         "%{prj.name}/vendor/spdlog/include",
         "%{IncludeDir.GLFW}",
         "%{IncludeDir.Glad}",
+        "%{IncludeDir.ImGui}",
         "%{IncludeDir.glm}"
     }
 
@@ -53,6 +56,7 @@ project "OpenGL-Core"
     { 
         "GLFW",
         "Glad",
+        "ImGui",
         "opengl32.lib"
     }
 
@@ -106,6 +110,7 @@ project "OpenGL-Sandbox"
     {
         "OpenGL-Core/vendor/spdlog/include",
         "OpenGL-Core/src",
+        "OpenGL-Core/vendor",
         "%{IncludeDir.glm}"
     }
 
