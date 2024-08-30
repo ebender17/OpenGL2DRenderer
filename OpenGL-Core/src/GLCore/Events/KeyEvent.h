@@ -6,7 +6,7 @@ namespace GLCore {
 
     // Acts as an abstract class. Cannot instantiate this outside
     // of a class that derives from it as Constructor is protected.
-    class GLCORE_API KeyEvent : public Event
+    class KeyEvent : public Event
     {
     public:
         inline int GetKeyCode() const { return m_KeyCode; }
@@ -19,7 +19,7 @@ namespace GLCore {
         int m_KeyCode;
     };
 
-    class GLCORE_API KeyPressedEvent : public KeyEvent
+    class KeyPressedEvent : public KeyEvent
     {
     public:
         KeyPressedEvent(int keycode, int repeatCount)
@@ -39,7 +39,7 @@ namespace GLCore {
         int m_RepeatCount;
     };
 
-    class GLCORE_API KeyReleasedEvent : public KeyEvent
+    class KeyReleasedEvent : public KeyEvent
     {
     public:
         KeyReleasedEvent(int keycode)
@@ -55,7 +55,7 @@ namespace GLCore {
         EVENT_CLASS_TYPE(KeyReleased)
     };
 
-    class GLCORE_API KeyTypedEvent : public KeyEvent
+    class KeyTypedEvent : public KeyEvent
     {
     public:
         KeyTypedEvent(int keycode)

@@ -23,7 +23,7 @@ namespace GLCore {
 
     // Interface representing a desktop system based Window.
     // Implement per platform.
-    class GLCORE_API Window
+    class Window
     {
     public:
         using EventCallbackFn = std::function<void(Event&)>;

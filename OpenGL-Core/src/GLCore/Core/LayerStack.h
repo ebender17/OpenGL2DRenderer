@@ -5,7 +5,7 @@
 
 namespace GLCore{
 
-    class GLCORE_API LayerStack
+    class LayerStack
     {
     public:
         LayerStack();

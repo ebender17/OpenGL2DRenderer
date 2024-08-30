@@ -6,7 +6,7 @@
 
 namespace GLCore {
 
-    class GLCORE_API Log
+    class Log
     {
     public:
         static void Init();

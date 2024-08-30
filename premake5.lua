@@ -5,8 +5,7 @@ workspace "OpenGL-Core"
     configurations
     {
         "Debug",
-        "Release",
-        "Dist"
+        "Release"
     }
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
@@ -24,9 +23,10 @@ include "OpenGL-Core/vendor/imgui"
 
 project "OpenGL-Core"
     location "OpenGL-Core"
-    kind "SharedLib"
+    kind "StaticLib"
     language "C++"
-    staticruntime "off"
+    cppdialect "C++20"
+    staticruntime "on"
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -40,6 +40,11 @@ project "OpenGL-Core"
         "%{prj.name}/src/**.cpp",
         "%{prj.name}/vendor/glm/glm/**.hpp",
         "%{prj.name}/vendor/glm/glm/**.inl",
+    }
+
+    defines
+    {
+        "_CRT_SECURE_NO_WARNINGS"
     }
 
     includedirs
@@ -61,41 +66,30 @@ project "OpenGL-Core"
     }
 
     filter "system:windows"
-        cppdialect "C++20"
         systemversion "latest"
 
         defines
         {
             "GLCORE_PLATFORM_WINDOWS",
-            "GLCORE_BUILD_DLL",
             "GLFW_INCLUDE_NONE"
-        }
-
-        postbuildcommands
-        {
-            ("{COPY} %{cfg.buildtarget.relpath} \"../bin/" .. outputdir .. "/OpenGL-Sandbox/\"")
         }
 
     filter "configurations:Debug"
         defines "GLCORE_DEBUG"
         runtime "Debug"
-        symbols "On"
+        symbols "on"
 
     filter "configurations:Release"
         defines "GLCORE_RELEASE"
         runtime "Release"
-        optimize "On"
-
-    filter "configurations:Dist"
-        defines "GLCORE_DIST"
-        runtime "Release"
-        optimize "On"
+        optimize "on"
 
 project "OpenGL-Sandbox"
     location "OpenGL-Sandbox"
     kind "ConsoleApp"
     language "C++"
-    staticruntime "off"
+    cppdialect "C++20"
+    staticruntime "on"
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -120,7 +114,6 @@ project "OpenGL-Sandbox"
     }
 
     filter "system:windows"
-        cppdialect "C++20"
         systemversion "latest"
 
         defines
@@ -131,14 +124,9 @@ project "OpenGL-Sandbox"
     filter "configurations:Debug"
         defines "GLCORE_DEBUG"
         runtime "Debug"
-        symbols "On"
+        symbols "on"
 
     filter "configurations:Release"
         defines "GLCORE_RELEASE"
         runtime "Release"
-        optimize "On"
-
-    filter "configurations:Dist"
-        defines "GLCORE_DIST"
-        runtime "Release"
-        optimize "On"
+        optimize "on"

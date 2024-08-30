@@ -61,14 +61,14 @@ namespace GLCore {
             data.Height = height;
 
             WindowResizeEvent event(width, height);
-            data.EventCallback(event); // this is calling OnEvent in Application.cpp
+            data.EventCallback(event);
         });
 
         glfwSetWindowCloseCallback(m_Window, [](GLFWwindow* window)
         {
             WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
             WindowCloseEvent event;
-            data.EventCallback(event); // this is calling OnEvent in Application.cpp
+            data.EventCallback(event);
         });
 
         glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int key, int scancode, int action, int mods)

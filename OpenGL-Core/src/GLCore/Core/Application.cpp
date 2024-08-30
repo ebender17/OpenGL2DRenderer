@@ -19,8 +19,8 @@ namespace GLCore {
         s_Instance = this;
 
         m_Window = std::unique_ptr<Window>(Window::Create({ name, width, height }));
-        m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent)); // sets up OnEvent to be called when OnEventCallback is called
-        
+        m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
+
         m_ImGuiLayer = new ImGuiLayer();
         PushOverlay(m_ImGuiLayer);
     }
@@ -54,8 +54,7 @@ namespace GLCore {
     void Application::OnEvent(Event& event)
     {
         EventDispatcher dispatcher(event);
-        dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose)); // call OnWindowClose on WindowCloseEvents
-        // GLCORE_LOG_INFO("{0}", event.ToString());
+        dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose));
 
         // iterate backwards to handle events
         for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();)
