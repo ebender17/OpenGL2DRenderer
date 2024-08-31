@@ -2,13 +2,13 @@
 
 #include "Core.h"
 
-#include "Window.h"
 #include "LayerStack.h"
+#include "Timestep.h"
+#include "Window.h"
 #include "GLCore/Events/Event.h"
 #include "GLCore/Events/ApplicationEvent.h"
 #include "GLCore/Events/KeyEvent.h"
 #include "GLCore/Events/MouseEvent.h"
-
 #include "GLCore/ImGui/ImGuiLayer.h"
 
 namespace GLCore {
@@ -31,11 +31,12 @@ namespace GLCore {
         inline static Application& Get() { return *s_Instance; }
     private:
         bool OnWindowClose(WindowCloseEvent& event);
-
+    private:
         std::unique_ptr<Window> m_Window;
         ImGuiLayer* m_ImGuiLayer;
         bool m_Running = true;
         LayerStack m_LayerStack;
+        float m_LastFrameTime = 0.0f;
     private:
         static Application* s_Instance;
     };

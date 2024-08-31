@@ -31,11 +31,15 @@ void SandboxLayer::OnEvent(Event& event)
     }
 }
 
-void SandboxLayer::OnUpdate() // TODO - timestep
+void SandboxLayer::OnUpdate(Timestep timestep)
 {
+    glClearColor(0.5, 0.5, 1, 1);
+    glClear(GL_COLOR_BUFFER_BIT);
+
     if (Input::IsKeyPressed(GLCORE_KEY_TAB))
         LOG_TRACE("Tab key is pressed!");
 
+    LOG_INFO("Timestep in seconds: {0}", timestep.GetSeconds());
     // auto [x, y] = Input::GetMousePosition();
     // LOG_INFO("{0}, {1}", x, y);
 }

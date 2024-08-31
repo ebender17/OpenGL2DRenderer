@@ -1,6 +1,7 @@
 #pragma once
 
-#include "GLCore/Core/Core.h"
+#include "Core.h"
+#include "Timestep.h"
 #include "GLCore/Events/Event.h"
 
 namespace GLCore {
@@ -13,7 +14,7 @@ namespace GLCore {
 
         virtual void OnAttach() {}
         virtual void OnDetach() {}
-        virtual void OnUpdate() {}
+        virtual void OnUpdate(Timestep timestep) {}
         virtual void OnImGuiRender() {}
         virtual void OnEvent(Event& event) {}
 
