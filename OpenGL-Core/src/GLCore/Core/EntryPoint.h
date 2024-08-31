@@ -7,7 +7,7 @@ extern GLCore::Application* GLCore::CreateApplication();
 int main(int argc, char** argv)
 {
     GLCore::Log::Init();
-    GLCORE_LOG_WARN("Initialized Log!");
+    LOG_WARN("Initialized Log!");
 
     auto app = GLCore::CreateApplication();
     app->Run();
