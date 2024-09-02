@@ -39,7 +39,6 @@ void SandboxLayer::OnUpdate(Timestep timestep)
     if (Input::IsKeyPressed(GLCORE_KEY_TAB))
         LOG_TRACE("Tab key is pressed!");
 
-    LOG_INFO("Timestep in seconds: {0}", timestep.GetSeconds());
     // auto [x, y] = Input::GetMousePosition();
     // LOG_INFO("{0}, {1}", x, y);
 }

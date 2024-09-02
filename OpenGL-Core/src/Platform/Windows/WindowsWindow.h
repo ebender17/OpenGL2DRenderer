@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GLCore/Core/Window.h"
+#include "GLCore/Renderer/GraphicsContext.h"
 
 #include <GLFW/glfw3.h>
 
@@ -28,6 +29,7 @@ namespace GLCore {
         virtual void Shutdown();
     private:
         GLFWwindow* m_Window;
+        GraphicsContext* m_Context;
 
         struct WindowData
         {
