@@ -8,8 +8,4 @@ namespace GLCore {
     {
     }
 
-    Layer::~Layer()
-    {
-    }
-
 }
