@@ -11,11 +11,11 @@ namespace GLCore {
     {
         switch (Renderer::GetAPI())
         {
-        case RendererAPI::None:
-            GLCORE_ASSERT(false, "RendererAPI::None is currently not supported!")
-            return nullptr;
-        case RendererAPI::OpenGL:
-            return new OpenGLVertexBuffer(vertices, size);
+            case RendererAPI::None:
+                GLCORE_ASSERT(false, "RendererAPI::None is currently not supported!")
+                return nullptr;
+            case RendererAPI::OpenGL:
+                return new OpenGLVertexBuffer(vertices, size);
         }
 
         GLCORE_ASSERT(false, "Unknown RendererAPI!");
@@ -26,11 +26,11 @@ namespace GLCore {
     {
         switch (Renderer::GetAPI())
         {
-        case RendererAPI::None:
-            GLCORE_ASSERT(false, "RendererAPI::None is currently not supported!")
-            return nullptr;
-        case RendererAPI::OpenGL:
-            return new OpenGLIndexBuffer(indices, count);
+            case RendererAPI::None:
+                GLCORE_ASSERT(false, "RendererAPI::None is currently not supported!")
+                return nullptr;
+            case RendererAPI::OpenGL:
+                return new OpenGLIndexBuffer(indices, count);
         }
 
         GLCORE_ASSERT(false, "Unknown RendererAPI!");
