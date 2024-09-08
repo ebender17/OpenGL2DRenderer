@@ -4,6 +4,7 @@
 
 #include "GLCore/Core/Log.h"
 
+//  TODO: move to platform folder
 namespace GLCore::Utils {
 
     enum class DebugLogLevel

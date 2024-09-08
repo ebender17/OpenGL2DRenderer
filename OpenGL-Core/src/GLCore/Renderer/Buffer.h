@@ -41,7 +41,7 @@ namespace GLCore {
         uint32_t Offset;
         bool Normalized;
 
-        BufferElement() {} // TODO - make default?
+        BufferElement() {} // TODO: make default?
         BufferElement(ShaderDataType type, const std::string& name, bool normalized = false)
             :Name(name), Type(type), Size(ShaderDaataTypeSize(type)), Offset(0), Normalized(normalized)
         {
@@ -72,7 +72,7 @@ namespace GLCore {
     class BufferLayout
     {
     public:
-        BufferLayout() {} // TODO - make default?
+        BufferLayout() {} // TODO: make default?
         BufferLayout(const std::initializer_list<BufferElement>& elements)
             : m_Elements(elements)
         {

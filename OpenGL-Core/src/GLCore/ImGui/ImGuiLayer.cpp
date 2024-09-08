@@ -56,7 +56,7 @@ namespace GLCore {
 
     void ImGuiLayer::OnImGuiRender()
     {
-        // TODO : for testing
+        // TODO: remove, using for testing
         static bool show = true;
         ImGui::ShowDemoWindow(&show);
     }
