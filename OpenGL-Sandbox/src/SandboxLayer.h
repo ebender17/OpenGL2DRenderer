@@ -20,5 +20,7 @@ private:
 
     std::shared_ptr<GLCore::Shader> m_BlueShader;
     std::shared_ptr<GLCore::VertexArray> m_QuadVertexArray;
+
+    GLCore::OrthographicCamera m_Camera;
 };
 
