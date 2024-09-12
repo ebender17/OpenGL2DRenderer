@@ -14,7 +14,11 @@
 #include "GLCore/ImGui/ImGuiLayer.h"
 
 #include "GLCore/Renderer/Renderer.h"
+#include "GLCore/Renderer/RenderCommand.h"
+
 #include "GLCore/Renderer/Buffer.h"
-#include "GLCore/Renderer/VertexArray.h"
 #include "GLCore/Renderer/Shader.h"
+#include "GLCore/Renderer/Texture.h"
+#include "GLCore/Renderer/VertexArray.h"
+
 #include "GLCore/Renderer/OrthographicCamera.h"

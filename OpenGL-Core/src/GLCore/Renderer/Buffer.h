@@ -13,7 +13,7 @@ namespace GLCore {
         Bool
     };
 
-    static uint32_t ShaderDaataTypeSize(ShaderDataType type)
+    static uint32_t ShaderDataTypeSize(ShaderDataType type)
     {
         switch (type)
         {
@@ -31,6 +31,7 @@ namespace GLCore {
         }
 
         GLCORE_ASSERT(false, "Unknown ShaderDataType!");
+        return 0;
     }
 
     struct BufferElement
@@ -43,7 +44,7 @@ namespace GLCore {
 
         BufferElement() {} // TODO: make default?
         BufferElement(ShaderDataType type, const std::string& name, bool normalized = false)
-            :Name(name), Type(type), Size(ShaderDaataTypeSize(type)), Offset(0), Normalized(normalized)
+            :Name(name), Type(type), Size(ShaderDataTypeSize(type)), Offset(0), Normalized(normalized)
         {
         }
 

@@ -20,6 +20,9 @@ private:
 
     GLCore::Ref<GLCore::Shader> m_FlatColorShader;
     GLCore::Ref<GLCore::VertexArray> m_QuadVertexArray;
+    
+    GLCore::Ref<GLCore::Shader> m_TextureShader;
+    GLCore::Ref<GLCore::Texture2D> m_Texture;
 
     GLCore::OrthographicCamera m_Camera;
 
