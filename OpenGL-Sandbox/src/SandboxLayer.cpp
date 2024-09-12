@@ -1,5 +1,12 @@
 #include "SandboxLayer.h"
 
+#include "Platform/OpenGL/OpenGLShader.h"
+
+#include <imgui/imgui.h>
+
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 using namespace GLCore;
 using namespace GLCore::Utils;
 
@@ -42,10 +49,10 @@ void SandboxLayer::OnAttach()
     m_QuadVertexArray.reset(VertexArray::Create());
     
     float quadVertices[3 * 4] = {
-        -0.75f, -0.75f, 0.0f,
-         0.75f, -0.75f, 0.0f,
-         0.75f,  0.75f, 0.0f,
-        -0.75f,  0.75f, 0.0f
+        -0.5f, -0.5f, 0.0f,
+         0.5f, -0.5f, 0.0f,
+         0.5f,  0.5f, 0.0f,
+        -0.5f,  0.5f, 0.0f
     };
 
     std::shared_ptr<VertexBuffer> quadVertexBuffer;
@@ -67,13 +74,14 @@ void SandboxLayer::OnAttach()
         layout(location = 1) in vec4 a_Color;
 
         uniform mat4 u_ViewProjection;
+        uniform mat4 u_Transform;
         
         out vec4 v_Color;
 
         void main()
         {
             v_Color = a_Color;
-            gl_Position = u_ViewProjection * vec4(a_Position, 1.0);
+            gl_Position = u_ViewProjection * u_Transform * vec4(a_Position, 1.0);
         }
     )";
 
@@ -90,33 +98,36 @@ void SandboxLayer::OnAttach()
         }
     )";
 
-    m_Shader.reset(new Shader(vertexSource, fragmentSource));
+    m_Shader.reset(GLCore::Shader::Create(vertexSource, fragmentSource));
 
-    std::string blueShaderVertexSource = R"(
+    std::string flatColorVertexSource = R"(
         #version 330 core
         
         layout(location = 0) in vec3 a_Position;
 
         uniform mat4 u_ViewProjection;
+        uniform mat4 u_Transform;
 
         void main()
         {
-            gl_Position = u_ViewProjection * vec4(a_Position, 1.0);
+            gl_Position = u_ViewProjection * u_Transform * vec4(a_Position, 1.0);
         }
     )";
 
-    std::string blueShaderFragmentSource = R"(
+    std::string flatColorFragmentSource = R"(
         #version 330 core
 
         layout(location = 0) out vec4 color;
 
+        uniform vec3 u_Color;
+
         void main()
         {
-            color = vec4(0.0549, 0.0824, 0.227, 1.0);
+            color = vec4(u_Color, 1.0);
         }
     )";
 
-    m_BlueShader.reset(new Shader(blueShaderVertexSource, blueShaderFragmentSource));
+    m_FlatColorShader.reset(GLCore::Shader::Create(flatColorVertexSource, flatColorFragmentSource));
 }
 
 void SandboxLayer::OnDetach()
@@ -149,7 +160,21 @@ void SandboxLayer::OnUpdate(Timestep timestep)
 
     Renderer::BeginScene(m_Camera);
 
-    Renderer::Submit(m_BlueShader, m_QuadVertexArray);
+    glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
+
+    std::dynamic_pointer_cast<OpenGLShader>(m_FlatColorShader)->Bind();
+    std::dynamic_pointer_cast<OpenGLShader>(m_FlatColorShader)->UploadUniformFloat3("u_Color", m_QuadColor);
+
+    for (int y = 0; y < 10; y++)
+    {
+        for (int x = 0; x < 10; x++)
+        {
+            glm::vec3 pos(x * 0.11f, y * 0.11f, 0.0f);
+            glm::mat4 transform = glm::translate(glm::mat4(1.0f), pos) * scale;
+            Renderer::Submit(m_FlatColorShader, m_QuadVertexArray, transform);
+        }
+    }
+
     Renderer::Submit(m_Shader, m_VertexArray);
 
     Renderer::EndScene();
@@ -157,4 +182,7 @@ void SandboxLayer::OnUpdate(Timestep timestep)
 
 void SandboxLayer::OnImGuiRender()
 {
+    ImGui::Begin("Settings");
+    ImGui::ColorEdit3("Square Color", glm::value_ptr(m_QuadColor));
+    ImGui::End();
 }
