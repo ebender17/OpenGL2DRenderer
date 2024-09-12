@@ -24,7 +24,7 @@ void SandboxLayer::OnAttach()
     EnableGLDebugging();
     SetGLDebugLogLevel(DebugLogLevel::Notification);
 
-    m_VertexArray.reset(VertexArray::Create());
+    m_VertexArray = VertexArray::Create();
 
     float vertices[3 * 7] = {
         -0.5f, -0.5f, 0.0f, 0.239f, 0.352f, 0.945f, 1.0f,
@@ -32,8 +32,7 @@ void SandboxLayer::OnAttach()
          0.0f,  0.5f, 0.0f, 0.886f, 0.952f, 0.960f, 1.0f
     };
 
-    std::shared_ptr<VertexBuffer> vertexBuffer;
-    vertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
+    Ref<VertexBuffer> vertexBuffer = VertexBuffer::Create(vertices, sizeof(vertices));
     BufferLayout layout = {
         { ShaderDataType::Float3, "a_Position" },
         { ShaderDataType::Float4, "a_Color"}
@@ -42,11 +41,10 @@ void SandboxLayer::OnAttach()
     m_VertexArray->AddVertexBuffer(vertexBuffer);
 
     uint32_t indices[3] = { 0, 1, 2 };
-    std::shared_ptr<IndexBuffer> indexBuffer;
-    indexBuffer.reset(IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
+    Ref<IndexBuffer> indexBuffer = IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t));
     m_VertexArray->SetIndexBuffer(indexBuffer);
 
-    m_QuadVertexArray.reset(VertexArray::Create());
+    m_QuadVertexArray = VertexArray::Create();
     
     float quadVertices[3 * 4] = {
         -0.5f, -0.5f, 0.0f,
@@ -55,16 +53,14 @@ void SandboxLayer::OnAttach()
         -0.5f,  0.5f, 0.0f
     };
 
-    std::shared_ptr<VertexBuffer> quadVertexBuffer;
-    quadVertexBuffer.reset(VertexBuffer::Create(quadVertices, sizeof(quadVertices)));
+    Ref<VertexBuffer> quadVertexBuffer = VertexBuffer::Create(quadVertices, sizeof(quadVertices));
     quadVertexBuffer->SetLayout({
         { ShaderDataType::Float3, "a_Position" }
     });
     m_QuadVertexArray->AddVertexBuffer(quadVertexBuffer);
 
     uint32_t quadIndices[6] = { 0, 1, 2, 2, 3, 0 };
-    std::shared_ptr<IndexBuffer> quadIndexBuffer;
-    quadIndexBuffer.reset(IndexBuffer::Create(quadIndices, sizeof(quadIndices) / sizeof(uint32_t)));
+    Ref<IndexBuffer> quadIndexBuffer = IndexBuffer::Create(quadIndices, sizeof(quadIndices) / sizeof(uint32_t));
     m_QuadVertexArray->SetIndexBuffer(quadIndexBuffer);
 
     std::string vertexSource = R"(
@@ -98,7 +94,7 @@ void SandboxLayer::OnAttach()
         }
     )";
 
-    m_Shader.reset(GLCore::Shader::Create(vertexSource, fragmentSource));
+    m_Shader = GLCore::Shader::Create(vertexSource, fragmentSource);
 
     std::string flatColorVertexSource = R"(
         #version 330 core
@@ -127,7 +123,7 @@ void SandboxLayer::OnAttach()
         }
     )";
 
-    m_FlatColorShader.reset(GLCore::Shader::Create(flatColorVertexSource, flatColorFragmentSource));
+    m_FlatColorShader = GLCore::Shader::Create(flatColorVertexSource, flatColorFragmentSource);
 }
 
 void SandboxLayer::OnDetach()

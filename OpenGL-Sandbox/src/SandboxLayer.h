@@ -15,11 +15,11 @@ public:
     virtual void OnUpdate(GLCore::Timestep timestep) override;
     virtual void OnImGuiRender() override;
 private:
-    std::shared_ptr<GLCore::Shader> m_Shader;
-    std::shared_ptr<GLCore::VertexArray> m_VertexArray;
+    GLCore::Ref<GLCore::Shader> m_Shader;
+    GLCore::Ref<GLCore::VertexArray> m_VertexArray;
 
-    std::shared_ptr<GLCore::Shader> m_FlatColorShader;
-    std::shared_ptr<GLCore::VertexArray> m_QuadVertexArray;
+    GLCore::Ref<GLCore::Shader> m_FlatColorShader;
+    GLCore::Ref<GLCore::VertexArray> m_QuadVertexArray;
 
     GLCore::OrthographicCamera m_Camera;
 
