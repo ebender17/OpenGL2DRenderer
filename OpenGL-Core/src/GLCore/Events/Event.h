@@ -30,6 +30,7 @@ namespace GLCore {
         EventCategoryMouse        = BIT(3),
         EventCategoryMouseButton  = BIT(4)
     };
+
 #define EVENT_CLASS_TYPE(type) static EventType GetStaticType() { return EventType::##type; }\
                                 virtual EventType GetEventType() const override { return GetStaticType(); }\
                                 virtual const char* GetName() const override { return #type; }
@@ -39,6 +40,8 @@ namespace GLCore {
     class Event
     {
     public:
+        virtual ~Event() = default;
+
         bool Handled = false;
 
         virtual EventType GetEventType() const = 0;

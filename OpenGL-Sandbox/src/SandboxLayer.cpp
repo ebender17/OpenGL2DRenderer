@@ -184,11 +184,8 @@ void SandboxLayer::OnEvent(Event& event)
 
 void SandboxLayer::OnUpdate(Timestep timestep)
 {
-    if (Input::IsKeyPressed(GLCORE_KEY_TAB))
+    if (Input::IsKeyPressed(Key::Tab))
         LOG_TRACE("Tab key is pressed!");
-
-    // auto [x, y] = Input::GetMousePosition();
-    // LOG_INFO("{0}, {1}", x, y);
 
     RenderCommand::SetClearColor({ 0.0f, 0.0f, 0.0f, 1 });
     RenderCommand::Clear();

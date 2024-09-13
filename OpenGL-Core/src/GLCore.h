@@ -9,7 +9,7 @@
 
 #include "GLCore/Core/Input.h"
 #include "GLCore/Core/KeyCodes.h"
-#include "GLCore/Core/MouseButtonCodes.h"
+#include "GLCore/Core/MouseCodes.h"
 
 #include "GLCore/ImGui/ImGuiLayer.h"
 

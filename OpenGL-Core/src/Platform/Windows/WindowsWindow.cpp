@@ -1,6 +1,8 @@
 #include "glpch.h"
 #include "WindowsWindow.h"
 
+#include "GLCore/Core/Input.h"
+
 #include "GLCore/Events/ApplicationEvent.h"
 #include "GLCore/Events/KeyEvent.h"
 #include "GLCore/Events/MouseEvent.h"
@@ -78,20 +80,20 @@ namespace GLCore {
                 {
                     case GLFW_PRESS:
                     {
-                        KeyPressedEvent event(key, 0);
+                        KeyPressedEvent event(static_cast<KeyCode>(key), 0);
                         data.EventCallback(event);
                         break;
                     }
                     case GLFW_RELEASE:
                     {
-                        KeyReleasedEvent event(key);
+                        KeyReleasedEvent event(static_cast<KeyCode>(key));
                         data.EventCallback(event);
                         break;
                     }
                     case GLFW_REPEAT:
                     {
                         // TODO : GLFW does not provide use with a repeat count although the Win32 API can.
-                        KeyPressedEvent event(key, 1);
+                        KeyPressedEvent event(static_cast<KeyCode>(key), 1);
                         data.EventCallback(event);
                         break;
                     }
@@ -106,13 +108,13 @@ namespace GLCore {
                 {
                     case GLFW_PRESS:
                     {
-                        MouseButtonPressedEvent event(button);
+                        MouseButtonPressedEvent event(static_cast<MouseCode>(button));
                         data.EventCallback(event);
                         break;
                     }
                     case GLFW_RELEASE:
                     {
-                        MouseButtonPressedEvent event(button);
+                        MouseButtonPressedEvent event(static_cast<MouseCode>(button));
                         data.EventCallback(event);
                         break;
                     }
