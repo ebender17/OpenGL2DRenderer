@@ -2,6 +2,8 @@
 
 #include "GLCore/Renderer/Texture.h"
 
+#include <glad/glad.h>
+
 namespace GLCore {
 
     class OpenGLTexture2D : public Texture2D
@@ -19,6 +21,7 @@ namespace GLCore {
         uint32_t m_Width;
         uint32_t m_Height;
         uint32_t m_RendererID;
+        GLenum m_InternalFormat, m_DataFormat;
     };
 
 }

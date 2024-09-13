@@ -23,6 +23,7 @@ private:
     
     GLCore::Ref<GLCore::Shader> m_TextureShader;
     GLCore::Ref<GLCore::Texture2D> m_Texture;
+    GLCore::Ref<GLCore::Texture2D> m_CharacterSprite;
 
     GLCore::OrthographicCamera m_Camera;
 

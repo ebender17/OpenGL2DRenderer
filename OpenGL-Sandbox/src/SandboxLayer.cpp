@@ -160,7 +160,9 @@ void SandboxLayer::OnAttach()
     )";
 
     m_TextureShader = Shader::Create(textureVertexSource, textureFragmentSource);
+
     m_Texture = Texture2D::Create("assets/textures/checkerboard.png");
+    m_CharacterSprite = Texture2D::Create("assets/textures/emily-pokemon-style.png");
 
     std::dynamic_pointer_cast<OpenGLShader>(m_TextureShader)->Bind();
     std::dynamic_pointer_cast<OpenGLShader>(m_TextureShader)->UploadUniformInt("u_Texture", 0);
@@ -192,7 +194,7 @@ void SandboxLayer::OnUpdate(Timestep timestep)
     RenderCommand::Clear();
 
     m_Camera.SetPosition({ 0.5f, 0.5f, 0.0f });
-    m_Camera.SetRotation(45.0f);
+    // m_Camera.SetRotation(45.0f);
 
     Renderer::BeginScene(m_Camera);
 
@@ -212,6 +214,8 @@ void SandboxLayer::OnUpdate(Timestep timestep)
     }
 
     m_Texture->Bind();
+    Renderer::Submit(m_TextureShader, m_QuadVertexArray);
+    m_CharacterSprite->Bind();
     Renderer::Submit(m_TextureShader, m_QuadVertexArray);
     // Renderer::Submit(m_Shader, m_VertexArray);
 
