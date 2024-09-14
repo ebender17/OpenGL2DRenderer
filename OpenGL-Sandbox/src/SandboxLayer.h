@@ -15,13 +15,11 @@ public:
     virtual void OnUpdate(GLCore::Timestep timestep) override;
     virtual void OnImGuiRender() override;
 private:
-    GLCore::Ref<GLCore::Shader> m_Shader;
-    GLCore::Ref<GLCore::VertexArray> m_VertexArray;
-
-    GLCore::Ref<GLCore::Shader> m_FlatColorShader;
     GLCore::Ref<GLCore::VertexArray> m_QuadVertexArray;
     
+    GLCore::Ref<GLCore::Shader> m_FlatColorShader;
     GLCore::Ref<GLCore::Shader> m_TextureShader;
+
     GLCore::Ref<GLCore::Texture2D> m_Texture;
     GLCore::Ref<GLCore::Texture2D> m_CharacterSprite;
 
