@@ -1,7 +1,7 @@
 #pragma once
 
 #include "GLCore/Core/Core.h"
-#include "Layer.h"
+#include "GLCore/Core/Layer.h"
 
 namespace GLCore{
 

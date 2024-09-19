@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core.h"
+#include "GLCore/Core/Core.h"
 #include "spdlog/spdlog.h"
 #include "spdlog/fmt/ostr.h"
 

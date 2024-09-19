@@ -1,7 +1,6 @@
 #pragma once
 
 #include "GLCore/Core/Layer.h"
-
 #include "GLCore/Events/ApplicationEvent.h"
 #include "GLCore/Events/KeyEvent.h"
 #include "GLCore/Events/MouseEvent.h"

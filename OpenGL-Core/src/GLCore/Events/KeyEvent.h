@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Event.h"
 #include "GLCore/Core/Input.h"
+#include "GLCore/Events/Event.h"
 
 namespace GLCore {
 

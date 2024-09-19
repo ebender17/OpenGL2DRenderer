@@ -1,8 +1,9 @@
 #include "glpch.h"
 #include "GLCore/Core/Input.h"
 
-#include <GLFW/glfw3.h>
 #include "GLCore/Core/Application.h"
+
+#include <GLFW/glfw3.h>
 
 namespace GLCore {
 

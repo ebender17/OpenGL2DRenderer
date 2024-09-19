@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Core.h"
-#include "Timestep.h"
+#include "GLCore/Core/Core.h"
+#include "GLCore/Core/Timestep.h"
 #include "GLCore/Events/Event.h"
 
 namespace GLCore {

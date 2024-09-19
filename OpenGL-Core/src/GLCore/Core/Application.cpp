@@ -1,8 +1,7 @@
 #include "glpch.h"
 #include "Application.h"
 
-#include "Log.h"
-#include "Input.h"
+#include "GLCore/Core/Log.h"
 #include "GLCore/Renderer/Renderer.h"
 
 #include <glfw/glfw3.h>

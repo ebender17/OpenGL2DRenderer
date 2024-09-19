@@ -2,13 +2,10 @@
 
 #include "Core.h"
 
-#include "LayerStack.h"
-#include "Timestep.h"
-#include "Window.h"
+#include "GLCore/Core/LayerStack.h"
+#include "GLCore/Core/Window.h"
 #include "GLCore/Events/Event.h"
 #include "GLCore/Events/ApplicationEvent.h"
-#include "GLCore/Events/KeyEvent.h"
-#include "GLCore/Events/MouseEvent.h"
 #include "GLCore/ImGui/ImGuiLayer.h"
 
 namespace GLCore {

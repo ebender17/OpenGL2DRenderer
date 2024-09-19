@@ -2,11 +2,9 @@
 #include "WindowsWindow.h"
 
 #include "GLCore/Core/Input.h"
-
 #include "GLCore/Events/ApplicationEvent.h"
 #include "GLCore/Events/KeyEvent.h"
 #include "GLCore/Events/MouseEvent.h"
-
 #include "Platform/OpenGL/OpenGLContext.h"
 
 namespace GLCore {

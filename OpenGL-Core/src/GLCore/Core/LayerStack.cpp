@@ -10,7 +10,10 @@ namespace GLCore {
     LayerStack::~LayerStack()
     {
         for (Layer* layer : m_Layers)
+        {
+            layer->OnDetach();
             delete layer;
+        }
     }
 
     // layers put before overlays and as the last layer
