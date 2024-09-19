@@ -11,7 +11,7 @@ using namespace GLCore;
 using namespace GLCore::Utils;
 
 SandboxLayer::SandboxLayer()
-    :m_Camera(-1.6f, 1.6f, -0.9f, 0.9f)
+    : m_CameraController(1280.0f / 720.f, true)
 {
 }
 
@@ -61,26 +61,19 @@ void SandboxLayer::OnDetach()
 
 void SandboxLayer::OnEvent(Event& event)
 {
-    if (event.GetEventType() == EventType::KeyPressed)
-    {
-        KeyPressedEvent& e = (KeyPressedEvent&)event;
-        // keycodes line up with ASCII so can cast to char to print char pressed
-        LOG_TRACE("{0}", (char)e.GetKeyCode());
-    }
+    m_CameraController.OnEvent(event);
 }
 
 void SandboxLayer::OnUpdate(Timestep timestep)
 {
-    if (Input::IsKeyPressed(Key::Tab))
-        LOG_TRACE("Tab key is pressed!");
+    // Update
+    m_CameraController.OnUpdate(timestep);
 
+    // Render
     RenderCommand::SetClearColor({ 0.0f, 0.0f, 0.0f, 1 });
     RenderCommand::Clear();
 
-    m_Camera.SetPosition({ 0.5f, 0.5f, 0.0f });
-    // m_Camera.SetRotation(45.0f);
-
-    Renderer::BeginScene(m_Camera);
+    Renderer::BeginScene(m_CameraController.GetCamera());
 
     glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 

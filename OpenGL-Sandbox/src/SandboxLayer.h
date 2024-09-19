@@ -23,7 +23,7 @@ private:
     GLCore::Ref<GLCore::Texture2D> m_Texture;
     GLCore::Ref<GLCore::Texture2D> m_CharacterSprite;
 
-    GLCore::OrthographicCamera m_Camera;
+    GLCore::OrthographicCameraController m_CameraController;
 
     glm::vec3 m_QuadColor = { 0.0549, 0.0824, 0.227 };
 };

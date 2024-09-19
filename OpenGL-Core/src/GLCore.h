@@ -22,3 +22,4 @@
 #include "GLCore/Renderer/VertexArray.h"
 
 #include "GLCore/Renderer/OrthographicCamera.h"
+#include "GLCore/Renderer/OrthographicCameraController.h"

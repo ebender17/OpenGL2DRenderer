@@ -9,8 +9,6 @@
 
 namespace GLCore {
 
-#define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
-
     Application* Application::s_Instance = nullptr;
 
     Application::Application(const std::string& name, uint32_t width, uint32_t height)
@@ -19,7 +17,7 @@ namespace GLCore {
         s_Instance = this;
 
         m_Window = std::unique_ptr<Window>(Window::Create({ name, width, height }));
-        m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
+        m_Window->SetEventCallback(GLCORE_BIND_EVENT_FN(Application::OnEvent));
 
         Renderer::Init();
 
@@ -54,7 +52,7 @@ namespace GLCore {
     void Application::OnEvent(Event& event)
     {
         EventDispatcher dispatcher(event);
-        dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose));
+        dispatcher.Dispatch<WindowCloseEvent>(GLCORE_BIND_EVENT_FN(Application::OnWindowClose));
 
         // iterate backwards to handle events
         for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();)
