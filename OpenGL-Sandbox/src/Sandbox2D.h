@@ -17,9 +17,6 @@ public:
 private:
     GLCore::OrthographicCameraController m_CameraController;
 
-    GLCore::Ref<GLCore::VertexArray> m_QuadVA;
-    GLCore::Ref<GLCore::Shader> m_FlatColorShader;
-
     glm::vec4 m_QuadColor = { 0.584f, 0.0f, 1.0f, 1.0f };
 };
 

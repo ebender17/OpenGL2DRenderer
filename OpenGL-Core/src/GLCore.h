@@ -14,6 +14,7 @@
 #include "GLCore/ImGui/ImGuiLayer.h"
 
 #include "GLCore/Renderer/Renderer.h"
+#include "GLCore/Renderer/Renderer2D.h"
 #include "GLCore/Renderer/RenderCommand.h"
 
 #include "GLCore/Renderer/Buffer.h"
