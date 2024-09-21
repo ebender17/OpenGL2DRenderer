@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RendererAPI.h"
+#include "GLCore/Renderer/RendererAPI.h"
 
 namespace GLCore {
 

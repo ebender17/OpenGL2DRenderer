@@ -1,11 +1,11 @@
 #include "glpch.h"
-#include "Log.h"
+#include "GLCore/Core/Log.h"
 
-#include "spdlog/sinks/stdout_color_sinks.h"
+#include <spdlog/sinks/stdout_color_sinks.h>
 
 namespace GLCore {
 
-    std::shared_ptr<spdlog::logger> Log::s_Logger;
+    Ref<spdlog::logger> Log::s_Logger;
 
     void Log::Init()
     {

@@ -1,12 +1,13 @@
 #include "glpch.h"
-#include "ImGuiLayer.h"
+#include "GLCore/ImGui/ImGuiLayer.h"
 
-#include "imgui.h"
-#include "backends/imgui_impl_glfw.h"
-#include "backends/imgui_impl_opengl3.h"
+#include <imgui.h>
+#include <backends/imgui_impl_glfw.h>
+#include <backends/imgui_impl_opengl3.h>
 
 #include "GLCore/Core/Application.h"
 
+// TODO : Temporary
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 

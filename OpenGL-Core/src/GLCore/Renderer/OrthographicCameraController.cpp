@@ -1,5 +1,5 @@
 #include "glpch.h"
-#include "OrthographicCameraController.h"
+#include "GLCore/Renderer/OrthographicCameraController.h"
 
 #include "GLCore/Core/Input.h"
 #include "GLCore/Core/KeyCodes.h"

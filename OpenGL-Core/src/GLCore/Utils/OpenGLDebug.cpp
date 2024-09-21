@@ -1,5 +1,5 @@
 #include "glpch.h"
-#include "OpenGLDebug.h"
+#include "GLCore/Utils/OpenGLDebug.h"
 
 namespace GLCore::Utils {
 

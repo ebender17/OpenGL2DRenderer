@@ -1,9 +1,9 @@
 #include "glpch.h"
 #include "Renderer2D.h"
 
-#include "VertexArray.h"
-#include "Shader.h"
-#include "RenderCommand.h"
+#include "GLCore/Renderer/VertexArray.h"
+#include "GLCore/Renderer/Shader.h"
+#include "GLCore/Renderer/RenderCommand.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 

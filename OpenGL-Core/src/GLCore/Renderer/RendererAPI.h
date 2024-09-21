@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 
-#include "VertexArray.h"
+#include "GLCore/Renderer/VertexArray.h"
 
 namespace GLCore {
 

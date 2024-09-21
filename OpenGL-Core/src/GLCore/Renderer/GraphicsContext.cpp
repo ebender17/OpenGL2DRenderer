@@ -1,25 +1,23 @@
 #include "glpch.h"
-#include "GLCore/Renderer/RendererAPI.h"
+#include "GLCore/Renderer/GraphicsContext.h"
 
-#include "Platform/OpenGL/OpenGLRendererAPI.h"
+#include "GLCore/Renderer/Renderer.h"
+#include "Platform/OpenGL/OpenGLContext.h"
 
 namespace GLCore {
-    
-    RendererAPI::API RendererAPI::s_API = RendererAPI::API::OpenGL;
 
-    Scope<RendererAPI> RendererAPI::Create()
+    Scope<GraphicsContext> GraphicsContext::Create(void* window)
     {
-        switch (s_API)
+        switch (Renderer::GetAPI())
         {
         case RendererAPI::API::None:
             GLCORE_ASSERT(false, "RendererAPI::None is currently not supported!");
             return nullptr;
         case RendererAPI::API::OpenGL:
-            return CreateScope<OpenGLRendererAPI>();
+            return CreateScope<OpenGLContext>(static_cast<GLFWwindow*>(window));
         }
 
         GLCORE_ASSERT(false, "Unknown RendererAPI!");
         return nullptr;
     }
-
 }
