@@ -2,7 +2,6 @@
 
 #include "GLCore/Renderer/OrthographicCamera.h"
 #include "GLCore/Core/Timestep.h"
-
 #include "GLCore/Events/ApplicationEvent.h"
 #include "GLCore/Events/MouseEvent.h"
 

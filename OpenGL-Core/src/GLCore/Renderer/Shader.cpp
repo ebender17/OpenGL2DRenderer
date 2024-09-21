@@ -1,7 +1,7 @@
 #include "glpch.h"
-#include "Shader.h"
+#include "GLCore/Renderer/Shader.h"
 
-#include "Renderer.h"
+#include "GLCore/Renderer/Renderer.h"
 #include "Platform/OpenGL/OpenGLShader.h"
 
 namespace GLCore {

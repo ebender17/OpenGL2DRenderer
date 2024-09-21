@@ -1,7 +1,7 @@
 #include "glpch.h"
-#include "VertexArray.h"
+#include "GLCore/Renderer/VertexArray.h"
 
-#include "Renderer.h"
+#include "GLCore/Renderer/Renderer.h"
 #include "Platform/OpenGL/OpenGLVertexArray.h"
 
 namespace GLCore {

@@ -43,7 +43,7 @@ namespace GLCore {
         // void* bc we do not want to tie the window to a specify library, for example a GLFWwindow
         virtual void* GetNativeWindow() const = 0;
 
-        static Window* Create(const WindowProps& props = WindowProps());
+        static Scope<Window> Create(const WindowProps& props = WindowProps());
     };
 
 }

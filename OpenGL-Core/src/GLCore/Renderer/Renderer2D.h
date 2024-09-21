@@ -1,7 +1,7 @@
 #pragma once
 
-#include "OrthographicCamera.h"
-#include "Texture.h"
+#include "GLCore/Renderer/OrthographicCamera.h"
+#include "GLCore/Renderer/Texture.h"
 
 namespace GLCore {
 

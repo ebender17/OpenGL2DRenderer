@@ -1,5 +1,5 @@
 #include "glpch.h"
-#include "Application.h"
+#include "GLCore/Core/Application.h"
 
 #include "GLCore/Core/Log.h"
 #include "GLCore/Renderer/Renderer.h"
@@ -15,7 +15,7 @@ namespace GLCore {
         GLCORE_ASSERT(!s_Instance, "Application already exists!");
         s_Instance = this;
 
-        m_Window = std::unique_ptr<Window>(Window::Create({ name, width, height }));
+        m_Window = Window::Create({ name, width, height });
         m_Window->SetEventCallback(GLCORE_BIND_EVENT_FN(Application::OnEvent));
 
         Renderer::Init();
@@ -26,6 +26,7 @@ namespace GLCore {
 
     Application::~Application()
     {
+        Renderer::Shutdown();
     }
 
     void Application::Run()

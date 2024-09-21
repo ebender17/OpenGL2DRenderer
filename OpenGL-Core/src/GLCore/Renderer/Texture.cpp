@@ -1,7 +1,7 @@
 #include "glpch.h"
-#include "Texture.h"
+#include "GLCore/Renderer/Texture.h"
 
-#include "Renderer.h"
+#include "GLCore/Renderer/Renderer.h"
 #include "Platform/OpenGL/OpenGLTexture.h"
 
 namespace GLCore {

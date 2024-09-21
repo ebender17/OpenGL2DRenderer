@@ -1,11 +1,7 @@
 #include "glpch.h"
-#include "LayerStack.h"
+#include "GLCore/Core/LayerStack.h"
 
 namespace GLCore {
-
-    LayerStack::LayerStack()
-    {
-    }
 
     LayerStack::~LayerStack()
     {

@@ -1,8 +1,7 @@
 #include "glpch.h"
-#include "Buffer.h"
+#include "GLCore/Renderer/Buffer.h"
 
-#include "Renderer.h"
-
+#include "GLCore/Renderer/Renderer.h"
 #include "Platform/OpenGL/OpenGLBuffer.h"
 
 namespace GLCore {

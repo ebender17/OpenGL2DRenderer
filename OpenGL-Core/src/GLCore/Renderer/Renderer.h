@@ -1,8 +1,8 @@
 #pragma once
 
-#include "OrthographicCamera.h"
-#include "RenderCommand.h"
-#include "Shader.h"
+#include "GLCore/Renderer/OrthographicCamera.h"
+#include "GLCore/Renderer/RenderCommand.h"
+#include "GLCore/Renderer/Shader.h"
 
 namespace GLCore {
 
@@ -10,6 +10,8 @@ namespace GLCore {
     {
     public:
         static void Init();
+        static void Shutdown();
+
         static void OnWindowResize(uint32_t width, uint32_t height);
 
         static void BeginScene(OrthographicCamera& camera);
