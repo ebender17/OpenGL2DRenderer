@@ -9,7 +9,7 @@
 
 namespace GLCore {
 
-    static bool s_GLFWInitialized = false;
+    static uint8_t s_GLFWWindowCount = 0;
 
     static void GLFWErrorCallback(int error, const char* description)
     {
@@ -37,15 +37,15 @@ namespace GLCore {
         m_Data.Width = props.Width;
         m_Data.Height = props.Height;
 
-        if (!s_GLFWInitialized)
+        if (s_GLFWWindowCount == 0)
         {
             int success = glfwInit();
             GLCORE_ASSERT(success, "Could not intialize GLFW!");
             glfwSetErrorCallback(GLFWErrorCallback);
-            s_GLFWInitialized = true;
         }
 
         m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
+        ++s_GLFWWindowCount;
 
         m_Context = CreateScope<OpenGLContext>(m_Window);
         m_Context->Init();
@@ -139,6 +139,13 @@ namespace GLCore {
     void WindowsWindow::Shutdown()
     {
         glfwDestroyWindow(m_Window);
+        --s_GLFWWindowCount;
+
+        if (--s_GLFWWindowCount == 0)
+        {
+            LOG_INFO("Terminating GLFW");
+            glfwTerminate();
+        }
     }
 
     void WindowsWindow::OnUpdate()
