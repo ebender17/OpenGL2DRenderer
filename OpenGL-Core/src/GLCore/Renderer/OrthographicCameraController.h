@@ -11,7 +11,7 @@ namespace GLCore {
     class OrthographicCameraController
     {
     public:
-        OrthographicCameraController(float aspectRatio, bool rotation = false);
+        OrthographicCameraController(float aspectRatio, bool rotation = false, float nearPlane = -1.0f, float farPlane = 1.0f);
 
         void OnUpdate(Timestep timestep);
         void OnEvent(Event& event);

@@ -18,5 +18,7 @@ private:
     GLCore::OrthographicCameraController m_CameraController;
 
     glm::vec4 m_QuadColor = { 0.584f, 0.0f, 1.0f, 1.0f };
+    
+    GLCore::Ref<GLCore::Texture2D> m_CheckerboardTexture;
 };
 
