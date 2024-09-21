@@ -39,10 +39,11 @@ namespace GLCore {
         std::string Name;
         ShaderDataType Type;
         uint32_t Size;
-        uint32_t Offset;
+        size_t Offset;
         bool Normalized;
 
-        BufferElement() {} // TODO: make default?
+        BufferElement() = default;
+
         BufferElement(ShaderDataType type, const std::string& name, bool normalized = false)
             :Name(name), Type(type), Size(ShaderDataTypeSize(type)), Offset(0), Normalized(normalized)
         {
@@ -73,7 +74,8 @@ namespace GLCore {
     class BufferLayout
     {
     public:
-        BufferLayout() {} // TODO: make default?
+        BufferLayout() = default;
+
         BufferLayout(const std::initializer_list<BufferElement>& elements)
             : m_Elements(elements)
         {
@@ -91,7 +93,7 @@ namespace GLCore {
     private:
         void CalculateOffsetsAndStride()
         {
-            uint32_t offset = 0;
+            size_t offset = 0;
             m_Stride = 0;
             for (auto& element : m_Elements)
             {
