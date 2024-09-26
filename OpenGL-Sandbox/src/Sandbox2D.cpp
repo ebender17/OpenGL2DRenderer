@@ -23,17 +23,28 @@ void Sandbox2D::OnDetach()
 
 void Sandbox2D::OnUpdate(GLCore::Timestep timestep)
 {
+    PROFILE_FUNCTION();
+
     // Update
-    m_CameraController.OnUpdate(timestep);
+    {
+        PROFILE_SCOPE("CameraController::OnUpdate");
+        m_CameraController.OnUpdate(timestep);
+    }
 
     // Render
-    RenderCommand::SetClearColor({ 0.0f, 0.0f, 0.0f, 1 });
-    RenderCommand::Clear();
+    {
+        PROFILE_SCOPE("Renderer Prep");
+        RenderCommand::SetClearColor({ 0.0f, 0.0f, 0.0f, 1 });
+        RenderCommand::Clear();
+    }
 
-    Renderer2D::BeginScene(m_CameraController.GetCamera());
-    Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 0.75f, 0.6f }, m_QuadColor);
-    Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 10.0f, 10.0f }, m_CheckerboardTexture, 5.0f, { 0.0f, 0.5f, 0.5f, 1.0f });
-    Renderer2D::EndScene();
+    {
+        PROFILE_SCOPE("Renderer Draw");
+        Renderer2D::BeginScene(m_CameraController.GetCamera());
+        Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 0.75f, 0.6f }, m_QuadColor);
+        Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 10.0f, 10.0f }, m_CheckerboardTexture, 5.0f, { 0.0f, 0.5f, 0.5f, 1.0f });
+        Renderer2D::EndScene();
+    }
 }
 
 void Sandbox2D::OnImGuiRender()

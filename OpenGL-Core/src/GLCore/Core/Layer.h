@@ -9,7 +9,7 @@ namespace GLCore {
     class Layer
     {
     public:
-        Layer(const std::string& name = "Layer");
+        Layer(const char* = "Layer");
         virtual ~Layer() = default;
 
         virtual void OnAttach() {}

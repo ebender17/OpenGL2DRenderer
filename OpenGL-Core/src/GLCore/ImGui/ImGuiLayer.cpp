@@ -55,13 +55,6 @@ namespace GLCore {
         ImGui::DestroyContext();
     }
 
-    void ImGuiLayer::OnImGuiRender()
-    {
-        // TODO: remove, using for testing
-        static bool show = true;
-        ImGui::ShowDemoWindow(&show);
-    }
-
     void ImGuiLayer::Begin()
     {
         ImGui_ImplOpenGL3_NewFrame();
