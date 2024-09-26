@@ -20,6 +20,8 @@ namespace GLCore {
 
     void Renderer2D::Init()
     {
+        PROFILE_FUNCTION();
+
         s_Data = new Renderer2DStorage();
         s_Data->QuadVertexArray = VertexArray::Create();
 
@@ -52,17 +54,23 @@ namespace GLCore {
 
     void Renderer2D::Shutdown()
     {
+        PROFILE_FUNCTION();
+
         delete s_Data;
     }
 
     void Renderer2D::BeginScene(const OrthographicCamera& camera)
     {
+        PROFILE_FUNCTION();
+
         s_Data->QuadShader->Bind();
         s_Data->QuadShader->SetMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
     }
 
     void Renderer2D::EndScene()
     {
+        PROFILE_FUNCTION();
+
     }
 
     void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
@@ -72,6 +80,8 @@ namespace GLCore {
 
     void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
     {
+        PROFILE_FUNCTION();
+
         s_Data->QuadShader->SetFloat4("u_Color", color);
         s_Data->WhiteTexture->Bind();
 
@@ -89,6 +99,8 @@ namespace GLCore {
 
     void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
     {
+        PROFILE_FUNCTION();
+
         s_Data->QuadShader->SetFloat("u_TilingFactor", tilingFactor);
         s_Data->QuadShader->SetFloat4("u_Color", tintColor);
         texture->Bind();

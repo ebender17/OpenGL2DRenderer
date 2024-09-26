@@ -35,6 +35,8 @@ namespace GLCore {
     OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height)
         : m_Width(width), m_Height(height)
     {
+        PROFILE_FUNCTION();
+
         // TODO : Support for other formats
         m_InternalFormat = GL_RGBA8;
         m_DataFormat = GL_RGBA;
@@ -50,9 +52,16 @@ namespace GLCore {
 
     OpenGLTexture2D::OpenGLTexture2D(const std::string& path)
     {
+        PROFILE_FUNCTION();
+
         int width, height, channels;
         stbi_set_flip_vertically_on_load(1);
-        stbi_uc* data = stbi_load(path.c_str(), &width, &height, &channels, 0);
+        stbi_uc* data = nullptr;
+        {
+            PROFILE_SCOPE("stbi load - OpenGLTexture2D::OpenGLTexture2D(const std::string&)");
+
+            data = stbi_load(path.c_str(), &width, &height, &channels, 0);
+        }
         GLCORE_ASSERT(data, "Failed to load image!");
         m_Width = width;
         m_Height = height;
@@ -86,11 +95,15 @@ namespace GLCore {
 
     OpenGLTexture2D::~OpenGLTexture2D()
     {
+        PROFILE_FUNCTION();
+
         glDeleteTextures(1, &m_RendererID);
     }
 
     void OpenGLTexture2D::SetData(void* data, uint32_t size)
     {
+        PROFILE_FUNCTION();
+
         // TODO : Support for other formats
         uint32_t bpp = m_DataFormat == GL_RGBA ? 4 : 3;
         GLCORE_ASSERT(size == m_Width * m_Height * bpp, "Data must be entire texture!");
@@ -99,6 +112,8 @@ namespace GLCore {
 
     void OpenGLTexture2D::Bind(uint32_t slot) const
     {
+        PROFILE_FUNCTION();
+
         glBindTextureUnit(slot, m_RendererID);
     }
 

@@ -14,11 +14,15 @@ Sandbox2D::Sandbox2D()
 
 void Sandbox2D::OnAttach()
 {
+    PROFILE_FUNCTION();
+
     m_CheckerboardTexture = Texture2D::Create("assets/textures/checkerboard.png");
 }
 
 void Sandbox2D::OnDetach()
 {
+    PROFILE_FUNCTION();
+
 }
 
 void Sandbox2D::OnUpdate(GLCore::Timestep timestep)
@@ -26,10 +30,7 @@ void Sandbox2D::OnUpdate(GLCore::Timestep timestep)
     PROFILE_FUNCTION();
 
     // Update
-    {
-        PROFILE_SCOPE("CameraController::OnUpdate");
-        m_CameraController.OnUpdate(timestep);
-    }
+    m_CameraController.OnUpdate(timestep);
 
     // Render
     {

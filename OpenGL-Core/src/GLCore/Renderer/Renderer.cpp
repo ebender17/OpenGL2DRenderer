@@ -10,6 +10,8 @@ namespace GLCore {
 
     void Renderer::Init()
     {
+        PROFILE_FUNCTION();
+
         RenderCommand::Init();
         Renderer2D::Init();
     }

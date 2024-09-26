@@ -15,6 +15,8 @@ namespace GLCore {
 
     void OrthographicCameraController::OnUpdate(Timestep timestep)
     {
+        PROFILE_FUNCTION();
+
         if (Input::IsKeyPressed(Key::A))
         {
             m_CameraPosition.x -= cos(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * timestep;
@@ -56,6 +58,8 @@ namespace GLCore {
 
     void OrthographicCameraController::OnEvent(Event& event)
     {
+        PROFILE_FUNCTION();
+
         EventDispatcher dispatcher(event);
         dispatcher.Dispatch<MouseScrolledEvent>(GLCORE_BIND_EVENT_FN(OrthographicCameraController::OnMouseScrolled));
         dispatcher.Dispatch<WindowResizeEvent>(GLCORE_BIND_EVENT_FN(OrthographicCameraController::OnWindowResized));
@@ -63,6 +67,8 @@ namespace GLCore {
 
     bool OrthographicCameraController::OnMouseScrolled(MouseScrolledEvent& event)
     {
+        PROFILE_FUNCTION();
+
         m_ZoomLevel -= event.GetYOffset() * 0.25f;
         m_ZoomLevel = std::max(m_ZoomLevel, 0.25f);
         m_Camera.SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
@@ -71,6 +77,8 @@ namespace GLCore {
 
     bool OrthographicCameraController::OnWindowResized(WindowResizeEvent& event)
     {
+        PROFILE_FUNCTION();
+
         m_AspectRatio = (float)event.GetWidth() / (float)event.GetHeight();
         m_Camera.SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
         return false;

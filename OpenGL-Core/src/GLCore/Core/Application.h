@@ -21,7 +21,7 @@ namespace GLCore {
         void OnEvent(Event& event);
 
         void PushLayer(Layer* layer);
-        void PushOverlay(Layer* layer);
+        void PushOverlay(Layer* overlay);
 
         inline Window& GetWindow() { return *m_Window; }
 
