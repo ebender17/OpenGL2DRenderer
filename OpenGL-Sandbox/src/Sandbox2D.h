@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GLCore.h"
+#include <GLCore.h>
 
 class Sandbox2D : public GLCore::Layer
 {

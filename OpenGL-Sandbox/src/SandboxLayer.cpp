@@ -1,6 +1,7 @@
 #include "SandboxLayer.h"
 
-#include "Platform/OpenGL/OpenGLShader.h"
+#include "Platform/OpenGL/Renderer/OpenGLShader.h"
+#include "Platform/OpenGL/Debug/OpenGLDebug.h"
 
 #include <imgui/imgui.h>
 
@@ -8,7 +9,6 @@
 #include <glm/gtc/type_ptr.hpp>
 
 using namespace GLCore;
-using namespace GLCore::Utils;
 
 SandboxLayer::SandboxLayer()
     : m_CameraController(1280.0f / 720.f, true)

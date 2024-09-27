@@ -1,7 +1,7 @@
 #include "glpch.h"
-#include "GLCore/Utils/OpenGLDebug.h"
+#include "Platform/OpenGL/Debug/OpenGLDebug.h"
 
-namespace GLCore::Utils {
+namespace GLCore {
 
     static DebugLogLevel s_DebugLogLevel = DebugLogLevel::HighAssert;
 

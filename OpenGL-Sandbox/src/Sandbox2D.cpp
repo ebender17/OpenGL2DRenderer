@@ -1,5 +1,7 @@
 #include "Sandbox2D.h"
 
+#include "Platform/OpenGL/Debug/OpenGLDebug.h"
+
 #include <imgui/imgui.h>
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -15,6 +17,9 @@ Sandbox2D::Sandbox2D()
 void Sandbox2D::OnAttach()
 {
     PROFILE_FUNCTION();
+
+    EnableGLDebugging();
+    SetGLDebugLogLevel(DebugLogLevel::Notification);
 
     m_CheckerboardTexture = Texture2D::Create("assets/textures/checkerboard.png");
 }

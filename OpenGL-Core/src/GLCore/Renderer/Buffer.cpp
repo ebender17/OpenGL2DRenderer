@@ -2,7 +2,7 @@
 #include "GLCore/Renderer/Buffer.h"
 
 #include "GLCore/Renderer/Renderer.h"
-#include "Platform/OpenGL/OpenGLBuffer.h"
+#include "Platform/OpenGL/Renderer/OpenGLBuffer.h"
 
 namespace GLCore {
 

@@ -5,7 +5,7 @@
 #include "GLCore/Events/ApplicationEvent.h"
 #include "GLCore/Events/KeyEvent.h"
 #include "GLCore/Events/MouseEvent.h"
-#include "Platform/OpenGL/OpenGLContext.h"
+#include "Platform/OpenGL/Renderer/OpenGLContext.h"
 
 namespace GLCore {
 

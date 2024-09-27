@@ -2,7 +2,7 @@
 #include "GLCore/Renderer/Shader.h"
 
 #include "GLCore/Renderer/Renderer.h"
-#include "Platform/OpenGL/OpenGLShader.h"
+#include "Platform/OpenGL/Renderer/OpenGLShader.h"
 
 namespace GLCore {
 

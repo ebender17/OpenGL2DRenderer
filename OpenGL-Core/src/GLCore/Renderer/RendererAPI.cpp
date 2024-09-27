@@ -1,7 +1,7 @@
 #include "glpch.h"
 #include "GLCore/Renderer/RendererAPI.h"
 
-#include "Platform/OpenGL/OpenGLRendererAPI.h"
+#include "Platform/OpenGL/Renderer/OpenGLRendererAPI.h"
 
 namespace GLCore {
     

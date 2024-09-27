@@ -1,7 +1,6 @@
 #pragma once
 
 #include <GLCore.h>
-#include <GLCoreUtils.h>
 
 class SandboxLayer : public GLCore::Layer
 {

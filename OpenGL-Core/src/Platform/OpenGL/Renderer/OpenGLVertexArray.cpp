@@ -1,5 +1,5 @@
 #include "glpch.h"
-#include "Platform/OpenGL/OpenGLVertexArray.h"
+#include "Platform/OpenGL/Renderer/OpenGLVertexArray.h"
 
 #include <glad/glad.h>
 

@@ -2,7 +2,7 @@
 #include "GLCore/Renderer/Texture.h"
 
 #include "GLCore/Renderer/Renderer.h"
-#include "Platform/OpenGL/OpenGLTexture.h"
+#include "Platform/OpenGL/Renderer/OpenGLTexture.h"
 
 namespace GLCore {
 
