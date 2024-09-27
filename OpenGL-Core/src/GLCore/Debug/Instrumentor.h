@@ -175,10 +175,29 @@ namespace GLCore {
 // TODO - place into a central config file where you can configure all project defines
 #define GLCORE_PROFILE 1
 #if GLCORE_PROFILE
+    // Resolve which function signature macro will be used.
+    #if defined(__GNUC__) || (defined(__MWERKS__) && (__MWERKS__ >= 0x3000)) || (defined(__ICC) && (__ICC >= 600)) || defined(__ghs__)
+        #define GL_FUNC_SIG __PRETTY_FUNCTION__
+    #elif defined(__DMC__) && (__DMC__ >= 0x810)
+        #define GL_FUNC_SIG __PRETTY_FUNCTION__
+    #elif (defined(__FUNCSIG__) || (_MSC_VER))
+        #define GL_FUNC_SIG __FUNCSIG__
+    #elif (defined(__INTEL_COMPILER) && (__INTEL_COMPILER >= 600)) || (defined(__IBMCPP__) && (__IBMCPP__ >= 500))
+        #define GL_FUNC_SIG __FUNCTION__
+    #elif defined(__BORLANDC__) && (__BORLANDC__ >= 0x550)
+        #define GL_FUNC_SIG __FUNC__
+    #elif defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901)
+        #define GL_FUNC_SIG __func__
+    #elif defined(__cplusplus) && (__cplusplus >= 201103)
+        #define GL_FUNC_SIG __func__
+    #else
+        #define GL_FUNC_SIG "GL_FUNC_SIG unknown!"
+    #endif
+
     #define PROFILE_BEGIN_SESSION(name, filepath) ::GLCore::Instrumentor::Get().BeginSession(name, filepath)
     #define PROFILE_END_SESSION() ::GLCore::Instrumentor::Get().EndSession()
     #define PROFILE_SCOPE(name) ::GLCore::InstrumentationTimer timer##__LINE__(name)
-    #define PROFILE_FUNCTION() PROFILE_SCOPE(__FUNCSIG__)
+    #define PROFILE_FUNCTION() PROFILE_SCOPE(GL_FUNC_SIG)
 #else
     #define PROFILE_BEGIN_SESSION(name, filepath)
     #define PROFILE_END_SESSION()

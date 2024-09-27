@@ -2,7 +2,7 @@
 #include "GLCore/Renderer/GraphicsContext.h"
 
 #include "GLCore/Renderer/Renderer.h"
-#include "Platform/OpenGL/OpenGLContext.h"
+#include "Platform/OpenGL/Renderer/OpenGLContext.h"
 
 namespace GLCore {
 
