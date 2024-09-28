@@ -136,6 +136,9 @@ namespace GLCore {
 
     void Renderer2D::Flush()
     {
+        if (s_Data.QuadIndexCount == 0)
+            return;
+
         uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase);
         s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, dataSize);
 

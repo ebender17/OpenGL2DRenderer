@@ -79,9 +79,9 @@ namespace GLCore {
         // iterate backwards to handle events
         for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();)
         {
-            (*--it)->OnEvent(event);
             if (event.Handled)
                 break;
+            (*--it)->OnEvent(event);
         }
     }
 
