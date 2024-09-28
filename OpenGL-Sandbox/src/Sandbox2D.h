@@ -21,5 +21,8 @@ private:
     
     GLCore::Ref<GLCore::Texture2D> m_CheckerboardTexture;
     GLCore::Ref<GLCore::Texture2D> m_PlayerTexture;
+    GLCore::Ref<GLCore::Texture2D> m_Tileset;
+
+    GLCore::Ref<GLCore::SubTexture2D> m_ExampleSubTexture;
 };
 

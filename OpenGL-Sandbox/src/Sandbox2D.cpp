@@ -23,6 +23,9 @@ void Sandbox2D::OnAttach()
 
     m_CheckerboardTexture = Texture2D::Create("assets/textures/checkerboard.png");
     m_PlayerTexture = Texture2D::Create("assets/textures/emily-pokemon-style.png");
+    m_Tileset = Texture2D::Create("assets/textures/TilesetFloor.png");
+
+    m_ExampleSubTexture = SubTexture2D::CreateFromCoords(m_Tileset, { 3, 3 }, { 16, 16 }, { 1, 2 });
 }
 
 void Sandbox2D::OnDetach()
@@ -52,7 +55,8 @@ void Sandbox2D::OnUpdate(GLCore::Timestep timestep)
         Renderer2D::DrawRotatedQuad({ 1.0f, 0.0f }, { 0.8f, 0.8f }, -45.0f, m_QuadColor);
         Renderer2D::DrawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8f }, { 0.8f, 0.2f, 0.3f, 1.0f });
         Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 20.0f, 20.0f }, m_CheckerboardTexture, 10.0f);
-        Renderer2D::DrawRotatedQuad({ -2.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, glm::radians(45.0f), m_PlayerTexture);
+        Renderer2D::DrawQuad({ -2.0f, 0.0f, 0.0f }, { 1.0f, 2.0f }, m_ExampleSubTexture);
+        Renderer2D::DrawRotatedQuad({ -2.0f, -2.0f, 0.0f }, { 1.0f, 1.0f }, glm::radians(45.0f), m_PlayerTexture);
 
         for (float y = -5.0f; y < 5.0f; y += 0.5f)
         {
