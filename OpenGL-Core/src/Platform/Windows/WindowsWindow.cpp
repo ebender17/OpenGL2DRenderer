@@ -47,7 +47,7 @@ namespace GLCore {
         {
             PROFILE_SCOPE("glfwInit");
             int success = glfwInit();
-            GLCORE_ASSERT(success, "Could not intialize GLFW!");
+            GLCORE_ASSERT(success, "Could not initialize GLFW!");
             glfwSetErrorCallback(GLFWErrorCallback);
         }
 
