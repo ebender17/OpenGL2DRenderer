@@ -3,11 +3,21 @@
 #include <memory>
 
 #ifdef GLCORE_DEBUG
-	#define GLCORE_ENABLE_ASSERTS
+    #if defined(GLCORE_PLATFORM_WINDOWS)
+        #define GLCORE_DEBUGBREAK() __debugbreak()
+    #elif defined(GLCORE_PLATFORM_LINUX)
+        #include <signal.h>
+        #define GLCORE_DEBUGBREAK() raise(SIGTRAP)
+    #else
+        #error "Platform doesn't support debugbreak yet!"
+    #endif
+    #define GLCORE_ENABLE_ASSERTS
+#else
+    #define GL_DEBUGBREAK()
 #endif
 
 #ifdef GLCORE_ENABLE_ASSERTS
-	#define GLCORE_ASSERT(x, ...) { if(!(x)) { LOG_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
+	#define GLCORE_ASSERT(x, ...) { if(!(x)) { LOG_ERROR("Assertion Failed: {0}", __VA_ARGS__); GLCORE_DEBUGBREAK(); } }
 #else
 	#define GLCORE_ASSERT(x, ...)
 #endif
