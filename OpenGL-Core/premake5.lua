@@ -22,7 +22,8 @@ project "OpenGL-Core"
 
     defines
     {
-        "_CRT_SECURE_NO_WARNINGS"
+        "_CRT_SECURE_NO_WARNINGS",
+        "GLFW_INCLUDE_NONE"
     }
 
     includedirs
@@ -49,8 +50,7 @@ project "OpenGL-Core"
 
         defines
         {
-            "GLCORE_PLATFORM_WINDOWS",
-            "GLFW_INCLUDE_NONE"
+            "GLCORE_PLATFORM_WINDOWS"
         }
 
     filter "configurations:Debug"

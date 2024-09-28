@@ -12,7 +12,7 @@ namespace GLCore {
     public:
         static void Init();
 
-        inline static Ref<spdlog::logger>& GetLogger() { return s_Logger; }
+        static Ref<spdlog::logger>& GetLogger() { return s_Logger; }
     private:
         static Ref<spdlog::logger> s_Logger;
     };

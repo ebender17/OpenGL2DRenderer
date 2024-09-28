@@ -4,7 +4,7 @@
 #include "GLCore/Core/Log.h"
 #include "GLCore/Renderer/Renderer.h"
 
-#include <glfw/glfw3.h>
+#include <GLFW/glfw3.h>
 
 namespace GLCore {
 
@@ -79,9 +79,9 @@ namespace GLCore {
         // iterate backwards to handle events
         for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();)
         {
-            (*--it)->OnEvent(event);
             if (event.Handled)
                 break;
+            (*--it)->OnEvent(event);
         }
     }
 
