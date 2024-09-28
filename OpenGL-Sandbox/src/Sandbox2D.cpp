@@ -22,6 +22,7 @@ void Sandbox2D::OnAttach()
     SetGLDebugLogLevel(DebugLogLevel::Notification);
 
     m_CheckerboardTexture = Texture2D::Create("assets/textures/checkerboard.png");
+    m_PlayerTexture = Texture2D::Create("assets/textures/emily-pokemon-style.png");
 }
 
 void Sandbox2D::OnDetach()
@@ -47,9 +48,10 @@ void Sandbox2D::OnUpdate(GLCore::Timestep timestep)
     {
         PROFILE_SCOPE("Renderer Draw");
         Renderer2D::BeginScene(m_CameraController.GetCamera());
-        Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 0.75f, 0.6f }, m_QuadColor);
-        Renderer2D::DrawQuad({ -0.5f, -0.5f }, { 1.0f, 1.0f }, { 0.0f, 0.25f, 0.75f, 1.0f  });
-        // Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 10.0f, 10.0f }, m_CheckerboardTexture, 5.0f, { 0.0f, 0.5f, 0.5f, 1.0f });
+        Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 3.0f, 3.0f }, m_QuadColor);
+        Renderer2D::DrawQuad({ -0.5f, -0.5f }, { 4.0f, 3.0f }, { 0.0f, 0.25f, 0.75f, 1.0f  });
+        Renderer2D::DrawQuad({ -2.5f, -2.5f, -0.1f }, { 5.0f, 5.0f }, m_CheckerboardTexture, 10.0f);
+        Renderer2D::DrawQuad({ -2.5f, -2.5f, 0.5f }, { 5.0f, 5.0f }, m_PlayerTexture, 1.0f, { 1.0f, 1.0f, 1.0f, 1.0f });
         // Renderer2D::DrawRotatedQuad({ -1.0f, 0.0f }, { 0.9f, 0.9f }, glm::radians(-25.0f), { 0.0f, 0.25f, 0.75f, 1.0f });
         Renderer2D::EndScene();
     }
