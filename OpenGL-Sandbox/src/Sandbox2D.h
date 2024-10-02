@@ -21,8 +21,11 @@ private:
     
     GLCore::Ref<GLCore::Texture2D> m_CheckerboardTexture;
     GLCore::Ref<GLCore::Texture2D> m_PlayerTexture;
-    GLCore::Ref<GLCore::Texture2D> m_Tileset;
+    GLCore::Ref<GLCore::Texture2D> m_TilesetWater;
+    GLCore::Ref<GLCore::Texture2D> m_TilesetGrass;
 
-    GLCore::Ref<GLCore::SubTexture2D> m_ExampleSubTexture;
+    uint32_t m_MapWidth;
+    uint32_t m_MapHeight;
+    std::unordered_map<char, GLCore::Ref<GLCore::SubTexture2D>> m_TextureMap;
 };
 
