@@ -100,6 +100,21 @@ void Sandbox2D::OnUpdate(GLCore::Timestep timestep)
                 else
                     Renderer2D::DrawQuad({ x, y, -0.05f }, { 1.0f, 1.0f }, m_TextureErrorColor);
             }
+        } */
+
+        // inner loop is x so we read memory how it is laid out in memory
+        for (uint32_t y = 0; y < m_MapHeight; y++)
+        {
+            for (uint32_t x = 0; x < m_MapWidth; x++)
+            {
+                char tileType = s_MapTiles[x + y + m_MapWidth];
+                Ref<SubTexture2D> texture;
+                if (m_TextureMap.find(tileType) != m_TextureMap.end())
+                    texture = m_TextureMap[tileType];
+                // TODO : else -> render error texture
+
+                Renderer2D::DrawQuad({ x - m_MapWidth / 2.0f, m_MapHeight - y - m_MapHeight / 2.0f, -0.05f }, { 1.0f, 1.0f }, texture);
+            }
         }
         Renderer2D::EndScene();
     }
