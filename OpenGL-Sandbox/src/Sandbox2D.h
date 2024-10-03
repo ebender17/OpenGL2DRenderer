@@ -18,14 +18,15 @@ private:
     GLCore::OrthographicCameraController m_CameraController;
 
     glm::vec4 m_QuadColor = { 0.584f, 0.0f, 1.0f, 1.0f };
+    glm::vec4 m_TextureErrorColor = { 0.992f, 0.242f, 0.707f, 1.0f };
     
-    GLCore::Ref<GLCore::Texture2D> m_CheckerboardTexture;
-    GLCore::Ref<GLCore::Texture2D> m_PlayerTexture;
-    GLCore::Ref<GLCore::Texture2D> m_TilesetWater;
-    GLCore::Ref<GLCore::Texture2D> m_TilesetGrass;
+    GLCore::Ref<GLCore::Texture2D> m_TrainerSpriteSheet;
+    GLCore::Ref<GLCore::SubTexture2D> m_TrainerTexture;
 
-    uint32_t m_MapWidth;
-    uint32_t m_MapHeight;
+    GLCore::Ref<GLCore::Texture2D> m_TilesetOutside;
+
+    uint32_t m_MapWidth = 0;
+    uint32_t m_MapHeight = 0;
     std::unordered_map<char, GLCore::Ref<GLCore::SubTexture2D>> m_TextureMap;
 };
 
