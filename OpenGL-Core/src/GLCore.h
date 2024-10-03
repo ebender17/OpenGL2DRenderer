@@ -20,6 +20,7 @@
 #include "GLCore/Renderer/Buffer.h"
 #include "GLCore/Renderer/Shader.h"
 #include "GLCore/Renderer/Texture.h"
+#include "GLCore/Renderer/SubTexture2D.h"
 #include "GLCore/Renderer/VertexArray.h"
 
 #include "GLCore/Renderer/OrthographicCamera.h"

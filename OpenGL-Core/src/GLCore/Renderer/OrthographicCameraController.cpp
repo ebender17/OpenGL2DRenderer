@@ -6,11 +6,13 @@
 
 namespace GLCore {
 
-    OrthographicCameraController::OrthographicCameraController(float aspectRatio, bool rotation, float nearPlane, float farPlane)
+    OrthographicCameraController::OrthographicCameraController(float aspectRatio, bool rotation, bool zoom, float nearPlane, float farPlane)
         : m_AspectRatio(aspectRatio),
-        m_Camera(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel, nearPlane, farPlane),
-        m_Rotation(rotation)
+        m_Bounds({ -m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel }),
+        m_Camera(m_Bounds.Left, m_Bounds.Right, m_Bounds.Bottom, m_Bounds.Top, nearPlane, farPlane),
+        m_Rotation(rotation), m_Zoom(zoom)
     {
+        CalculateView();
     }
 
     void OrthographicCameraController::OnUpdate(Timestep timestep)
@@ -65,13 +67,21 @@ namespace GLCore {
         dispatcher.Dispatch<WindowResizeEvent>(GLCORE_BIND_EVENT_FN(OrthographicCameraController::OnWindowResized));
     }
 
+    void OrthographicCameraController::CalculateView()
+    {
+        m_Bounds = { -m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel };
+        m_Camera.SetProjection(m_Bounds.Left, m_Bounds.Right, m_Bounds.Bottom, m_Bounds.Top);
+    }
+
     bool OrthographicCameraController::OnMouseScrolled(MouseScrolledEvent& event)
     {
         PROFILE_FUNCTION();
 
+        if (!m_Zoom) { return false; }
+
         m_ZoomLevel -= event.GetYOffset() * 0.25f;
         m_ZoomLevel = std::max(m_ZoomLevel, 0.25f);
-        m_Camera.SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
+        CalculateView();
         return false;
     }
 
@@ -80,7 +90,7 @@ namespace GLCore {
         PROFILE_FUNCTION();
 
         m_AspectRatio = (float)event.GetWidth() / (float)event.GetHeight();
-        m_Camera.SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
+        CalculateView();
         return false;
     }
 

@@ -9,8 +9,25 @@
 
 using namespace GLCore;
 
+static const uint32_t s_MapWidth = 24;
+static const char* s_MapTiles = 
+"WWWWWWWWWWWWWWWWWWWWWWWW"
+"WWWWWWWWWWWWWWWWWWWWWWWW"
+"WWWWWWWGGGGWWWWWWWWWWWWW"
+"WWWWWWGGGGGGGWWWWWWWWWWW"
+"WWWWWWGGGGGGGGGGWWWWWWWW"
+"WWWWWWWWGGGGGGWWWWWWWWWW"
+"WWWWWWWWWWWWWWWPPPWWWWWW"
+"WWWWWWWWWWWWWWWWWWWWWWWW"
+"WWWWWWWWWWWWWWWWWWWWWWWW"
+"WWWWWWWWWWWWWWWWWWWWWWWW"
+"WWWWWWWWWWWWWWWWWWWWWWWW"
+"WWWWWWWWWWWWWWWWWWWWWWWW"
+"WWWWWWWWWWWWWWWWWWWWWWWW"
+;
+
 Sandbox2D::Sandbox2D()
-    : Layer("Sandbox2D"), m_CameraController(1280.f / 720.0f, false, -2.0f, 2.0f)
+    : Layer("Sandbox2D"), m_CameraController(1280.f / 720.0f, false, false, -2.0f, 2.0f)
 {
 }
 
@@ -21,8 +38,19 @@ void Sandbox2D::OnAttach()
     EnableGLDebugging();
     SetGLDebugLogLevel(DebugLogLevel::Notification);
 
-    m_CheckerboardTexture = Texture2D::Create("assets/textures/checkerboard.png");
-    m_PlayerTexture = Texture2D::Create("assets/textures/emily-pokemon-style.png");
+    m_CameraController.SetZoomLevel(5.5f);
+
+    m_MapWidth = s_MapWidth;
+    m_MapHeight = strlen(s_MapTiles) / s_MapWidth;
+
+    m_TrainerSpriteSheet = Texture2D::Create("assets/textures/trainer-sapphire.png");
+    m_TrainerTexture = SubTexture2D::CreateFromCoords(m_TrainerSpriteSheet, { 0, 3 }, { 32, 48 }, { 1, 1 });
+    m_TilesetOutside = Texture2D::Create("assets/textures/outside.png");
+
+    // grass
+    m_TextureMap['G'] = SubTexture2D::CreateFromCoords(m_TilesetOutside, { 0, 5 }, { 32, 32 });
+    // water
+    m_TextureMap['W'] = SubTexture2D::CreateFromCoords(m_TilesetOutside, { 0, 15 }, {32, 32});
 }
 
 void Sandbox2D::OnDetach()
@@ -41,7 +69,7 @@ void Sandbox2D::OnUpdate(GLCore::Timestep timestep)
     // Render
     {
         PROFILE_SCOPE("Renderer Prep");
-        RenderCommand::SetClearColor({ 0.0f, 0.0f, 0.0f, 1 });
+        RenderCommand::SetClearColor({ 1.0f, 0.0f, 0.0f, 1 });
         RenderCommand::Clear();
     }
 
@@ -49,17 +77,18 @@ void Sandbox2D::OnUpdate(GLCore::Timestep timestep)
     {
         PROFILE_SCOPE("Renderer Draw");
         Renderer2D::BeginScene(m_CameraController.GetCamera());
-        Renderer2D::DrawRotatedQuad({ 1.0f, 0.0f }, { 0.8f, 0.8f }, -45.0f, m_QuadColor);
-        Renderer2D::DrawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8f }, { 0.8f, 0.2f, 0.3f, 1.0f });
-        Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 20.0f, 20.0f }, m_CheckerboardTexture, 10.0f);
-        Renderer2D::DrawRotatedQuad({ -2.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, glm::radians(45.0f), m_PlayerTexture);
+        Renderer2D::DrawQuad({ -2.0f, -2.0f, 0.0f }, { 1.0f, 1.0f }, m_TrainerTexture);
 
-        for (float y = -5.0f; y < 5.0f; y += 0.5f)
+        // inner loop is x so we read memory how it is laid out in memory
+        for (uint32_t y = 0; y < m_MapHeight; y++)
         {
-            for (float x = -5.0f; x < 5.0f; x += 0.5f)
+            for (uint32_t x = 0; x < m_MapWidth; x++)
             {
-                glm::vec4 color = { (x + 5.0f) / 10.0f, 0.6f, (y + 5.0f) / 10.0f, 0.7f };
-                Renderer2D::DrawQuad({ x, y }, { 0.45f, 0.45f }, color);
+                char tileType = s_MapTiles[x + y + m_MapWidth];
+                if (m_TextureMap.find(tileType) != m_TextureMap.end())
+                    Renderer2D::DrawQuad({ x - m_MapWidth / 2.0f, m_MapHeight - y - m_MapHeight / 2.0f, -0.05f }, { 1.0f, 1.0f }, m_TextureMap[tileType]);
+                else
+                    Renderer2D::DrawQuad({ x - m_MapWidth / 2.0f, m_MapHeight - y - m_MapHeight / 2.0f, -0.05f }, { 1.0f, 1.0f }, m_TextureErrorColor);
             }
         }
         Renderer2D::EndScene();
@@ -77,7 +106,7 @@ void Sandbox2D::OnImGuiRender()
     ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
     ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
 
-    ImGui::ColorEdit4("Quad Color", glm::value_ptr(m_QuadColor));
+    // ImGui::ColorEdit4("Quad Color", glm::value_ptr(m_QuadColor));
     ImGui::End();
 }
 
