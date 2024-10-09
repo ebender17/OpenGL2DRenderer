@@ -11,13 +11,13 @@ using namespace GLCore;
 
 static const uint32_t s_MapWidth = 24;
 static const char* s_MapTiles = 
-"WWWWWWWWWWWWWWWWWWWWWWWW"
+"PPWWWWWWWWWWWWWWWWWWWWWW"
 "WWWWWWWWWWWWWWWWWWWWWWWW"
 "WWWWWWWGGGGWWWWWWWWWWWWW"
 "WWWWWWGGGGGGGWWWWWWWWWWW"
 "WWWWWWGGGGGGGGGGWWWWWWWW"
 "WWWWWWWWGGGGGGWWWWWWWWWW"
-"WWWWWWWWWWWWWWWPPPWWWWWW"
+"WWWWWWWWWWWWWWWWWWWWWWWW"
 "WWWWWWWWWWWWWWWWWWWWWWWW"
 "WWWWWWWWWWWWWWWWWWWWWWWW"
 "WWWWWWWWWWWWWWWWWWWWWWWW"
@@ -44,13 +44,13 @@ void Sandbox2D::OnAttach()
     m_MapHeight = strlen(s_MapTiles) / s_MapWidth;
 
     m_TrainerSpriteSheet = Texture2D::Create("assets/textures/trainer-sapphire.png");
-    m_TrainerTexture = SubTexture2D::CreateFromCoords(m_TrainerSpriteSheet, { 0, 3 }, { 32, 48 }, { 1, 1 });
+    m_TrainerTexture = SubTexture2D::CreateFromCoords(m_TrainerSpriteSheet, { 0, 3 }, { 32, 48 });
     m_TilesetOutside = Texture2D::Create("assets/textures/outside.png");
 
     // grass
-    m_TextureMap['G'] = SubTexture2D::CreateFromCoords(m_TilesetOutside, { 0, 5 }, { 32, 32 });
+    m_TextureMap['G'] = SubTexture2D::CreateFromCoords(m_TilesetOutside, { 1, 501 }, { 32, 32 });
     // water
-    m_TextureMap['W'] = SubTexture2D::CreateFromCoords(m_TilesetOutside, { 0, 15 }, {32, 32});
+    m_TextureMap['W'] = SubTexture2D::CreateFromCoords(m_TilesetOutside, { 5, 300 }, {32, 32});
 }
 
 void Sandbox2D::OnDetach()
@@ -77,14 +77,14 @@ void Sandbox2D::OnUpdate(GLCore::Timestep timestep)
     {
         PROFILE_SCOPE("Renderer Draw");
         Renderer2D::BeginScene(m_CameraController.GetCamera());
-        Renderer2D::DrawQuad({ -2.0f, -2.0f, 0.0f }, { 1.0f, 1.0f }, m_TrainerTexture);
+        Renderer2D::DrawQuad({ -2.0f, -2.0f, 0.0f }, { 1.0f, 1.5f }, m_TrainerTexture);
 
         // inner loop is x so we read memory how it is laid out in memory
         for (uint32_t y = 0; y < m_MapHeight; y++)
         {
             for (uint32_t x = 0; x < m_MapWidth; x++)
             {
-                char tileType = s_MapTiles[x + y + m_MapWidth];
+                char tileType = s_MapTiles[x + y * m_MapWidth];
                 if (m_TextureMap.find(tileType) != m_TextureMap.end())
                     Renderer2D::DrawQuad({ x - m_MapWidth / 2.0f, m_MapHeight - y - m_MapHeight / 2.0f, -0.05f }, { 1.0f, 1.0f }, m_TextureMap[tileType]);
                 else

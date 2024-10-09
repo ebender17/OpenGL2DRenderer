@@ -11,7 +11,7 @@ public:
     virtual void OnAttach() override;
     virtual void OnDetach() override;
 
-    void OnUpdate(GLCore::Timestep timestep) override;
+    virtual void OnUpdate(GLCore::Timestep timestep) override;
     virtual void OnImGuiRender() override;
     virtual void OnEvent(GLCore::Event& event) override;
 private:
