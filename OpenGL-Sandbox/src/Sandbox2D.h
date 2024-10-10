@@ -2,6 +2,8 @@
 
 #include <GLCore.h>
 
+#include "2D/PlayerTopDown.h"
+
 class Sandbox2D : public GLCore::Layer
 {
 public:
@@ -20,8 +22,7 @@ private:
     glm::vec4 m_QuadColor = { 0.584f, 0.0f, 1.0f, 1.0f };
     glm::vec4 m_TextureErrorColor = { 0.992f, 0.242f, 0.707f, 1.0f };
     
-    GLCore::Ref<GLCore::Texture2D> m_TrainerSpriteSheet;
-    GLCore::Ref<GLCore::SubTexture2D> m_TrainerTexture;
+    GLCore::Ref<PlayerTopDown> m_Player;
 
     GLCore::Ref<GLCore::Texture2D> m_TilesetOutside;
 
