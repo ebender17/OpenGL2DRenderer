@@ -2,6 +2,8 @@
 
 #include <GLCore.h>
 
+#include "AnimatorTopDown.h"
+
 const uint16_t TILE_SIZE = 1; // TODO : pass this in somewhere
 
 class PlayerTopDown
@@ -19,12 +21,29 @@ public:
     void Move(GLCore::Timestep timestep);
 
     const glm::vec3& GetPosition() const { return m_Position; }
+
+    // TODO : move into a 'living being' anim object?
+    enum class PlayerState
+    {
+        IDLE = 0,
+        TURNING,
+        WALKING
+    };
+
+    enum class FacingDirection
+    {
+        DOWN = 0,
+        RIGHT,
+        UP,
+        LEFT
+    };
 private:
     glm::vec3 m_Position;
     const char* m_TextureFilepath;
 
     GLCore::Ref<GLCore::Texture2D> m_SpriteSheet;
     GLCore::Ref<GLCore::SubTexture2D> m_Sprite;
+    GLCore::Ref<AnimatorTopDown> m_Animator;
 
     float m_Speed = 4.0f;
     glm::vec3 m_InitialPosition;

@@ -14,6 +14,13 @@ PlayerTopDown::~PlayerTopDown()
 void PlayerTopDown::LoadAssets()
 {
     m_SpriteSheet = Texture2D::Create(m_TextureFilepath);
+
+    // TODO - left off here - add to Animator
+    // 1. Make the AnimationFrames (subtexture, timeafteranim)
+    // 2. Add the frames to a AnimationTopDown (name, loop) & add frames
+    // 3. Add the anims to Animator
+    // 4. Call animator.onupdate
+    // 5. Set active animation where needed on input
     m_Sprite = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 0, 3 }, { 32, 48 }); // TODO : change from hard-coded
 }
 
