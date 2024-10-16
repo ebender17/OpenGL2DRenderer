@@ -4,13 +4,13 @@ using namespace GLCore;
 
 /*----------Animation----------*/
 
-AnimationTopDown::AnimationTopDown(const char* name, bool loop)
+AnimationTopDown::AnimationTopDown(const std::string& name, bool loop)
     : m_Name(name), m_Loop(loop)
 {
     m_Frames.reserve(4);
 }
 
-void AnimationTopDown::AddFrame(const AnimationFrame& animationFrame)
+void AnimationTopDown::AddFrame(Ref<AnimationFrame> animationFrame)
 {
     m_Frames.emplace_back(animationFrame);
 }
@@ -38,7 +38,6 @@ void AnimationTopDown::OnUpdate(Timestep timestep)
             Stop();
         }
     }
-
 }
 
 void AnimationTopDown::Play()
@@ -55,15 +54,15 @@ void AnimationTopDown::Stop()
 
 /*----------Animator----------*/
 
-void AnimatorTopDown::AddAnimation(const char* name, const AnimationTopDown& animation)
+void AnimatorTopDown::AddAnimation(Ref<AnimationTopDown> animation)
 {
-    if (m_AnimationsMap.find(name) != m_AnimationsMap.end())
+    if (m_AnimationsMap.find(animation->GetName()) != m_AnimationsMap.end())
     {
         GLCORE_ASSERT(false, "Animation name already exists!");
         return;
     }
 
-    m_AnimationsMap[animation.GetName()] = CreateRef<AnimationTopDown>(animation);
+    m_AnimationsMap[animation->GetName()] = animation;
 }
 
 void AnimatorTopDown::OnUpdate(Timestep timestep)
@@ -72,8 +71,22 @@ void AnimatorTopDown::OnUpdate(Timestep timestep)
     m_ActiveAnimation->OnUpdate(timestep);
 }
 
-void AnimatorTopDown::SetActiveAnimation(const char* name)
+void AnimatorTopDown::SetActiveAnimation(const std::string& name)
 {
+    if (!m_ActiveAnimation)
+    {
+        if (m_AnimationsMap.find(name) != m_AnimationsMap.end())
+        {
+            m_ActiveAnimation = m_AnimationsMap[name];
+            m_ActiveAnimation->Play();
+        }
+        else
+        {
+            LOG_ERROR("Could not find animation!");
+        }
+        return;
+    }
+
     if (m_ActiveAnimation->GetName() == name) { return; }
 
     if (m_AnimationsMap.find(name) != m_AnimationsMap.end())
@@ -81,5 +94,9 @@ void AnimatorTopDown::SetActiveAnimation(const char* name)
         m_ActiveAnimation->Stop();
         m_ActiveAnimation = m_AnimationsMap[name];
         m_ActiveAnimation->Play();
+    }
+    else
+    {
+        LOG_ERROR("Could not find animation!");
     }
 }

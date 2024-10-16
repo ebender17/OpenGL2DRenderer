@@ -5,7 +5,7 @@
 struct AnimationFrame
 {
     GLCore::Ref<GLCore::SubTexture2D> SubTexture;
-    float TimeAfterFrame;
+    float TimeAfterFrame = 0.0f;
 
     AnimationFrame() = default;
 
@@ -18,18 +18,18 @@ struct AnimationFrame
 class AnimationTopDown
 {
 public:
-    AnimationTopDown(const char* name, bool loop);
+    AnimationTopDown(const std::string& name, bool loop);
 
-    void AddFrame(const AnimationFrame& animationFrame);
+    void AddFrame(GLCore::Ref<AnimationFrame> animationFrame);
 
     void OnUpdate(GLCore::Timestep timestep);
     
     void Play();
     void Stop();
 
-    const char* GetName() const { return m_Name; }
+    const std::string& GetName() const { return m_Name; }
 private:
-    const char* m_Name;
+    std::string m_Name; // TODO : Use enums instead of names?
     bool m_Loop;
     std::vector<GLCore::Ref<AnimationFrame>> m_Frames;
 
@@ -40,16 +40,17 @@ private:
 
 class AnimatorTopDown
 {
+public:
     AnimatorTopDown() = default;
     ~AnimatorTopDown() = default;
 
-    void AddAnimation(const char* name, const AnimationTopDown& animation);
+    void AddAnimation(GLCore::Ref<AnimationTopDown> animation);
 
     void OnUpdate(GLCore::Timestep timestep);
 
-    void SetActiveAnimation(const char* name);
+    void SetActiveAnimation(const std::string& name);
 private:
-    std::unordered_map<const char*, GLCore::Ref<AnimationTopDown>> m_AnimationsMap;
+    std::unordered_map<std::string, GLCore::Ref<AnimationTopDown>> m_AnimationsMap;
 
     GLCore::Ref<AnimationTopDown> m_ActiveAnimation;
     // TODO - then in here we have a reference to a sprite component
