@@ -4,7 +4,7 @@ using namespace GLCore;
 
 /*----------Animation----------*/
 
-AnimationTopDown::AnimationTopDown(const std::string& name, bool loop)
+AnimationTopDown::AnimationTopDown(const char* name, bool loop)
     : m_Name(name), m_Loop(loop)
 {
     m_Frames.reserve(4);
@@ -28,7 +28,7 @@ void AnimationTopDown::OnUpdate(Timestep timestep)
             m_TimeSinceLastFrame = 0.0f;
             m_CurrentFrameIndex++;
         }
-        else if ((m_CurrentFrameIndex + 1) > m_Frames.size() && m_Loop) // next index is not valid & loop
+        else if (m_Loop) // next index is not valid & loop
         {
             m_TimeSinceLastFrame = 0.0f;
             m_CurrentFrameIndex = 0;
@@ -67,11 +67,12 @@ void AnimatorTopDown::AddAnimation(Ref<AnimationTopDown> animation)
 
 void AnimatorTopDown::OnUpdate(Timestep timestep)
 {
+    // TODO : just call update on all animations? should check if playing or not in animation
     if (m_ActiveAnimation == nullptr) { return; }
     m_ActiveAnimation->OnUpdate(timestep);
 }
 
-void AnimatorTopDown::SetActiveAnimation(const std::string& name)
+void AnimatorTopDown::SetActiveAnimation(const char* name)
 {
     if (!m_ActiveAnimation)
     {

@@ -14,38 +14,109 @@ PlayerTopDown::~PlayerTopDown()
 void PlayerTopDown::LoadAssets()
 {
     m_SpriteSheet = Texture2D::Create(m_TextureFilepath);
-    m_IdleSprite = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 0, 3 }, { 32, 48 });
-    
-    // WALK FORWARD
-    std::string name = "walk-forward";
-    Ref<AnimationTopDown> walkForwardAnim = CreateRef<AnimationTopDown>(name, true);
-    Ref<AnimationFrame> walkForwardFrame = CreateRef<AnimationFrame>(m_IdleSprite, 2.0f);
-    walkForwardAnim->AddFrame(walkForwardFrame);
 
-    Ref<SubTexture2D> walkSpriteTwo = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 1, 3 }, { 32, 48 });
-    Ref<AnimationFrame> walkForwardFrameTwo = CreateRef<AnimationFrame>(walkSpriteTwo, 2.0f);
-    walkForwardAnim->AddFrame(walkForwardFrameTwo);
+    // TODO : Clean up setting up animations, create function
+    // IDLE DOWN
+    idleDownAnim = CreateRef<AnimationTopDown>("idle-down", true);
+    Ref<SubTexture2D> subTexture = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 0, 3 }, { 32, 48 });
+    Ref<AnimationFrame> frame = CreateRef<AnimationFrame>(subTexture, 0.0f);
+    idleDownAnim->AddFrame(frame);
 
-    Ref<SubTexture2D> walkSpriteThree = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 2, 3 }, { 32, 48 });
-    Ref<AnimationFrame> walkForwardFrameThree = CreateRef<AnimationFrame>(walkSpriteThree, 2.0f);
-    walkForwardAnim->AddFrame(walkForwardFrameThree);
+    // WALK DOWN
+    walkDownAnim = CreateRef<AnimationTopDown>("walk-down", true);
+    walkDownAnim->AddFrame(frame);
 
-    Ref<SubTexture2D> walkSpriteFour = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 3, 3 }, { 32, 48 });
-    Ref<AnimationFrame> walkForwardFrameFour = CreateRef<AnimationFrame>(walkSpriteFour, 2.0f);
-    walkForwardAnim->AddFrame(walkForwardFrameFour);
+    subTexture = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 1, 3 }, { 32, 48 });
+    frame = CreateRef<AnimationFrame>(subTexture, 0.15f);
+    walkDownAnim->AddFrame(frame);
+
+    subTexture = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 2, 3 }, { 32, 48 });
+    frame = CreateRef<AnimationFrame>(subTexture, 0.15f);
+    walkDownAnim->AddFrame(frame);
+
+    subTexture = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 3, 3 }, { 32, 48 });
+    frame = CreateRef<AnimationFrame>(subTexture, 0.15f);
+    walkDownAnim->AddFrame(frame);
+
+    // IDLE UP
+    idleUpAnim = CreateRef<AnimationTopDown>("idle-up", true);
+    subTexture = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 0, 0 }, { 32, 48 });
+    frame = CreateRef<AnimationFrame>(subTexture, 0.0f);
+    idleUpAnim->AddFrame(frame);
+
+    // WALK UP
+    walkUpAnim = CreateRef<AnimationTopDown>("walk-up", true);
+    walkDownAnim->AddFrame(frame);
+
+    subTexture = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 1, 0 }, { 32, 48 });
+    frame = CreateRef<AnimationFrame>(subTexture, 0.15f);
+    walkUpAnim->AddFrame(frame);
+
+    subTexture = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 2, 0 }, { 32, 48 });
+    frame = CreateRef<AnimationFrame>(subTexture, 0.15f);
+    walkUpAnim->AddFrame(frame);
+
+    subTexture = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 3, 0 }, { 32, 48 });
+    frame = CreateRef<AnimationFrame>(subTexture, 0.15f);
+    walkUpAnim->AddFrame(frame);
+
+    // IDLE LEFT
+    idleLeftAnim = CreateRef<AnimationTopDown>("idle-left", true);
+    subTexture = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 0, 2 }, { 32, 48 });
+    frame = CreateRef<AnimationFrame>(subTexture, 0.0f);
+    idleLeftAnim->AddFrame(frame);
+
+    // WALK LEFT
+    walkLeftAnim = CreateRef<AnimationTopDown>("walk-left", true);
+    walkLeftAnim->AddFrame(frame);
+
+    subTexture = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 1, 2 }, { 32, 48 });
+    frame = CreateRef<AnimationFrame>(subTexture, 0.15f);
+    walkLeftAnim->AddFrame(frame);
+
+    subTexture = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 2, 2 }, { 32, 48 });
+    frame = CreateRef<AnimationFrame>(subTexture, 0.15f);
+    walkLeftAnim->AddFrame(frame);
+
+    subTexture = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 3, 2 }, { 32, 48 });
+    frame = CreateRef<AnimationFrame>(subTexture, 0.15f);
+    walkLeftAnim->AddFrame(frame);
+
+    // IDLE RIGHT
+    idleRightAnim = CreateRef<AnimationTopDown>("idle-right", true);
+    subTexture = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 0, 1 }, { 32, 48 });
+    frame = CreateRef<AnimationFrame>(subTexture, 0.0f);
+    idleRightAnim->AddFrame(frame);
+
+    // WALK RIGHT
+    walkRightAnim = CreateRef<AnimationTopDown>("walk-right", true);
+    walkRightAnim->AddFrame(frame);
+
+    subTexture = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 1, 1 }, { 32, 48 });
+    frame = CreateRef<AnimationFrame>(subTexture, 0.15f);
+    walkRightAnim->AddFrame(frame);
+
+    subTexture = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 2, 1 }, { 32, 48 });
+    frame = CreateRef<AnimationFrame>(subTexture, 0.15f);
+    walkRightAnim->AddFrame(frame);
+
+    subTexture = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 3, 1 }, { 32, 48 });
+    frame = CreateRef<AnimationFrame>(subTexture, 0.15f);
+    walkRightAnim->AddFrame(frame);
 
     m_Animator = CreateRef<AnimatorTopDown>();
-    m_Animator->AddAnimation(walkForwardAnim);
+    m_Animator->AddAnimation(idleDownAnim);
+    m_Animator->AddAnimation(idleUpAnim);
+    m_Animator->AddAnimation(idleLeftAnim);
+    m_Animator->AddAnimation(idleRightAnim);
+    m_Animator->AddAnimation(walkDownAnim);
+    m_Animator->AddAnimation(walkUpAnim);
+    m_Animator->AddAnimation(walkLeftAnim);
+    m_Animator->AddAnimation(walkRightAnim);
 
     // TODO : replace where need to set animation
-    m_Animator->SetActiveAnimation(walkForwardAnim->GetName());
-
-    // TODO - left off here - add to Animator
-    // 1. Make the AnimationFrames (subtexture, timeafteranim)
-    // 2. Add the frames to a AnimationTopDown (name, loop) & add frames
-    // 3. Add the anims to Animator
-    // 4. Call animator.onupdate
-    // 5. Set active animation where needed on input
+    m_Direction = Direction::Down;
+    m_Animator->SetActiveAnimation(idleDownAnim->GetName());
 }
 
 void PlayerTopDown::OnUpdate(GLCore::Timestep timestep)
@@ -53,17 +124,33 @@ void PlayerTopDown::OnUpdate(GLCore::Timestep timestep)
     m_Animator->OnUpdate(timestep);
 
     if (!m_IsMoving)
+    {
         ProcessPlayerInput();
+    }
     else if (m_InputDirection != glm::vec2(0.0f))
+    {
+        switch (m_Direction)
+        {
+            case Direction::Down:
+                m_Animator->SetActiveAnimation(walkDownAnim->GetName());
+                break;
+            case Direction::Up:
+                m_Animator->SetActiveAnimation(walkUpAnim->GetName());
+                break;
+            case Direction::Left:
+                m_Animator->SetActiveAnimation(walkLeftAnim->GetName());
+                break;
+            case Direction::Right:
+                m_Animator->SetActiveAnimation(walkRightAnim->GetName());
+                break;
+        }
         Move(timestep);
-    else
-        m_IsMoving = false;
+    }
 }
 
 void PlayerTopDown::OnRender()
 {
-    // TODO : animate sprite & update based on facing position & state
-    Renderer2D::DrawQuad({ m_Position.x, m_Position.y, 0.5f }, { 1.0f, 1.5f }, m_IdleSprite);
+    Renderer2D::DrawQuad({ m_Position.x, m_Position.y, 0.5f }, { 1.0f, 1.5f }, m_Animator->GetCurrentFrame());
 }
 
 void PlayerTopDown::ProcessPlayerInput()
@@ -72,18 +159,22 @@ void PlayerTopDown::ProcessPlayerInput()
 
     if (m_InputDirection.y == 0 && Input::IsKeyPressed(Key::A))
     {
+        m_Direction = Direction::Left;
         m_InputDirection = { -1.0f, 0.0f };
     }
     if (m_InputDirection.y == 0 && Input::IsKeyPressed(Key::D))
     {
+        m_Direction = Direction::Right;
         m_InputDirection = { 1.0f, 0.0f };
     }
     if (m_InputDirection.x == 0 && Input::IsKeyPressed(Key::W))
     {
+        m_Direction = Direction::Up;
         m_InputDirection = { 0.0f, 1.0f };
     }
-    if (Input::IsKeyPressed(Key::S))
+    if (m_InputDirection.x == 0 && Input::IsKeyPressed(Key::S))
     {
+        m_Direction = Direction::Down;
         m_InputDirection = { 0.0f, -1.0f };
     }
 
@@ -92,6 +183,24 @@ void PlayerTopDown::ProcessPlayerInput()
         m_InitialPosition = m_Position;
         m_IsMoving = true;
     }
+    else
+    {
+        switch (m_Direction)
+        {
+        case Direction::Down:
+            m_Animator->SetActiveAnimation(idleDownAnim->GetName());
+            break;
+        case Direction::Up:
+            m_Animator->SetActiveAnimation(idleUpAnim->GetName());
+            break;
+        case Direction::Left:
+            m_Animator->SetActiveAnimation(idleLeftAnim->GetName());
+            break;
+        case Direction::Right:
+            m_Animator->SetActiveAnimation(idleRightAnim->GetName());
+            break;
+        }
+    }
 }
 
 void PlayerTopDown::Move(Timestep timestep)
@@ -99,9 +208,14 @@ void PlayerTopDown::Move(Timestep timestep)
     m_PercentMovedToNextTile += m_Speed * timestep;
     if (m_PercentMovedToNextTile >= 1.0)
     {
-        m_Position.x = m_InitialPosition.x + (TILE_SIZE * m_InputDirection.x);
-        m_Position.y = m_InitialPosition.y + (TILE_SIZE * m_InputDirection.y);
+        m_Position.x = m_InitialPosition.x + m_InputDirection.x;
+        m_Position.y = m_InitialPosition.y + m_InputDirection.y;
         m_PercentMovedToNextTile = 0.0f;
         m_IsMoving = false;
+    }
+    else
+    {
+        m_Position.x = m_InitialPosition.x + m_InputDirection.x * m_PercentMovedToNextTile;
+        m_Position.y = m_InitialPosition.y + m_InputDirection.y * m_PercentMovedToNextTile;
     }
 }
