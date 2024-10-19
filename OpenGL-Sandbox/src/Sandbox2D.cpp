@@ -11,19 +11,19 @@ using namespace GLCore;
 
 static const uint32_t s_MapWidth = 24;
 static const char* s_MapTiles = 
-"PPWWWWWWWWWWWWWWWWWWWWWW"
-"WWWWWWWWWWWWWWWWWWWWWWWW"
-"WWWWWWWGGGGWWWWWWWWWWWWW"
-"WWWWWWGGGGGGGWWWWWWWWWWW"
-"WWWWWWGGGGGGGGGGWWWWWWWW"
-"WWWWWWWWGGGGGGWWWWWWWWWW"
-"WWWWWWWWWWWWWWWWWWWWWWWW"
-"WWWWWWWWWWWWWWWWWWWWWWWW"
-"WWWWWWWWWWWWWWWWWWWWWWWW"
-"WWWWWWWWWWWWWWWWWWWWWWWW"
-"WWWWWWWWWWWWWWWWWWWWWWWW"
-"WWWWWWWWWWWWWWWWWWWWWWWW"
-"WWWWWWWWWWWWWWWWWWWWWWWW"
+"PPGGGGGGGGGGGGGGGGGGGGGG"
+"GGGGGGGGGGGGGGGGGGGGGGGG"
+"GGGGGGGGGGGGGGGGGGGGGGGG"
+"GGGGGGGGGWWWWGGGGGGGGGGG"
+"GGGGGGGGWWWWWWWGGGGGGGGG"
+"GGGGGGGWWWWWWWWWGGGGGGGG"
+"GGGGGGGWWWWWWWWWGGGGGGG"
+"GGGGGGGGWWWWWWWGGGGGGGGG"
+"GGGGGGGGGGWWWWWGGGGGGGGG"
+"GGGGGGGGGGGGGGGGGGGGGGGG"
+"GGGGGGGGGGGGGGGGGGGGGGGG"
+"GGGGGGGGGGGGGGGGGGGGGGGG"
+"GGGGGGGGGGGGGGGGGGGGGGGG"
 ;
 
 Sandbox2D::Sandbox2D()
@@ -43,14 +43,14 @@ void Sandbox2D::OnAttach()
     m_MapWidth = s_MapWidth;
     m_MapHeight = strlen(s_MapTiles) / s_MapWidth;
 
-    m_Player = CreateRef<PlayerTopDown>(glm::vec3(-2.0f, -2.0f, 0.5f), "assets/textures/trainer-sapphire.png");
+    m_Player = CreateRef<PlayerController>(glm::vec3(-2.0f, -2.0f, 0.5f), "assets/textures/trainer-sapphire.png");
     m_Player->LoadAssets();
     m_TilesetOutside = Texture2D::Create("assets/textures/outside.png");
 
     // grass
-    m_TextureMap['G'] = SubTexture2D::CreateFromCoords(m_TilesetOutside, { 1, 501 }, { 32, 32 });
+    m_TexCoordsMap['G'] = SubTexture2D::CreateFromCoords(m_TilesetOutside, { 1, 501 }, { 32, 32 });
     // water
-    m_TextureMap['W'] = SubTexture2D::CreateFromCoords(m_TilesetOutside, { 5, 300 }, {32, 32});
+    m_TexCoordsMap['W'] = SubTexture2D::CreateFromCoords(m_TilesetOutside, { 6, 414 }, {32, 32});
 }
 
 void Sandbox2D::OnDetach()
@@ -89,8 +89,8 @@ void Sandbox2D::OnUpdate(GLCore::Timestep timestep)
             for (uint32_t x = 0; x < m_MapWidth; x++)
             {
                 char tileType = s_MapTiles[x + y * m_MapWidth];
-                if (m_TextureMap.find(tileType) != m_TextureMap.end())
-                    Renderer2D::DrawQuad({ x - m_MapWidth / 2.0f, m_MapHeight - y - m_MapHeight / 2.0f, -0.05f }, { 1.0f, 1.0f }, m_TextureMap[tileType]);
+                if (m_TexCoordsMap.find(tileType) != m_TexCoordsMap.end())
+                    Renderer2D::DrawQuad({ x - m_MapWidth / 2.0f, m_MapHeight - y - m_MapHeight / 2.0f, -0.05f }, { 1.0f, 1.0f }, m_TexCoordsMap[tileType]->GetTexture(), m_TexCoordsMap[tileType]->GetTexCoords());
                 else
                     Renderer2D::DrawQuad({ x - m_MapWidth / 2.0f, m_MapHeight - y - m_MapHeight / 2.0f, -0.05f }, { 1.0f, 1.0f }, m_TextureErrorColor);
             }

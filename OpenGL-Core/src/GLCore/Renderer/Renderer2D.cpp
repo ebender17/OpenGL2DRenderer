@@ -171,36 +171,19 @@ namespace GLCore {
         DrawQuad(transform, color);
     }
 
-    void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture, float tilingFactor, const glm::vec4& color)
+    void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec2* texCoords, float tilingFactor, const glm::vec4& color)
     {
-        DrawQuad({ position.x, position.y, 0.0f }, size, texture, tilingFactor, color);
+        DrawQuad({ position.x, position.y, 0.0f }, size, texture, texCoords, tilingFactor, color);
     }
 
-    void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, float tilingFactor, const glm::vec4& color)
+    void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec2* texCoords, float tilingFactor, const glm::vec4& color)
     {
         PROFILE_FUNCTION();
 
         glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
             * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
-        DrawQuad(transform, texture, tilingFactor, color);
-    }
-
-    void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<SubTexture2D>& subtexture, float tilingFactor, const glm::vec4& color)
-    {
-        PROFILE_FUNCTION();
-
-        DrawQuad({ position.x, position.y, 0.0f }, size, subtexture, tilingFactor, color);
-    }
-
-    void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<SubTexture2D>& subtexture, float tilingFactor, const glm::vec4& color)
-    {
-        PROFILE_FUNCTION();
-
-        glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
-            * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
-
-        DrawQuad(transform, subtexture, tilingFactor, color);
+        DrawQuad(transform, texture, texCoords, tilingFactor, color);
     }
 
     void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color)
@@ -230,7 +213,7 @@ namespace GLCore {
         s_Data.Stats.QuadCount++;
     }
 
-    void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, float tilingFactor, const glm::vec4& color)
+    void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, const glm::vec2* texCoords, float tilingFactor, const glm::vec4& color)
     {
         PROFILE_FUNCTION();
 
@@ -238,7 +221,11 @@ namespace GLCore {
             NextBatch();
 
         const size_t quadVertexCount = 4;
-        const glm::vec2 textureCoords[] = { { 0.0f, 0.0f }, { 1.0f, 0.0f }, {1.0f, 1.0f }, { 0.0f, 1.0f } };
+        if (!texCoords)
+        {
+            const glm::vec2 defaultCoords[] = {{0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f}};
+            texCoords = defaultCoords; // TODO : check this works
+        }
 
         float textureIndex = 0.0f;
         // Searching if texture has already been submitted
@@ -266,7 +253,7 @@ namespace GLCore {
         {
             s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[i];
             s_Data.QuadVertexBufferPtr->Color = color;
-            s_Data.QuadVertexBufferPtr->TexCoord = textureCoords[i];
+            s_Data.QuadVertexBufferPtr->TexCoord = texCoords[i];
             s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
             s_Data.QuadVertexBufferPtr->TilingFactor = tilingFactor;
             s_Data.QuadVertexBufferPtr++;
@@ -275,56 +262,6 @@ namespace GLCore {
         s_Data.QuadIndexCount += 6;
 
         s_Data.Stats.QuadCount++;
-    }
-
-    void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<SubTexture2D>& subtexture, float tilingFactor, const glm::vec4& color)
-    {
-        PROFILE_FUNCTION();
-
-        // TODO : combine with the function above so we have one function?
-        if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
-            NextBatch();
-
-        const size_t quadVertexCount = 4;
-        const glm::vec2* textureCoords = subtexture->GetTexCoords();
-        const Ref<Texture2D> texture = subtexture->GetTexture();
-
-        float textureIndex = 0.0f;
-        // Searching if texture has already been submitted
-        for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
-        {
-            if (*s_Data.TextureSlots[i].get() == *texture.get())
-            {
-                textureIndex = (float)i;
-                break;
-            }
-        }
-
-        // If the texture index could not be found
-        if (textureIndex == 0.0f)
-        {
-            if (s_Data.TextureSlotIndex >= Renderer2DData::MaxTextureSlots)
-                NextBatch();
-
-            textureIndex = (float)s_Data.TextureSlotIndex;
-            s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
-            s_Data.TextureSlotIndex++;
-        }
-
-        for (size_t i = 0; i < quadVertexCount; i++)
-        {
-            s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[i];
-            s_Data.QuadVertexBufferPtr->Color = color;
-            s_Data.QuadVertexBufferPtr->TexCoord = textureCoords[i];
-            s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
-            s_Data.QuadVertexBufferPtr->TilingFactor = tilingFactor;
-            s_Data.QuadVertexBufferPtr++;
-        }
-
-        s_Data.QuadIndexCount += 6;
-
-        s_Data.Stats.QuadCount++;
-
     }
 
     void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const glm::vec4& color)
@@ -363,12 +300,12 @@ namespace GLCore {
         s_Data.Stats.QuadCount++;
     }
 
-    void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, float tilingFactor, const glm::vec4& color)
+    void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, const glm::vec2* texCoords, float tilingFactor, const glm::vec4& color)
     {
-        DrawRotatedQuad({ position.x, position.y, 0.0f }, size, rotation, texture, tilingFactor, color);
+        DrawRotatedQuad({ position.x, position.y, 0.0f }, size, rotation, texture, texCoords, tilingFactor, color);
     }
 
-    void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, float tilingFactor, const glm::vec4& color)
+    void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, const glm::vec2* texCoords, float tilingFactor, const glm::vec4& color)
     {
         PROFILE_FUNCTION();
 
@@ -376,25 +313,7 @@ namespace GLCore {
             * glm::rotate(glm::mat4(1.0f), rotation, { 0.0f, 0.0f, 1.0f })
             * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
-        DrawQuad(transform, texture, tilingFactor, color);
-    }
-
-    void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<SubTexture2D>& subtexture, float tilingFactor, const glm::vec4& color)
-    {
-        PROFILE_FUNCTION();
-
-        DrawRotatedQuad({ position.x, position.y, 0.0f }, size, rotation, subtexture, tilingFactor, color);
-    }
-
-    void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<SubTexture2D>& subtexture, float tilingFactor, const glm::vec4& color)
-    {
-        PROFILE_FUNCTION();
-
-        glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
-            * glm::rotate(glm::mat4(1.0f), rotation, { 0.0f, 0.0f, 1.0f })
-            * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
-
-        DrawQuad(transform, subtexture, tilingFactor, color);
+        DrawQuad(transform, texture, texCoords, tilingFactor, color);
     }
 
     void Renderer2D::ResetStats()

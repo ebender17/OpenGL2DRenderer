@@ -2,7 +2,7 @@
 
 #include <GLCore.h>
 
-#include "2D/PlayerTopDown.h"
+#include "2D/Player/PlayerController.h"
 
 class Sandbox2D : public GLCore::Layer
 {
@@ -22,12 +22,12 @@ private:
     glm::vec4 m_QuadColor = { 0.584f, 0.0f, 1.0f, 1.0f };
     glm::vec4 m_TextureErrorColor = { 0.992f, 0.242f, 0.707f, 1.0f };
     
-    GLCore::Ref<PlayerTopDown> m_Player;
+    GLCore::Ref<PlayerController> m_Player;
 
     GLCore::Ref<GLCore::Texture2D> m_TilesetOutside;
 
     uint32_t m_MapWidth = 0;
     uint32_t m_MapHeight = 0;
-    std::unordered_map<char, GLCore::Ref<GLCore::SubTexture2D>> m_TextureMap;
+    std::unordered_map<char, GLCore::Ref<GLCore::SubTexture2D>> m_TexCoordsMap;
 };
 

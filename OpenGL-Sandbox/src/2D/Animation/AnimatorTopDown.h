@@ -5,12 +5,12 @@
 struct AnimationFrame
 {
     GLCore::Ref<GLCore::SubTexture2D> SubTexture;
-    float TimeAfterFrame = 0.0f;
+    float FrameDuration = 0.0f;
 
     AnimationFrame() = default;
 
-    AnimationFrame(GLCore::Ref<GLCore::SubTexture2D> subTexture, float timeAfterFrame)
-        : SubTexture(subTexture), TimeAfterFrame(timeAfterFrame)
+    AnimationFrame(GLCore::Ref<GLCore::SubTexture2D> subTexture, float frameDuration)
+        : SubTexture(subTexture), FrameDuration(frameDuration)
     {
     }
 };
@@ -29,7 +29,7 @@ public:
 
     const char* GetName() const { return m_Name; }
 
-    GLCore::Ref<GLCore::SubTexture2D> GetCurrentFrame() { return m_Frames[m_CurrentFrameIndex]->SubTexture; }
+    GLCore::Ref<AnimationFrame> GetCurrentFrame() { return m_Frames[m_CurrentFrameIndex]; }
 private:
     const char* m_Name; // TODO : Use enums instead of names?
     bool m_Loop;
@@ -52,7 +52,7 @@ public:
 
     void SetActiveAnimation(const char* name);
 
-    GLCore::Ref<GLCore::SubTexture2D> GetCurrentFrame() { return m_ActiveAnimation->GetCurrentFrame(); }
+    GLCore::Ref<AnimationFrame> GetCurrentFrame() { return m_ActiveAnimation->GetCurrentFrame(); }
 private:
     std::unordered_map<const char*, GLCore::Ref<AnimationTopDown>> m_AnimationsMap;
 

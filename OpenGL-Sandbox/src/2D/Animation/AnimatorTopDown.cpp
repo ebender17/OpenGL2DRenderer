@@ -10,18 +10,18 @@ AnimationTopDown::AnimationTopDown(const char* name, bool loop)
     m_Frames.reserve(4);
 }
 
-void AnimationTopDown::AddFrame(Ref<AnimationFrame> animationFrame)
+void AnimationTopDown::AddFrame(const GLCore::Ref<AnimationFrame> animationFrame)
 {
     m_Frames.emplace_back(animationFrame);
 }
 
 void AnimationTopDown::OnUpdate(Timestep timestep)
 {
-    if (!m_IsRunning) { return; }
+    if (!m_IsRunning || m_Frames.empty()) { return; }
 
     m_TimeSinceLastFrame += timestep;
 
-    if (m_TimeSinceLastFrame > m_Frames[m_CurrentFrameIndex]->TimeAfterFrame) // time to change current frame
+    if (m_TimeSinceLastFrame > m_Frames[m_CurrentFrameIndex]->FrameDuration) // time to change current frame
     {
         if ((m_CurrentFrameIndex + 1) < m_Frames.size()) // next index is valid
         {
@@ -67,7 +67,6 @@ void AnimatorTopDown::AddAnimation(Ref<AnimationTopDown> animation)
 
 void AnimatorTopDown::OnUpdate(Timestep timestep)
 {
-    // TODO : just call update on all animations? should check if playing or not in animation
     if (m_ActiveAnimation == nullptr) { return; }
     m_ActiveAnimation->OnUpdate(timestep);
 }
@@ -83,7 +82,7 @@ void AnimatorTopDown::SetActiveAnimation(const char* name)
         }
         else
         {
-            LOG_ERROR("Could not find animation!");
+            LOG_ERROR("Could not find animation: {0}", std::string(name));
         }
         return;
     }
@@ -98,6 +97,6 @@ void AnimatorTopDown::SetActiveAnimation(const char* name)
     }
     else
     {
-        LOG_ERROR("Could not find animation!");
+        LOG_ERROR("Could not find animation: {0}", std::string(name));
     }
 }
