@@ -41,7 +41,6 @@ void PlayerController::LoadAssets()
     SetupAnimation(m_WalkRight, true, {32, 48}, 1, 4, 0.15f);
 
     m_Direction = Direction::Down;
-    m_Animator->SetActiveAnimation("");
 }
 
 void PlayerController::OnUpdate(GLCore::Timestep timestep)

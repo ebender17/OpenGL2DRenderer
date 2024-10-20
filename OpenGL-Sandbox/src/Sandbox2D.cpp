@@ -17,7 +17,7 @@ static const char* s_MapTiles =
 "GGGGGGGGGWWWWGGGGGGGGGGG"
 "GGGGGGGGWWWWWWWGGGGGGGGG"
 "GGGGGGGWWWWWWWWWGGGGGGGG"
-"GGGGGGGWWWWWWWWWGGGGGGG"
+"GGGGGGGWWWWWWWWWGGGGGGGG"
 "GGGGGGGGWWWWWWWGGGGGGGGG"
 "GGGGGGGGGGWWWWWGGGGGGGGG"
 "GGGGGGGGGGGGGGGGGGGGGGGG"
@@ -27,7 +27,7 @@ static const char* s_MapTiles =
 ;
 
 Sandbox2D::Sandbox2D()
-    : Layer("Sandbox2D"), m_CameraController(1280.f / 720.0f, false, false, -2.0f, 2.0f)
+    : Layer("Sandbox2D"), m_CameraController(CreateRef<TargetCameraController>(1280.f / 720.0f, -2.0f, 2.0f))
 {
 }
 
@@ -38,12 +38,16 @@ void Sandbox2D::OnAttach()
     EnableGLDebugging();
     SetGLDebugLogLevel(DebugLogLevel::Notification);
 
-    m_CameraController.SetZoomLevel(5.5f);
+    m_CameraController->SetZoomLevel(5.5f);
 
     m_MapWidth = s_MapWidth;
     m_MapHeight = strlen(s_MapTiles) / s_MapWidth;
 
-    m_Player = CreateRef<PlayerController>(glm::vec3(-2.0f, -2.0f, 0.5f), "assets/textures/trainer-sapphire.png");
+    // TODO : figure out the actual bounds we want, left off here
+    float mapBounds[4] = { 0.0f, m_MapWidth, 0.0f, m_MapHeight };
+    m_CameraController->SetBounds(mapBounds);
+
+    m_Player = CreateRef<PlayerController>(glm::vec3(0.0f, 0.0f, 0.5f), "assets/textures/trainer-sapphire.png");
     m_Player->LoadAssets();
     m_TilesetOutside = Texture2D::Create("assets/textures/outside.png");
 
@@ -65,9 +69,9 @@ void Sandbox2D::OnUpdate(GLCore::Timestep timestep)
 
     // Update
 
-    // TODO : New Camera Controller
-    /// m_CameraController.OnUpdate(timestep);
     m_Player->OnUpdate(timestep);
+    m_CameraController->SetTarget(m_Player->GetPosition());
+    m_CameraController->OnUpdate(timestep);
 
     // Render
     {
@@ -80,7 +84,7 @@ void Sandbox2D::OnUpdate(GLCore::Timestep timestep)
     {
         PROFILE_SCOPE("Renderer Draw");
         // TODO : New Camera Controller
-        Renderer2D::BeginScene(m_CameraController.GetCamera());
+        Renderer2D::BeginScene(m_CameraController->GetCamera());
         m_Player->OnRender();
 
         // inner loop is x so we read memory how it is laid out in memory
@@ -90,9 +94,11 @@ void Sandbox2D::OnUpdate(GLCore::Timestep timestep)
             {
                 char tileType = s_MapTiles[x + y * m_MapWidth];
                 if (m_TexCoordsMap.find(tileType) != m_TexCoordsMap.end())
-                    Renderer2D::DrawQuad({ x - m_MapWidth / 2.0f, m_MapHeight - y - m_MapHeight / 2.0f, -0.05f }, { 1.0f, 1.0f }, m_TexCoordsMap[tileType]->GetTexture(), m_TexCoordsMap[tileType]->GetTexCoords());
+                    // TODO : figure out where we want to start setting tiles & go back to flipping w/code below 
+                    // x - m_MapWidth / 2.0f, m_MapHeight - y - m_MapHeight / 2.0f
+                    Renderer2D::DrawQuad({ x, y, -0.05f }, { 1.0f, 1.0f }, m_TexCoordsMap[tileType]->GetTexture(), m_TexCoordsMap[tileType]->GetTexCoords());
                 else
-                    Renderer2D::DrawQuad({ x - m_MapWidth / 2.0f, m_MapHeight - y - m_MapHeight / 2.0f, -0.05f }, { 1.0f, 1.0f }, m_TextureErrorColor);
+                    Renderer2D::DrawQuad({ x, y, -0.05f }, { 1.0f, 1.0f }, m_TextureErrorColor);
             }
         }
         Renderer2D::EndScene();
@@ -116,6 +122,5 @@ void Sandbox2D::OnImGuiRender()
 
 void Sandbox2D::OnEvent(GLCore::Event& event)
 {
-    // TODO : New Camera Controller
-    // m_CameraController.OnEvent(event);
+    m_CameraController->OnEvent(event);
 }

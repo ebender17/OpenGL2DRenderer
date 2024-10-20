@@ -3,6 +3,7 @@
 #include <GLCore.h>
 
 #include "2D/Player/PlayerController.h"
+#include "2D/Camera/TargetCameraController.h"
 
 class Sandbox2D : public GLCore::Layer
 {
@@ -17,7 +18,7 @@ public:
     virtual void OnImGuiRender() override;
     virtual void OnEvent(GLCore::Event& event) override;
 private:
-    GLCore::OrthographicCameraController m_CameraController;
+    GLCore::Ref<TargetCameraController> m_CameraController;
 
     glm::vec4 m_QuadColor = { 0.584f, 0.0f, 1.0f, 1.0f };
     glm::vec4 m_TextureErrorColor = { 0.992f, 0.242f, 0.707f, 1.0f };
