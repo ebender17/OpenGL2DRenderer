@@ -4,10 +4,10 @@
 
 #include "Camera2DBaseController.h"
 
-class TargetCameraController : public Camera2DBaseController
+class TargetCamera2DController : public Camera2DBaseController
 {
 public:
-    TargetCameraController(float aspectRatio, float nearPlane = -1.0f, float farPlane = 1.0f);
+    TargetCamera2DController(float aspectRatio, float nearPlane = -1.0f, float farPlane = 1.0f);
 
     void OnUpdate(GLCore::Timestep timestep);
     virtual void OnEvent(GLCore::Event& event) override;

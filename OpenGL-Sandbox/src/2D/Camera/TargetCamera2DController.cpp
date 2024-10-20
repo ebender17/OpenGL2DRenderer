@@ -1,11 +1,11 @@
-#include "TargetCameraController.h"
+#include "TargetCamera2DController.h"
 
-TargetCameraController::TargetCameraController(float aspectRatio, float nearPlane, float farPlane)
+TargetCamera2DController::TargetCamera2DController(float aspectRatio, float nearPlane, float farPlane)
     : Camera2DBaseController(aspectRatio, nearPlane, farPlane), m_Target(0.0f)
 {
 }
 
-void TargetCameraController::OnUpdate(GLCore::Timestep timestep)
+void TargetCamera2DController::OnUpdate(GLCore::Timestep timestep)
 {
     Camera2DBaseController::OnUpdate(timestep);
 
@@ -18,7 +18,7 @@ void TargetCameraController::OnUpdate(GLCore::Timestep timestep)
     m_Camera.SetPosition({ m_Target.x, m_Target.y, 0.0f });
 }
 
-void TargetCameraController::OnEvent(GLCore::Event& event)
+void TargetCamera2DController::OnEvent(GLCore::Event& event)
 {
     Camera2DBaseController::OnEvent(event);
 

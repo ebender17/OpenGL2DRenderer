@@ -1,14 +1,14 @@
 #include "glpch.h"
-#include "OrthographicCameraController.h"
+#include "InputCamera2DController.h"
 
 using namespace GLCore;
 
-OrthographicCameraController::OrthographicCameraController(float aspectRatio, bool rotation, bool zoom, float nearPlane, float farPlane)
+InputCamera2DController::InputCamera2DController(float aspectRatio, bool rotation, bool zoom, float nearPlane, float farPlane)
     : Camera2DBaseController(aspectRatio, nearPlane, farPlane), m_Rotation(rotation), m_Zoom(zoom)
 {
 }
 
-void OrthographicCameraController::OnUpdate(GLCore::Timestep timestep)
+void InputCamera2DController::OnUpdate(GLCore::Timestep timestep)
 {
     Camera2DBaseController::OnUpdate(timestep);
 
@@ -51,15 +51,15 @@ void OrthographicCameraController::OnUpdate(GLCore::Timestep timestep)
     m_Camera.SetRotation(m_CameraRotation);
 }
 
-void OrthographicCameraController::OnEvent(GLCore::Event& event)
+void InputCamera2DController::OnEvent(GLCore::Event& event)
 {
     Camera2DBaseController::OnEvent(event);
 
     EventDispatcher dispatcher(event);
-    dispatcher.Dispatch<MouseScrolledEvent>(GLCORE_BIND_EVENT_FN(OrthographicCameraController::OnMouseScrolled));
+    dispatcher.Dispatch<MouseScrolledEvent>(GLCORE_BIND_EVENT_FN(InputCamera2DController::OnMouseScrolled));
 }
 
-bool OrthographicCameraController::OnMouseScrolled(GLCore::MouseScrolledEvent& event)
+bool InputCamera2DController::OnMouseScrolled(GLCore::MouseScrolledEvent& event)
 {
     PROFILE_FUNCTION();
 

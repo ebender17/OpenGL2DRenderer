@@ -27,7 +27,7 @@ static const char* s_MapTiles =
 ;
 
 Sandbox2D::Sandbox2D()
-    : Layer("Sandbox2D"), m_CameraController(CreateRef<TargetCameraController>(1280.f / 720.0f, -2.0f, 2.0f))
+    : Layer("Sandbox2D"), m_CameraController(CreateRef<TargetCamera2DController>(1280.f / 720.0f, -2.0f, 2.0f))
 {
 }
 
