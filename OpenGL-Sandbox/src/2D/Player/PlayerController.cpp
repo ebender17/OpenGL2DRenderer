@@ -17,37 +17,39 @@ void PlayerController::LoadAssets()
     m_Animator = CreateRef<AnimatorTopDown>();
 
     // IDLE DOWN
-    SetupAnimation(m_IdleDown, false, {32, 48}, 3, 1, 0.0f); // TODO : check false works here
+    SetupAnimation(m_IdleDown, false, {32, 48}, 3, 1, 0.0f);
 
     // WALK DOWN
     SetupAnimation(m_WalkDown, true, {32, 48}, 3, 4, 0.15f);
 
     // IDLE UP
-    SetupAnimation(m_IdleUp, false, {32, 48}, 0, 1, 0.0f); // TODO : check false works here
+    SetupAnimation(m_IdleUp, false, {32, 48}, 0, 1, 0.0f);
 
     // WALK UP
     SetupAnimation(m_WalkUp, true, {32, 48}, 0, 4, 0.15f);
 
     // IDLE LEFT
-    SetupAnimation(m_IdleLeft, false, {32, 48}, 2, 1, 0.0f); // TODO : check false works here
+    SetupAnimation(m_IdleLeft, false, {32, 48}, 2, 1, 0.0f);
 
     // WALK LEFT
     SetupAnimation(m_WalkLeft, true, {32, 48}, 2, 4, 0.15f);
 
     // IDLE RIGHT
-    SetupAnimation(m_IdleRight, false, {32, 48}, 1, 1, 0.0f); // TODO : check false works here
+    SetupAnimation(m_IdleRight, false, {32, 48}, 1, 1, 0.0f);
 
     // WALK RIGHT
     SetupAnimation(m_WalkRight, true, {32, 48}, 1, 4, 0.15f);
-
-    m_Direction = Direction::Down;
 }
 
 void PlayerController::OnUpdate(GLCore::Timestep timestep)
 {
     m_Animator->OnUpdate(timestep);
 
-    if (!isMoving)
+    if (m_PlayerState == PlayerState::Turning)
+    {
+
+    }
+    else if (m_PlayerState == PlayerState::Idle)
     {
         ProcessPlayerInput();
     }
@@ -80,33 +82,56 @@ void PlayerController::OnRender()
 
 void PlayerController::ProcessPlayerInput()
 {
+    Direction newDirection = Direction::Down;
     m_InputDirection = glm::vec2(0.0f);
 
     if (m_InputDirection.y == 0 && Input::IsKeyPressed(Key::A))
     {
-        m_Direction = Direction::Left;
+        newDirection = Direction::Left;
         m_InputDirection = { -1.0f, 0.0f };
     }
     if (m_InputDirection.y == 0 && Input::IsKeyPressed(Key::D))
     {
-        m_Direction = Direction::Right;
+        newDirection = Direction::Right;
         m_InputDirection = { 1.0f, 0.0f };
     }
     if (m_InputDirection.x == 0 && Input::IsKeyPressed(Key::W))
     {
-        m_Direction = Direction::Up;
+        newDirection = Direction::Up;
         m_InputDirection = { 0.0f, 1.0f };
     }
     if (m_InputDirection.x == 0 && Input::IsKeyPressed(Key::S))
     {
-        m_Direction = Direction::Down;
+        newDirection = Direction::Down;
         m_InputDirection = { 0.0f, -1.0f };
     }
 
     if (m_InputDirection != glm::vec2(0.0f))
     {
+        if (newDirection != m_Direction)
+        {
+            m_PlayerState = PlayerState::Turning; // TODO : need to set to Idle at the end of 'turning' animation
+            m_Direction = newDirection;
+            // TODO : this below is duplicate code so clean this up
+            switch (m_Direction)
+            {
+            case Direction::Down:
+                m_Animator->SetActiveAnimation(m_IdleDown);
+                break;
+            case Direction::Up:
+                m_Animator->SetActiveAnimation(m_IdleUp);
+                break;
+            case Direction::Left:
+                m_Animator->SetActiveAnimation(m_IdleLeft);
+                break;
+            case Direction::Right:
+                m_Animator->SetActiveAnimation(m_IdleRight);
+                break;
+            }
+            return;
+        }
         m_InitialPosition = m_Position;
-        isMoving = true;
+        m_PlayerState = PlayerState::Walking;
     }
     else
     {
@@ -136,7 +161,7 @@ void PlayerController::Move(Timestep timestep)
         m_Position.x = m_InitialPosition.x + m_InputDirection.x;
         m_Position.y = m_InitialPosition.y + m_InputDirection.y;
         m_PercentMovedToNextTile = 0.0f;
-        isMoving = false;
+        m_PlayerState = PlayerState::Idle;
     }
     else
     {
@@ -151,8 +176,15 @@ void PlayerController::SetupAnimation(const char* animationName, bool isLoop, co
     for (int i = 0; i < frameCount; i++)
     {
         auto subTexture = SubTexture2D::CreateFromCoords(m_SpriteSheet, { i, row }, spriteSize);
-        Ref<AnimationFrame> frame = CreateRef<AnimationFrame>(subTexture, frameDuration); // TODO : frame duration for each frame
+        Ref<AnimationFrame> frame = CreateRef<AnimationFrame>(subTexture, frameDuration);
         animation->AddFrame(frame);
     }
+    animation->SetAnimationEndCallback(std::bind(OnAnimationEnd, this)); // TODO : can pass in unique callbacks if needed
     m_Animator->AddAnimation(animation);
+}
+
+void PlayerController::OnAnimationEnd()
+{
+    if (m_PlayerState == PlayerState::Turning)
+        m_PlayerState == PlayerState::Idle;
 }

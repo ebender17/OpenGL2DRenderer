@@ -7,6 +7,13 @@
 class PlayerController
 {
 public:
+    enum class PlayerState
+    {
+        Idle = 0,
+        Turning,
+        Walking
+    };
+
     enum class Direction
     {
         Down = 0,
@@ -23,19 +30,19 @@ public:
     void OnUpdate(GLCore::Timestep timestep);
     void OnRender();
 
-    void ProcessPlayerInput();
-    void Move(GLCore::Timestep timestep);
-
     const glm::vec3& GetPosition() const { return m_Position; }
 private:
+    void ProcessPlayerInput();
+    void Move(GLCore::Timestep timestep);
     void SetupAnimation(const char* animationName, bool isLoop, const glm::vec2& spriteSize, unsigned int row, size_t frameCount, float frameDuration);
+    void OnAnimationEnd();
 private:
     glm::vec3 m_Position;
     const char* m_TextureFilepath;
 
     GLCore::Ref<GLCore::Texture2D> m_SpriteSheet;
     GLCore::Ref<AnimatorTopDown> m_Animator;
-    bool isMoving = false;
+    PlayerState m_PlayerState = PlayerState::Idle;
 
     float m_Speed = 5.0f;
     glm::vec3 m_InitialPosition;
