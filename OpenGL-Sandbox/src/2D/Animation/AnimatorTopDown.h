@@ -27,7 +27,7 @@ public:
     void Play();
     void Stop();
 
-    void SetAnimationEndCallback(const std::function<void()>& callback) { m_OnAnimationEnd = callback; }
+    void SetAnimationStopCallback(const std::function<void()>& callback) { m_OnAnimationStop = callback; }
 
     const char* GetName() const { return m_Name; }
     GLCore::Ref<AnimationFrame> GetCurrentFrame() { return m_Frames[m_CurrentFrameIndex]; }
@@ -35,7 +35,7 @@ private:
     const char* m_Name; // TODO : Use enums instead of names?
     bool m_Loop;
     std::vector<GLCore::Ref<AnimationFrame>> m_Frames;
-    std::function<void()> m_OnAnimationEnd; // TODO : trigger this in Stop()? what about loops? Also need to setup ability to bind this func to another function
+    std::function<void()> m_OnAnimationStop;
 
     bool m_IsRunning = false;
     float m_TimeSinceLastFrame = 0.0f;

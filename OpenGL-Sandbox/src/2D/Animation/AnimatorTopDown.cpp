@@ -50,7 +50,7 @@ void AnimationTopDown::Stop()
     m_IsRunning = false;
     m_TimeSinceLastFrame = 0.0f;
     m_CurrentFrameIndex = 0;
-    m_OnAnimationEnd();
+    m_OnAnimationStop();
 }
 
 /*----------Animator----------*/

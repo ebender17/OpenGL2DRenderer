@@ -17,25 +17,25 @@ void PlayerController::LoadAssets()
     m_Animator = CreateRef<AnimatorTopDown>();
 
     // IDLE DOWN
-    SetupAnimation(m_IdleDown, false, {32, 48}, 3, 1, 0.0f);
+    SetupAnimation(m_IdleDown, false, {32, 48}, 3, 1, 0.1f);
 
     // WALK DOWN
     SetupAnimation(m_WalkDown, true, {32, 48}, 3, 4, 0.15f);
 
     // IDLE UP
-    SetupAnimation(m_IdleUp, false, {32, 48}, 0, 1, 0.0f);
+    SetupAnimation(m_IdleUp, false, {32, 48}, 0, 1, 0.1f);
 
     // WALK UP
     SetupAnimation(m_WalkUp, true, {32, 48}, 0, 4, 0.15f);
 
     // IDLE LEFT
-    SetupAnimation(m_IdleLeft, false, {32, 48}, 2, 1, 0.0f);
+    SetupAnimation(m_IdleLeft, false, {32, 48}, 2, 1, 0.1f);
 
     // WALK LEFT
     SetupAnimation(m_WalkLeft, true, {32, 48}, 2, 4, 0.15f);
 
     // IDLE RIGHT
-    SetupAnimation(m_IdleRight, false, {32, 48}, 1, 1, 0.0f);
+    SetupAnimation(m_IdleRight, false, {32, 48}, 1, 1, 0.1f);
 
     // WALK RIGHT
     SetupAnimation(m_WalkRight, true, {32, 48}, 1, 4, 0.15f);
@@ -46,30 +46,12 @@ void PlayerController::OnUpdate(GLCore::Timestep timestep)
     m_Animator->OnUpdate(timestep);
 
     if (m_PlayerState == PlayerState::Turning)
-    {
-
-    }
+        return;
     else if (m_PlayerState == PlayerState::Idle)
-    {
         ProcessPlayerInput();
-    }
     else if (m_InputDirection != glm::vec2(0.0f))
     {
-        switch (m_Direction)
-        {
-            case Direction::Down:
-                m_Animator->SetActiveAnimation(m_WalkDown);
-                break;
-            case Direction::Up:
-                m_Animator->SetActiveAnimation(m_WalkUp);
-                break;
-            case Direction::Left:
-                m_Animator->SetActiveAnimation(m_WalkLeft);
-                break;
-            case Direction::Right:
-                m_Animator->SetActiveAnimation(m_WalkRight);
-                break;
-        }
+        SetActiveWalkAnimation();
         Move(timestep);
     }
 }
@@ -110,46 +92,19 @@ void PlayerController::ProcessPlayerInput()
     {
         if (newDirection != m_Direction)
         {
-            m_PlayerState = PlayerState::Turning; // TODO : need to set to Idle at the end of 'turning' animation
             m_Direction = newDirection;
-            // TODO : this below is duplicate code so clean this up
-            switch (m_Direction)
-            {
-            case Direction::Down:
-                m_Animator->SetActiveAnimation(m_IdleDown);
-                break;
-            case Direction::Up:
-                m_Animator->SetActiveAnimation(m_IdleUp);
-                break;
-            case Direction::Left:
-                m_Animator->SetActiveAnimation(m_IdleLeft);
-                break;
-            case Direction::Right:
-                m_Animator->SetActiveAnimation(m_IdleRight);
-                break;
-            }
-            return;
+            SetActiveIdleAnimation();
+            m_PlayerState = PlayerState::Turning;
         }
-        m_InitialPosition = m_Position;
-        m_PlayerState = PlayerState::Walking;
+        else
+        {
+            m_InitialPosition = m_Position;
+            m_PlayerState = PlayerState::Walking;
+        }
     }
     else
     {
-        switch (m_Direction)
-        {
-        case Direction::Down:
-            m_Animator->SetActiveAnimation(m_IdleDown);
-            break;
-        case Direction::Up:
-            m_Animator->SetActiveAnimation(m_IdleUp);
-            break;
-        case Direction::Left:
-            m_Animator->SetActiveAnimation(m_IdleLeft);
-            break;
-        case Direction::Right:
-            m_Animator->SetActiveAnimation(m_IdleRight);
-            break;
-        }
+        SetActiveIdleAnimation();
     }
 }
 
@@ -179,12 +134,50 @@ void PlayerController::SetupAnimation(const char* animationName, bool isLoop, co
         Ref<AnimationFrame> frame = CreateRef<AnimationFrame>(subTexture, frameDuration);
         animation->AddFrame(frame);
     }
-    animation->SetAnimationEndCallback(std::bind(OnAnimationEnd, this)); // TODO : can pass in unique callbacks if needed
+    animation->SetAnimationStopCallback(std::bind(&PlayerController::OnAnimationEnd, this)); // TODO : can pass in unique callbacks if needed
     m_Animator->AddAnimation(animation);
 }
 
 void PlayerController::OnAnimationEnd()
 {
     if (m_PlayerState == PlayerState::Turning)
-        m_PlayerState == PlayerState::Idle;
+        m_PlayerState = PlayerState::Idle;
+}
+
+void PlayerController::SetActiveIdleAnimation()
+{
+    switch (m_Direction)
+    {
+    case Direction::Down:
+        m_Animator->SetActiveAnimation(m_IdleDown);
+        break;
+    case Direction::Up:
+        m_Animator->SetActiveAnimation(m_IdleUp);
+        break;
+    case Direction::Left:
+        m_Animator->SetActiveAnimation(m_IdleLeft);
+        break;
+    case Direction::Right:
+        m_Animator->SetActiveAnimation(m_IdleRight);
+        break;
+    }
+}
+
+void PlayerController::SetActiveWalkAnimation()
+{
+    switch (m_Direction)
+    {
+    case Direction::Down:
+        m_Animator->SetActiveAnimation(m_WalkDown);
+        break;
+    case Direction::Up:
+        m_Animator->SetActiveAnimation(m_WalkUp);
+        break;
+    case Direction::Left:
+        m_Animator->SetActiveAnimation(m_WalkLeft);
+        break;
+    case Direction::Right:
+        m_Animator->SetActiveAnimation(m_WalkRight);
+        break;
+    }
 }

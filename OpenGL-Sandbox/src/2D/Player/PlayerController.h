@@ -34,8 +34,12 @@ public:
 private:
     void ProcessPlayerInput();
     void Move(GLCore::Timestep timestep);
+
     void SetupAnimation(const char* animationName, bool isLoop, const glm::vec2& spriteSize, unsigned int row, size_t frameCount, float frameDuration);
     void OnAnimationEnd();
+
+    void SetActiveIdleAnimation();
+    void SetActiveWalkAnimation();
 private:
     glm::vec3 m_Position;
     const char* m_TextureFilepath;
@@ -44,7 +48,7 @@ private:
     GLCore::Ref<AnimatorTopDown> m_Animator;
     PlayerState m_PlayerState = PlayerState::Idle;
 
-    float m_Speed = 5.0f;
+    float m_Speed = 4.0f;
     glm::vec3 m_InitialPosition;
     glm::vec2 m_InputDirection = glm::vec2(0.0);
     Direction m_Direction = Direction::Down;
