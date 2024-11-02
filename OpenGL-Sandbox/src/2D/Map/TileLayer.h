@@ -25,6 +25,6 @@ private:
     int m_TileSize;
     int m_RowCount, m_ColumnCount;
     TileMap m_TileMap;
-    TilesetList m_TilesetList;
+    TilesetList m_Tilesets;
 };
 

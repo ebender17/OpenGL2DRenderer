@@ -24,12 +24,17 @@ namespace GLCore {
         {
             return m_RendererID == ((OpenGLTexture2D&)other).m_RendererID;
         }
+
+        virtual const std::string& GetName() const override { return m_Name; };
+    private:
+        void ExtractNameFromFilePath(const std::string& filepath);
     private:
         std::string path;
         uint32_t m_Width;
         uint32_t m_Height;
         uint32_t m_RendererID;
         GLenum m_InternalFormat, m_DataFormat;
+        std::string m_Name;
     };
 
 }

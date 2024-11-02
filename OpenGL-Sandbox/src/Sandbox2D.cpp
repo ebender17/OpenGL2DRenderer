@@ -2,6 +2,7 @@
 
 #include "Platform/OpenGL/Debug/OpenGLDebug.h"
 
+// TODO : do we need these includes?
 #include <imgui/imgui.h>
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -49,6 +50,7 @@ void Sandbox2D::OnAttach()
 
     m_Player = CreateRef<PlayerController>(glm::vec3(0.0f, 0.0f, 0.5f), "assets/textures/trainer-sapphire.png");
     m_Player->LoadAssets();
+
     m_TilesetOutside = Texture2D::Create("assets/textures/outside.png");
 
     // grass

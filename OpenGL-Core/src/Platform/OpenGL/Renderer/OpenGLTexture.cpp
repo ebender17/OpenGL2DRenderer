@@ -1,4 +1,5 @@
 #include "glpch.h"
+#include "GLCore/Utils/FilePath.h"
 #include "Platform/OpenGL/Renderer/OpenGLTexture.h"
 
 #include <stb_image.h>
@@ -50,7 +51,7 @@ namespace GLCore {
         glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
     }
 
-    OpenGLTexture2D::OpenGLTexture2D(const std::string& path)
+    OpenGLTexture2D::OpenGLTexture2D(const std::string& filepath)
     {
         PROFILE_FUNCTION();
 
@@ -60,7 +61,7 @@ namespace GLCore {
         {
             PROFILE_SCOPE("stbi load - OpenGLTexture2D::OpenGLTexture2D(const std::string&)");
 
-            data = stbi_load(path.c_str(), &width, &height, &channels, 0);
+            data = stbi_load(filepath.c_str(), &width, &height, &channels, 0);
         }
         GLCORE_ASSERT(data, "Failed to load image!");
         m_Width = width;
@@ -91,6 +92,8 @@ namespace GLCore {
         glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, m_DataFormat, GL_UNSIGNED_BYTE, data);
 
         stbi_image_free(data);
+
+        m_Name = GLCore::Utils::ExtractNameFromFilePath(filepath);
     }
 
     OpenGLTexture2D::~OpenGLTexture2D()
