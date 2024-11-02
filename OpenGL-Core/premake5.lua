@@ -18,6 +18,8 @@ project "OpenGL-Core"
         "vendor/stb_image/**.cpp",
         "vendor/glm/glm/**.hpp",
         "vendor/glm/glm/**.inl",
+        "vendor/tinyxml/**.h",
+        "vendor/tinyxml/**.cpp",
     }
 
     defines
@@ -34,7 +36,8 @@ project "OpenGL-Core"
         "%{IncludeDir.Glad}",
         "%{IncludeDir.ImGui}",
         "%{IncludeDir.glm}",
-        "%{IncludeDir.stb_image}"
+        "%{IncludeDir.stb_image}",
+        "%{IncludeDir.tinyxml}"
     }
 
     links 
