@@ -4,10 +4,10 @@ using namespace GLCore;
 
 /*----------Animation----------*/
 
-AnimationTopDown::AnimationTopDown(const char* name, bool loop)
+AnimationTopDown::AnimationTopDown(const char* name, bool loop, unsigned int reserveFrameCount)
     : m_Name(name), m_Loop(loop)
 {
-    m_Frames.reserve(4);
+    m_Frames.reserve(reserveFrameCount);
 }
 
 void AnimationTopDown::AddFrame(const GLCore::Ref<AnimationFrame> animationFrame)
@@ -34,9 +34,7 @@ void AnimationTopDown::OnUpdate(Timestep timestep)
             m_CurrentFrameIndex = 0;
         }
         else
-        {
             Stop();
-        }
     }
 }
 

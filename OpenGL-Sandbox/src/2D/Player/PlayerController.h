@@ -35,7 +35,7 @@ private:
     void ProcessPlayerInput();
     void Move(GLCore::Timestep timestep);
 
-    void SetupAnimation(const char* animationName, bool isLoop, const glm::vec2& spriteSize, unsigned int row, size_t frameCount, float frameDuration);
+    void SetupAnimation(const char* animationName, bool isLoop, const glm::vec2& spriteSize, unsigned int row, size_t frameCount, float frameDuration, unsigned int reserveFrameCount);
     void OnAnimationEnd();
 
     void SetActiveIdleAnimation();

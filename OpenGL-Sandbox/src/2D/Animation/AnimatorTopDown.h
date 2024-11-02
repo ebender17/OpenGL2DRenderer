@@ -18,7 +18,7 @@ struct AnimationFrame
 class AnimationTopDown
 {
 public:
-    AnimationTopDown(const char* name, bool loop);
+    AnimationTopDown(const char* name, bool loop, unsigned int reserveFrameCount);
 
     void AddFrame(GLCore::Ref<AnimationFrame> animationFrame);
 
