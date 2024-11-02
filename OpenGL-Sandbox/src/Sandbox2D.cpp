@@ -11,23 +11,23 @@ using namespace GLCore;
 
 static const uint32_t s_MapWidth = 24;
 static const char* s_MapTiles = 
-"WWWWWWWWWWWWWWWWWWWWWWWW"
-"WWWWWWWWWWWWWWWWWWWWWWWW"
-"WWWWWWWGGGGWWWWWWWWWWWWW"
-"WWWWWWGGGGGGGWWWWWWWWWWW"
-"WWWWWWGGGGGGGGGGWWWWWWWW"
-"WWWWWWWWGGGGGGWWWWWWWWWW"
-"WWWWWWWWWWWWWWWPPPWWWWWW"
-"WWWWWWWWWWWWWWWWWWWWWWWW"
-"WWWWWWWWWWWWWWWWWWWWWWWW"
-"WWWWWWWWWWWWWWWWWWWWWWWW"
-"WWWWWWWWWWWWWWWWWWWWWWWW"
-"WWWWWWWWWWWWWWWWWWWWWWWW"
-"WWWWWWWWWWWWWWWWWWWWWWWW"
+"PPGGGGGGGGGGGGGGGGGGGGGG"
+"GGGGGGGGGGGGGGGGGGGGGGGG"
+"GGGGGGGGGGGGGGGGGGGGGGGG"
+"GGGGGGGGGWWWWGGGGGGGGGGG"
+"GGGGGGGGWWWWWWWGGGGGGGGG"
+"GGGGGGGWWWWWWWWWGGGGGGGG"
+"GGGGGGGWWWWWWWWWGGGGGGGG"
+"GGGGGGGGWWWWWWWGGGGGGGGG"
+"GGGGGGGGGGWWWWWGGGGGGGGG"
+"GGGGGGGGGGGGGGGGGGGGGGGG"
+"GGGGGGGGGGGGGGGGGGGGGGGG"
+"GGGGGGGGGGGGGGGGGGGGGGGG"
+"GGGGGGGGGGGGGGGGGGGGGGGG"
 ;
 
 Sandbox2D::Sandbox2D()
-    : Layer("Sandbox2D"), m_CameraController(1280.f / 720.0f, false, false, -2.0f, 2.0f)
+    : Layer("Sandbox2D"), m_CameraController(CreateRef<TargetCamera2DController>(1280.f / 720.0f, -2.0f, 2.0f))
 {
 }
 
@@ -38,19 +38,23 @@ void Sandbox2D::OnAttach()
     EnableGLDebugging();
     SetGLDebugLogLevel(DebugLogLevel::Notification);
 
-    m_CameraController.SetZoomLevel(5.5f);
+    m_CameraController->SetZoomLevel(5.5f);
 
     m_MapWidth = s_MapWidth;
     m_MapHeight = strlen(s_MapTiles) / s_MapWidth;
 
-    m_TrainerSpriteSheet = Texture2D::Create("assets/textures/trainer-sapphire.png");
-    m_TrainerTexture = SubTexture2D::CreateFromCoords(m_TrainerSpriteSheet, { 0, 3 }, { 32, 48 }, { 1, 1 });
+    // TODO : figure out the actual bounds we want, left off here
+    float mapBounds[4] = { 0.0f, m_MapWidth, 0.0f, m_MapHeight };
+    m_CameraController->SetBounds(mapBounds);
+
+    m_Player = CreateRef<PlayerController>(glm::vec3(0.0f, 0.0f, 0.5f), "assets/textures/trainer-sapphire.png");
+    m_Player->LoadAssets();
     m_TilesetOutside = Texture2D::Create("assets/textures/outside.png");
 
     // grass
-    m_TextureMap['G'] = SubTexture2D::CreateFromCoords(m_TilesetOutside, { 0, 5 }, { 32, 32 });
+    m_TexCoordsMap['G'] = SubTexture2D::CreateFromCoords(m_TilesetOutside, { 1, 501 }, { 32, 32 });
     // water
-    m_TextureMap['W'] = SubTexture2D::CreateFromCoords(m_TilesetOutside, { 0, 15 }, {32, 32});
+    m_TexCoordsMap['W'] = SubTexture2D::CreateFromCoords(m_TilesetOutside, { 6, 414 }, {32, 32});
 }
 
 void Sandbox2D::OnDetach()
@@ -64,7 +68,10 @@ void Sandbox2D::OnUpdate(GLCore::Timestep timestep)
     PROFILE_FUNCTION();
 
     // Update
-    m_CameraController.OnUpdate(timestep);
+
+    m_Player->OnUpdate(timestep);
+    m_CameraController->SetTarget(m_Player->GetPosition());
+    m_CameraController->OnUpdate(timestep);
 
     // Render
     {
@@ -76,19 +83,22 @@ void Sandbox2D::OnUpdate(GLCore::Timestep timestep)
     Renderer2D::ResetStats();
     {
         PROFILE_SCOPE("Renderer Draw");
-        Renderer2D::BeginScene(m_CameraController.GetCamera());
-        Renderer2D::DrawQuad({ -2.0f, -2.0f, 0.0f }, { 1.0f, 1.0f }, m_TrainerTexture);
+        // TODO : New Camera Controller
+        Renderer2D::BeginScene(m_CameraController->GetCamera());
+        m_Player->OnRender();
 
         // inner loop is x so we read memory how it is laid out in memory
         for (uint32_t y = 0; y < m_MapHeight; y++)
         {
             for (uint32_t x = 0; x < m_MapWidth; x++)
             {
-                char tileType = s_MapTiles[x + y + m_MapWidth];
-                if (m_TextureMap.find(tileType) != m_TextureMap.end())
-                    Renderer2D::DrawQuad({ x - m_MapWidth / 2.0f, m_MapHeight - y - m_MapHeight / 2.0f, -0.05f }, { 1.0f, 1.0f }, m_TextureMap[tileType]);
+                char tileType = s_MapTiles[x + y * m_MapWidth];
+                if (m_TexCoordsMap.find(tileType) != m_TexCoordsMap.end())
+                    // TODO : figure out where we want to start setting tiles & go back to flipping w/code below 
+                    // x - m_MapWidth / 2.0f, m_MapHeight - y - m_MapHeight / 2.0f
+                    Renderer2D::DrawQuad({ x, y, -0.05f }, { 1.0f, 1.0f }, m_TexCoordsMap[tileType]->GetTexture(), m_TexCoordsMap[tileType]->GetTexCoords());
                 else
-                    Renderer2D::DrawQuad({ x - m_MapWidth / 2.0f, m_MapHeight - y - m_MapHeight / 2.0f, -0.05f }, { 1.0f, 1.0f }, m_TextureErrorColor);
+                    Renderer2D::DrawQuad({ x, y, -0.05f }, { 1.0f, 1.0f }, m_TextureErrorColor);
             }
         }
         Renderer2D::EndScene();
@@ -112,5 +122,5 @@ void Sandbox2D::OnImGuiRender()
 
 void Sandbox2D::OnEvent(GLCore::Event& event)
 {
-    m_CameraController.OnEvent(event);
+    m_CameraController->OnEvent(event);
 }

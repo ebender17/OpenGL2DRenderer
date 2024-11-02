@@ -21,6 +21,7 @@ namespace GLCore {
     private:
         uint32_t m_RendererID;
         uint32_t m_VertexBufferIndex = 0;
+        // TODO - use Ref
         std::vector<std::shared_ptr<VertexBuffer>> m_VertexBuffers;
         std::shared_ptr<IndexBuffer> m_IndexBuffer;
     };
