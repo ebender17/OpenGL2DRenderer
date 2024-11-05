@@ -3,7 +3,7 @@
 #include "GameMap.h"
 #include "TileLayer.h"
 
-#include <tinyxml/tinyxml.h>
+#include <tinyxml/tinyxml2.h>
 
 class MapParser
 {
@@ -24,8 +24,8 @@ private:
     ~MapParser() = default;
 
     bool Parse(const std::string& id, const std::string& source);
-    Tileset* ParseTileset(TiXmlElement* xmlTileset);
-    TileLayer* ParseTileLayer(TiXmlElement* xmlLayer, TilesetList tilesets, int tileSize, int rowCount, int columnCount);
+    Tileset* ParseTileset(tinyxml2::XMLElement* xmlTileset);
+    TileLayer* ParseTileLayer(tinyxml2::XMLElement* xmlLayer, TilesetList tilesets, int tileSize, int rowCount, int columnCount);
 
 private:
     std::map<std::string, GameMap*> m_MapDict; // TODO : move this data to another class as suggested by YouTube comment

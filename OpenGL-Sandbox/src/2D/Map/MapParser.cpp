@@ -1,5 +1,7 @@
 #include "MapParser.h"
 
+using namespace tinyxml2;
+
 static MapParser* s_Instance = nullptr;
 
 // TODO : make sure to call this!
@@ -35,8 +37,8 @@ MapParser& MapParser::GetInstance()
 
 bool MapParser::Parse(const std::string& id, const std::string& source)
 {
-    TiXmlDocument xml;
-    xml.LoadFile(source);
+    XMLDocument xml;
+    xml.LoadFile(source.c_str());
 
     if (xml.Error())
     {
@@ -44,17 +46,17 @@ bool MapParser::Parse(const std::string& id, const std::string& source)
         return false;
     }
 
-    TiXmlElement* root = xml.RootElement();
+    XMLElement* root = xml.RootElement();
     int rowCount, columnCount, tileSize;
 
-    root->Attribute("width", &columnCount);
-    root->Attribute("height", &rowCount);
-    root->Attribute("tilewidth", &tileSize);
+    root->IntAttribute("width", columnCount);
+    root->IntAttribute("height", rowCount);
+    root->IntAttribute("tilewidth", tileSize);
 
     // Parse Tilesets
     TilesetList tilesets;
     tilesets.reserve(5); // TODO : get rid of magic number? how many tilesets do we normally use?
-    for (TiXmlElement* element = root->FirstChildElement(); element != nullptr; element = element->NextSiblingElement())
+    for (XMLElement* element = root->FirstChildElement(); element != nullptr; element = element->NextSiblingElement())
     {
         if (element->Value() == "tileset")
             tilesets.emplace_back(ParseTileset(element));
@@ -62,7 +64,7 @@ bool MapParser::Parse(const std::string& id, const std::string& source)
 
     // Parse TileLayers
     GameMap* gamemap = new GameMap(7); // TODO : get rid of magic number? how many layers do we normally have?
-    for (TiXmlElement* element = root->FirstChildElement(); element != nullptr; element = element->NextSiblingElement())
+    for (XMLElement* element = root->FirstChildElement(); element != nullptr; element = element->NextSiblingElement())
     {
         if (element->Value() == "layer")
         {
@@ -75,30 +77,30 @@ bool MapParser::Parse(const std::string& id, const std::string& source)
     return true;
 }
 
-Tileset* MapParser::ParseTileset(TiXmlElement* xmlTileset)
+Tileset* MapParser::ParseTileset(XMLElement* xmlTileset)
 {
     Tileset* tileset = new Tileset();
     tileset->Name = xmlTileset->Attribute("name");
-    xmlTileset->Attribute("firstgid", &tileset->FirstId);
+    xmlTileset->IntAttribute("firstgid", tileset->FirstId);
 
-    xmlTileset->Attribute("tilecount", &tileset->TileCount);
+    xmlTileset->IntAttribute("tilecount", tileset->TileCount);
     tileset->LastId = (tileset->FirstId + tileset->TileCount);
 
-    xmlTileset->Attribute("columns", &tileset->ColumnCount);
+    xmlTileset->IntAttribute("columns", tileset->ColumnCount);
     tileset->RowCount = tileset->TileCount / tileset->ColumnCount;
-    xmlTileset->Attribute("tilewidth", &tileset->TileSize);
+    xmlTileset->IntAttribute("tilewidth", tileset->TileSize);
 
-    TiXmlElement* image = xmlTileset->FirstChildElement();
+    XMLElement* image = xmlTileset->FirstChildElement();
     tileset->Source = image->Attribute("source");
 
     // TODO : check these strings have no typos
     return tileset;
 }
 
-TileLayer* MapParser::ParseTileLayer(TiXmlElement* xmlLayer, TilesetList tilesets, int tileSize, int rowCount, int columnCount)
+TileLayer* MapParser::ParseTileLayer(XMLElement* xmlLayer, TilesetList tilesets, int tileSize, int rowCount, int columnCount)
 {
-    TiXmlElement* data;
-    for (TiXmlElement* element = xmlLayer->FirstChildElement(); element != nullptr; element = element->NextSiblingElement())
+    XMLElement* data;
+    for (XMLElement* element = xmlLayer->FirstChildElement(); element != nullptr; element = element->NextSiblingElement())
     {
         if (element->Value() == "data")
         {

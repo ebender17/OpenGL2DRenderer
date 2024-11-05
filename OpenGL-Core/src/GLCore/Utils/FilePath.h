@@ -2,7 +2,6 @@
 
 namespace GLCore::Utils {
 
-    static std::string ExtractNameFromFilePath(const std::string& filepath);
+    std::string ExtractNameFromFilePath(const std::string& filepath);
 
 }
-
