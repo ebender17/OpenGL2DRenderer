@@ -14,5 +14,5 @@ public:
 
     std::vector<MapLayer*>& GetMapLayers() { return m_MapLayers; }
 private:
-    std::vector<MapLayer*> m_MapLayers;
+    std::vector<MapLayer*> m_MapLayers; // TODO : convert to smart pointers
 };

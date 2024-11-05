@@ -9,7 +9,7 @@ struct Tileset {
     std::string Name, Source;
 };
 
-using TilesetList = std::vector<Tileset*>;
+using TilesetList = std::vector<Tileset*>; // TODO : convert to smart pointers
 using TileMap = std::vector<std::vector<int> >;
 
 class TileLayer : MapLayer

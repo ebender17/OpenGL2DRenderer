@@ -28,6 +28,6 @@ private:
     TileLayer* ParseTileLayer(tinyxml2::XMLElement* xmlLayer, TilesetList tilesets, int tileSize, int rowCount, int columnCount);
 
 private:
-    std::map<std::string, GameMap*> m_MapDict; // TODO : move this data to another class as suggested by YouTube comment
+    std::map<std::string, GameMap*> m_MapDict; // TODO : move this data to another class as suggested by YouTube comment & convert to smart pointers
 };
 
