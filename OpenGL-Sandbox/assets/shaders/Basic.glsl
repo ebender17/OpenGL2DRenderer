@@ -17,12 +17,12 @@ void main()
 
 layout (location = 0) out vec4 color;
 
-uniform vec4 u_Color;
-
 layout (location = 0) in vec2 v_TexCoord;
+
+uniform vec4 u_Color;
+uniform sampler2D texture1;
 
 void main()
 {
-    // color = u_Color;
-    color = vec4(v_TexCoord, 0.0, 1.0);
+    color = mix(texture(texture1, v_TexCoord), u_Color, 0.8);
 }

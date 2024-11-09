@@ -20,6 +20,7 @@ private:
     uint32_t m_VAO;
     uint32_t m_VBO;
     uint32_t m_EBO;
+    uint32_t m_CheckerboardTexture;
     // TODO : Use Shader Library
     std::unique_ptr<GLCore::Shader> m_Shader;
 };

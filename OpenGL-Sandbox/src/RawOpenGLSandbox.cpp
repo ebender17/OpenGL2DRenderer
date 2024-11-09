@@ -5,6 +5,8 @@
 
 #include <imgui/imgui.h>
 
+#include <stb_image/stb_image.h>
+
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -36,6 +38,7 @@ void RawOpenGLSandbox::OnAttach()
         1, 2, 3
     };
 
+    // Setup buffers
     glGenVertexArrays(1, &m_VAO);
     glBindVertexArray(m_VAO);
 
@@ -53,7 +56,53 @@ void RawOpenGLSandbox::OnAttach()
     glVertexAttribPointer(1, 2, GL_FLOAT, false, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
+    // Load and create textures
+    int width, height, channels;
+    stbi_set_flip_vertically_on_load(true);
 
+    stbi_uc* data = nullptr;
+    {
+        PROFILE_SCOPE("stbi load - OpenGLTexture2D::OpenGLTexture2D(const std::string&)");
+
+        data = stbi_load("assets/textures/checkerboard.png", &width, &height, &channels, 0);
+    }
+    GLCORE_ASSERT(data, "Failed to load image!");
+
+    GLenum internalFormat, dataFormat;
+    switch (channels)
+    {
+    case 1:
+        GLCORE_ASSERT(data, "Do not yet support textures with 1 channel.");
+        break;
+    case 2:
+        GLCORE_ASSERT(data, "Do not yet support textures with 2 channels.");
+        break;
+    case 3:
+        internalFormat = GL_RGB8;
+        dataFormat = GL_RGB;
+        break;
+    case 4:
+        internalFormat = GL_RGBA8;
+        dataFormat = GL_RGBA;
+        break;
+    default:
+        GLCORE_ASSERT(data, "Do not support textures with more than 4 channels.");
+    }
+
+    glGenTextures(1, &m_CheckerboardTexture);
+    glBindTexture(GL_TEXTURE_2D, m_CheckerboardTexture);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, dataFormat, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    stbi_image_free(data);
+
+    // Shaders
     m_Shader = std::make_unique<OpenGLShader>("assets/shaders/Basic.glsl");
     m_Shader->Bind();
     m_Shader->SetFloat4("u_Color", glm::vec4(0.0f, 0.5f, 0.8f, 1.0f));
@@ -63,8 +112,9 @@ void RawOpenGLSandbox::OnAttach()
 
 void RawOpenGLSandbox::OnDetach()
 {
-    glDeleteBuffers(1, &m_VBO);
     glDeleteVertexArrays(1, &m_VAO);
+    glDeleteBuffers(1, &m_VBO);
+    glDeleteBuffers(1, &m_EBO);
 }
 
 void RawOpenGLSandbox::OnUpdate(GLCore::Timestep timestep)
@@ -73,6 +123,9 @@ void RawOpenGLSandbox::OnUpdate(GLCore::Timestep timestep)
 
     glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_CheckerboardTexture);
 
     m_Shader->Bind();
     glBindVertexArray(m_VAO);
