@@ -2,6 +2,8 @@
 
 #include <GLCore.h>
 
+#include "3D/Camera/FirstPersonCamera.h"
+
 class RawOpenGLSandbox : public GLCore::Layer
 {
 public:
@@ -14,18 +16,22 @@ public:
     void OnUpdate(GLCore::Timestep timestep) override;
     virtual void OnImGuiRender() override;
     virtual void OnEvent(GLCore::Event& event) override;
+
 private:
-    unsigned int m_ScreenWidth;
-    unsigned int m_ScreenHeight;
+    void InitCamera();
+
+    bool OnWindowResized(GLCore::WindowResizeEvent& event);
+private:
     uint32_t m_VAO;
     uint32_t m_VBO;
     uint32_t m_EBO;
     uint32_t m_CheckerboardTexture;
+
     // TODO : Use Shader Library
     std::unique_ptr<GLCore::Shader> m_Shader;
 
     //Camera
-    glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, -3.0f);
+    std::unique_ptr<FirstPersonCamera> m_Camera;
 
     // Light
     glm::vec3 lightPos = glm::vec3(1.2f, 1.0f, 2.0f);

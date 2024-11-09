@@ -107,11 +107,13 @@ void Sandbox2D::OnUpdate(GLCore::Timestep timestep)
         {
             for (uint32_t x = 0; x < m_MapWidth; x++)
             {
-                char tileType = s_MapTiles[x + y + m_MapWidth];
-                if (m_TextureMap.find(tileType) != m_TextureMap.end())
-                    Renderer2D::DrawQuad({ x - m_MapWidth / 2.0f, m_MapHeight - y - m_MapHeight / 2.0f, -0.05f }, { 1.0f, 1.0f }, m_TextureMap[tileType]);
+                char tileType = s_MapTiles[x + y * m_MapWidth];
+                if (m_TexCoordsMap.find(tileType) != m_TexCoordsMap.end())
+                    // TODO : figure out where we want to start setting tiles & go back to flipping w/code below 
+                    // x - m_MapWidth / 2.0f, m_MapHeight - y - m_MapHeight / 2.0f
+                    Renderer2D::DrawQuad({ x, y, -0.05f }, { 1.0f, 1.0f }, m_TexCoordsMap[tileType]->GetTexture(), m_TexCoordsMap[tileType]->GetTexCoords());
                 else
-                    Renderer2D::DrawQuad({ x - m_MapWidth / 2.0f, m_MapHeight - y - m_MapHeight / 2.0f, -0.05f }, { 1.0f, 1.0f }, m_TextureErrorColor);
+                    Renderer2D::DrawQuad({ x, y, -0.05f }, { 1.0f, 1.0f }, m_TextureErrorColor);
             }
         }
         Renderer2D::EndScene();
