@@ -15,13 +15,15 @@ using namespace GLCore;
 RawOpenGLSandbox::RawOpenGLSandbox()
     : Layer("Sandbox2D")
 {
-    InitCamera();
 }
 
 void RawOpenGLSandbox::OnAttach()
 {
     EnableGLDebugging();
     SetGLDebugLogLevel(DebugLogLevel::Notification);
+
+    InitLights();
+    InitCamera();
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
@@ -92,55 +94,22 @@ void RawOpenGLSandbox::OnAttach()
     glVertexAttribPointer(2, 3, GL_FLOAT, false, 8 * sizeof(float), (void*)(5 * sizeof(float)));
 
     // Load and create textures
-    int width, height, channels;
-    stbi_set_flip_vertically_on_load(true);
-
-    stbi_uc* data = nullptr;
-    {
-        PROFILE_SCOPE("stbi load - OpenGLTexture2D::OpenGLTexture2D(const std::string&)");
-
-        data = stbi_load("assets/textures/checkerboard.png", &width, &height, &channels, 0);
-    }
-    GLCORE_ASSERT(data, "Failed to load image!");
-
-    GLenum internalFormat, dataFormat;
-    switch (channels)
-    {
-    case 1:
-        GLCORE_ASSERT(data, "Do not yet support textures with 1 channel.");
-        break;
-    case 2:
-        GLCORE_ASSERT(data, "Do not yet support textures with 2 channels.");
-        break;
-    case 3:
-        internalFormat = GL_RGB8;
-        dataFormat = GL_RGB;
-        break;
-    case 4:
-        internalFormat = GL_RGBA8;
-        dataFormat = GL_RGBA;
-        break;
-    default:
-        GLCORE_ASSERT(data, "Do not support textures with more than 4 channels.");
-    }
-
-    glGenTextures(1, &m_CheckerboardTexture);
-    glBindTexture(GL_TEXTURE_2D, m_CheckerboardTexture);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, dataFormat, GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-
-    stbi_image_free(data);
+    uint32_t diffuse, specular;
+    GenerateTexture2D("assets/textures/wooden-box-diffuse.png", &diffuse);
+    GenerateTexture2D("assets/textures/wooden-box-specular.png", &specular);
+    m_Material = Material(diffuse, specular, 32.0f);
 
     // Shaders
     m_Shader = std::make_unique<OpenGLShader>("assets/shaders/Basic.glsl");
     m_Shader->Bind();
-    m_Shader->SetFloat4("u_Color", glm::vec4(0.1f, 1.0f, 1.0f, 1.0f));
+    m_Shader->SetInt("u_Material.diffuse", 0);
+    m_Shader->SetInt("u_Material.specular", 1);
+    m_Shader->SetFloat("u_Material.shininess", 32.0f);
+
+    m_Shader->SetFloat3("u_DirLight.direction", m_DirectionalLight->Direction);
+    m_Shader->SetFloat3("u_DirLight.ambient", m_DirectionalLight->Ambient);
+    m_Shader->SetFloat3("u_DirLight.diffuse", m_DirectionalLight->Diffuse);
+    m_Shader->SetFloat3("u_DirLight.specular", m_DirectionalLight->Specular);
 
     glBindVertexArray(0);
 }
@@ -162,13 +131,11 @@ void RawOpenGLSandbox::OnUpdate(GLCore::Timestep timestep)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     m_Shader->Bind();
-    // TODO : move to light class
-    m_Shader->SetFloat3("u_LightColor", { 1.0f, 1.0f, 1.0f });
-    m_Shader->SetFloat3("u_LightPos", lightPos);
-    m_Shader->SetFloat3("u_ViewPos", m_Camera->GetPosition());
     m_Shader->SetMat4("u_ViewProjection", m_Camera->GetViewProjectionMatrix());
+    m_Shader->SetFloat3("u_ViewPos", m_Camera->GetPosition());
 
     // Model matrix
+    // TODO : move outside of update loop
     glm::vec3 cubePositions[] = {
         glm::vec3(0.0f,  0.0f,  0.0f),
         glm::vec3(2.0f,  5.0f, -15.0f),
@@ -183,7 +150,9 @@ void RawOpenGLSandbox::OnUpdate(GLCore::Timestep timestep)
     };
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_CheckerboardTexture);
+    glBindTexture(GL_TEXTURE_2D, m_Material.DiffuseId);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, m_Material.SpecularId);
 
     glBindVertexArray(m_VAO);
     for (unsigned int i = 0; i < 10; i++)
@@ -209,11 +178,67 @@ void RawOpenGLSandbox::OnEvent(GLCore::Event& event)
     dispatcher.Dispatch<WindowResizeEvent>(GLCORE_BIND_EVENT_FN(RawOpenGLSandbox::OnWindowResized));
 }
 
+void RawOpenGLSandbox::InitLights()
+{
+    m_DirectionalLight = std::make_unique<DirectionalLight>(glm::vec3(-0.2f, -1.0f, -0.3f),
+        glm::vec3(0.05f, 0.05f, 0.05f),
+        glm::vec3(0.4f, 0.4f, 0.4f),
+        glm::vec3(0.5f, 0.5f, 0.5f));
+}
+
 void RawOpenGLSandbox::InitCamera()
 {
     PerspectiveProjInfo persProjInfo = { 45.0f, (float)1280, (float)720, 0.1f, 1000.0f };
     m_Camera = std::make_unique<FirstPersonCamera>(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 1.0f, 0.0f), persProjInfo);
+}
+
+void RawOpenGLSandbox::GenerateTexture2D(const std::string& filepath, uint32_t* texture)
+{
+    int width, height, channels;
+    stbi_set_flip_vertically_on_load(true);
+
+    stbi_uc* data = nullptr;
+    {
+        PROFILE_SCOPE("stbi load - OpenGLTexture2D::OpenGLTexture2D(const std::string&)");
+
+        data = stbi_load(filepath.c_str(), &width, &height, &channels, 0);
+    }
+    GLCORE_ASSERT(data, "Failed to load image!");
+
+    GLenum internalFormat, dataFormat;
+    switch (channels)
+    {
+    case 1:
+        GLCORE_ASSERT(data, "Do not yet support textures with 1 channel.");
+        break;
+    case 2:
+        GLCORE_ASSERT(data, "Do not yet support textures with 2 channels.");
+        break;
+    case 3:
+        internalFormat = GL_RGB8;
+        dataFormat = GL_RGB;
+        break;
+    case 4:
+        internalFormat = GL_RGBA8;
+        dataFormat = GL_RGBA;
+        break;
+    default:
+        GLCORE_ASSERT(data, "Do not support textures with more than 4 channels.");
+    }
+
+    glGenTextures(1, texture);
+    glBindTexture(GL_TEXTURE_2D, *texture);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, dataFormat, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    stbi_image_free(data);
 }
 
 bool RawOpenGLSandbox::OnWindowResized(GLCore::WindowResizeEvent& event)

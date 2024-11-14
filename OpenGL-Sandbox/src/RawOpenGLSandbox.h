@@ -3,6 +3,21 @@
 #include <GLCore.h>
 
 #include "3D/Camera/FirstPersonCamera.h"
+#include "3D/Lighting/Light.h"
+
+struct Material
+{
+    uint32_t DiffuseId;
+    uint32_t SpecularId;
+    float Shininess;
+
+    Material() = default;
+
+    Material(uint32_t diffuseId, uint32_t specularId, float shininess)
+        : DiffuseId(diffuseId), SpecularId(specularId), Shininess(shininess)
+    {
+    }
+};
 
 class RawOpenGLSandbox : public GLCore::Layer
 {
@@ -18,14 +33,17 @@ public:
     virtual void OnEvent(GLCore::Event& event) override;
 
 private:
+    void InitLights();
     void InitCamera();
+    void GenerateTexture2D(const std::string& filepath, uint32_t* texture);
 
     bool OnWindowResized(GLCore::WindowResizeEvent& event);
 private:
     uint32_t m_VAO;
     uint32_t m_VBO;
     uint32_t m_EBO;
-    uint32_t m_CheckerboardTexture;
+    
+    Material m_Material;
 
     // TODO : Use Shader Library
     std::unique_ptr<GLCore::Shader> m_Shader;
@@ -33,7 +51,7 @@ private:
     //Camera
     std::unique_ptr<FirstPersonCamera> m_Camera;
 
-    // Light
-    glm::vec3 lightPos = glm::vec3(1.2f, 1.0f, 2.0f);
+    // Lights
+    std::unique_ptr<DirectionalLight> m_DirectionalLight;
 };
 
