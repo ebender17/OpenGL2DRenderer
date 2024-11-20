@@ -29,6 +29,7 @@ layout (location = 0) out vec4 color;
 struct Material {
     sampler2D diffuse;
     sampler2D specular;
+    sampler2D emission;
     float shininess;
 }; 
 
@@ -49,6 +50,7 @@ uniform Material u_Material;
 // Light uniforms
 uniform vec3 u_ViewPos;
 uniform DirLight u_DirLight;
+uniform float u_Time;
 
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir);
 
@@ -59,7 +61,7 @@ void main()
 
     vec3 result = CalcDirLight(u_DirLight, norm, viewDir);
 
-    color = vec3(result, 1.0);
+    color = vec4(result, 1.0);
 }
 
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
@@ -69,10 +71,18 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
     float diff = max(dot(normal, lightDir), 0.0);
 
     vec3 reflectDir = reflect(-lightDir, normal);
+    vec3 specularMap = vec3(texture(u_Material.specular, v_TexCoords));
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), u_Material.shininess);
+
+    vec3 emission = vec3(0.0);
+    if (specularMap.r == 0.0) // check for mask
+    {
+        emission = texture(u_Material.emission, v_TexCoords).rgb;
+        emission = emission * (sin(u_Time) * 0.5 + 0.5) * 2.0;  // fading
+    }
 
     vec3 ambient  = light.ambient  * vec3(texture(u_Material.diffuse, v_TexCoords));
     vec3 diffuse  = light.diffuse  * diff * vec3(texture(u_Material.diffuse, v_TexCoords));
-    vec3 specular = light.specular * spec * vec3(texture(u_Material.specular, v_TexCoords));
-    return (ambient + diffuse + specular);
+    vec3 specular = light.specular * spec * specularMap;
+    return (ambient + diffuse + specular + emission);
 }

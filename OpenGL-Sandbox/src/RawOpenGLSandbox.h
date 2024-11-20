@@ -9,14 +9,8 @@ struct Material
 {
     uint32_t DiffuseId;
     uint32_t SpecularId;
+    uint32_t EmissionId;
     float Shininess;
-
-    Material() = default;
-
-    Material(uint32_t diffuseId, uint32_t specularId, float shininess)
-        : DiffuseId(diffuseId), SpecularId(specularId), Shininess(shininess)
-    {
-    }
 };
 
 class RawOpenGLSandbox : public GLCore::Layer

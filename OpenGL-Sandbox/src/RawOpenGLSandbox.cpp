@@ -3,6 +3,8 @@
 #include "Platform/OpenGL/Debug/OpenGLDebug.h"
 #include "Platform/OpenGL/Renderer/OpenGLShader.h"
 
+#include <GLFW/glfw3.h>
+
 #include <imgui/imgui.h>
 
 #include <stb_image/stb_image.h>
@@ -92,18 +94,19 @@ void RawOpenGLSandbox::OnAttach()
     glVertexAttribPointer(1, 2, GL_FLOAT, false, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(2, 3, GL_FLOAT, false, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
     // Load and create textures
-    uint32_t diffuse, specular;
-    GenerateTexture2D("assets/textures/wooden-box-diffuse.png", &diffuse);
-    GenerateTexture2D("assets/textures/wooden-box-specular.png", &specular);
-    m_Material = Material(diffuse, specular, 32.0f);
+    GenerateTexture2D("assets/textures/wooden-box-diffuse.png", &m_Material.DiffuseId);
+    GenerateTexture2D("assets/textures/wooden-box-specular.png", &m_Material.SpecularId);
+    GenerateTexture2D("assets/textures/box-emissive.png", &m_Material.EmissionId);
 
     // Shaders
     m_Shader = std::make_unique<OpenGLShader>("assets/shaders/Basic.glsl");
     m_Shader->Bind();
     m_Shader->SetInt("u_Material.diffuse", 0);
     m_Shader->SetInt("u_Material.specular", 1);
+    m_Shader->SetInt("u_Material.emission", 2);
     m_Shader->SetFloat("u_Material.shininess", 32.0f);
 
     m_Shader->SetFloat3("u_DirLight.direction", m_DirectionalLight->Direction);
@@ -133,6 +136,7 @@ void RawOpenGLSandbox::OnUpdate(GLCore::Timestep timestep)
     m_Shader->Bind();
     m_Shader->SetMat4("u_ViewProjection", m_Camera->GetViewProjectionMatrix());
     m_Shader->SetFloat3("u_ViewPos", m_Camera->GetPosition());
+    m_Shader->SetFloat("u_Time", glfwGetTime());
 
     // Model matrix
     // TODO : move outside of update loop
@@ -153,6 +157,8 @@ void RawOpenGLSandbox::OnUpdate(GLCore::Timestep timestep)
     glBindTexture(GL_TEXTURE_2D, m_Material.DiffuseId);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, m_Material.SpecularId);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, m_Material.EmissionId);
 
     glBindVertexArray(m_VAO);
     for (unsigned int i = 0; i < 10; i++)
