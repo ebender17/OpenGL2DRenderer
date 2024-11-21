@@ -12,6 +12,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <format>
+
 using namespace GLCore;
 
 RawOpenGLSandbox::RawOpenGLSandbox()
@@ -114,6 +116,17 @@ void RawOpenGLSandbox::OnAttach()
     m_Shader->SetFloat3("u_DirLight.diffuse", m_DirectionalLight->Diffuse);
     m_Shader->SetFloat3("u_DirLight.specular", m_DirectionalLight->Specular);
 
+    for (int i = 0; i < 4; i++)
+    {
+        m_Shader->SetFloat3(std::format("u_PointLights[{}].position", i), m_PointLights[i]->Position);
+        m_Shader->SetFloat3(std::format("u_PointLights[{}].ambient", i), m_PointLights[i]->Ambient);
+        m_Shader->SetFloat3(std::format("u_PointLights[{}].diffuse", i), m_PointLights[i]->Diffuse);
+        m_Shader->SetFloat3(std::format("u_PointLights[{}].specular", i), m_PointLights[i]->Specular);
+        m_Shader->SetFloat(std::format("u_PointLights[{}].constant", i), m_PointLights[i]->Constant);
+        m_Shader->SetFloat(std::format("u_PointLights[{}].linear", i),m_PointLights[i]->Linear);
+        m_Shader->SetFloat(std::format("u_PointLights[{}].quadratic", i), m_PointLights[i]->Quadratic);
+    }
+
     glBindVertexArray(0);
 }
 
@@ -190,6 +203,24 @@ void RawOpenGLSandbox::InitLights()
         glm::vec3(0.05f, 0.05f, 0.05f),
         glm::vec3(0.4f, 0.4f, 0.4f),
         glm::vec3(0.5f, 0.5f, 0.5f));
+
+    glm::vec3 ambient = glm::vec3(0.05f, 0.05f, 0.05f);
+    glm::vec3 diffuse = glm::vec3(0.8f, 0.8f, 0.8f);
+    glm::vec3 specular = glm::vec3(1.0f, 1.0f, 1.0f);
+    float constant = 1.0f;
+    float linear = 0.09f;
+    float quadratic = 0.032f;
+
+    m_PointLights = {
+        std::make_unique<PointLight>(glm::vec3(0.7f,  0.2f,  2.0f),
+        ambient, diffuse, specular, constant, linear, quadratic),
+        std::make_unique<PointLight>(glm::vec3(2.3f, -3.3f, -4.0f),
+        ambient, diffuse, specular, constant, linear, quadratic),
+        std::make_unique<PointLight>(glm::vec3(-4.0f,  2.0f, -12.0f),
+        ambient, diffuse, specular, constant, linear, quadratic),
+        std::make_unique<PointLight>(glm::vec3(0.0f,  0.0f, -3.0f),
+        ambient, diffuse, specular, constant, linear, quadratic),
+    };
 }
 
 void RawOpenGLSandbox::InitCamera()

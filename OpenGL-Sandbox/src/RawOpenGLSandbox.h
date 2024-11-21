@@ -1,5 +1,7 @@
 #pragma once
 
+#define NR_POINT_LIGHTS 4
+
 #include <GLCore.h>
 
 #include "3D/Camera/FirstPersonCamera.h"
@@ -47,5 +49,6 @@ private:
 
     // Lights
     std::unique_ptr<DirectionalLight> m_DirectionalLight;
+    std::array<std::unique_ptr<PointLight>, NR_POINT_LIGHTS> m_PointLights;
 };
 
