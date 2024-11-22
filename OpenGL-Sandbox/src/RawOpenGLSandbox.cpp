@@ -104,6 +104,10 @@ void RawOpenGLSandbox::OnAttach()
     GenerateTexture2D("assets/textures/box-emissive.png", &m_Material.EmissionId);
 
     // Shaders
+    m_FlatColorShader = std::make_unique<OpenGLShader>("assets/shaders/FlatColor.glsl");
+    m_FlatColorShader->Bind();
+    m_FlatColorShader->SetFloat4("u_Color", { 1.0, 1.0, 1.0, 1.0 });
+
     m_Shader = std::make_unique<OpenGLShader>("assets/shaders/Basic.glsl");
     m_Shader->Bind();
     m_Shader->SetInt("u_Material.diffuse", 0);
@@ -127,6 +131,22 @@ void RawOpenGLSandbox::OnAttach()
         m_Shader->SetFloat(std::format("u_PointLights[{}].quadratic", i), m_PointLights[i]->Quadratic);
     }
 
+    m_Shader->SetFloat3("u_SpotLight.ambient", m_FlashLight->Ambient);
+    m_Shader->SetFloat3("u_SpotLight.diffuse", m_FlashLight->Diffuse);
+    m_Shader->SetFloat3("u_SpotLight.specular", m_FlashLight->Specular);
+    m_Shader->SetFloat("u_SpotLight.constant", m_FlashLight->Constant);
+    m_Shader->SetFloat("u_SpotLight.linear", m_FlashLight->Linear);
+    m_Shader->SetFloat("u_SpotLight.quadratic", m_FlashLight->Quadratic);
+    m_Shader->SetFloat("u_SpotLight.innerCutOff", m_FlashLight->InnerCutOff);
+    m_Shader->SetFloat("u_SpotLight.outerCutOff", m_FlashLight->OuterCutOff);
+
+    glGenVertexArrays(1, &m_LightCubeVAO);
+    glBindVertexArray(m_LightCubeVAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
     glBindVertexArray(0);
 }
 
@@ -146,10 +166,15 @@ void RawOpenGLSandbox::OnUpdate(GLCore::Timestep timestep)
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    glm::mat4 viewProjectionMatrix = m_Camera->GetViewProjectionMatrix();
+    glm::vec3 camPos = m_Camera->GetPosition();
     m_Shader->Bind();
-    m_Shader->SetMat4("u_ViewProjection", m_Camera->GetViewProjectionMatrix());
-    m_Shader->SetFloat3("u_ViewPos", m_Camera->GetPosition());
+    m_Shader->SetMat4("u_ViewProjection", viewProjectionMatrix);
+    m_Shader->SetFloat3("u_ViewPos", camPos);
     m_Shader->SetFloat("u_Time", glfwGetTime());
+
+    m_Shader->SetFloat3("u_SpotLight.position", camPos);
+    m_Shader->SetFloat3("u_SpotLight.direction", m_Camera->GetFront());
 
     // Model matrix
     // TODO : move outside of update loop
@@ -181,6 +206,18 @@ void RawOpenGLSandbox::OnUpdate(GLCore::Timestep timestep)
         float angle = 20.0f * i;
         model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
         m_Shader->SetMat4("u_Model", model);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
+
+    m_FlatColorShader->Bind();
+    m_FlatColorShader->SetMat4("u_ViewProjection", viewProjectionMatrix);
+    glBindVertexArray(m_LightCubeVAO);
+    for (unsigned int i = 0; i < m_PointLights.size(); i++)
+    {
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, m_PointLights[i]->Position);
+        model = glm::scale(model, glm::vec3(0.2f));
+        m_FlatColorShader->SetMat4("u_Transform", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
 
@@ -221,6 +258,13 @@ void RawOpenGLSandbox::InitLights()
         std::make_unique<PointLight>(glm::vec3(0.0f,  0.0f, -3.0f),
         ambient, diffuse, specular, constant, linear, quadratic),
     };
+
+    m_FlashLight = std::make_unique<SpotLight>(glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(1.0f, 1.0f, 1.0f),
+        glm::vec3(1.0f, 1.0f, 1.0f),
+        1.0f, 0.09f, 0.032f, glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f)));
 }
 
 void RawOpenGLSandbox::InitCamera()

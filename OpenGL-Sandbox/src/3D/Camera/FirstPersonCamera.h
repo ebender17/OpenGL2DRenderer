@@ -36,6 +36,7 @@ public:
 
     const glm::mat4& GetProjMatrix() const { return m_PerspectiveProj; }
     const glm::vec3& GetPosition() const { return m_CameraPos; }
+    const glm::vec3& GetFront() const { return m_Up; }
 private:
     void UpdateProjectionMatrix();
     glm::vec2 GetNormalizedMousePosition();

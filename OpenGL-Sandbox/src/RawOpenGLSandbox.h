@@ -36,6 +36,7 @@ private:
     bool OnWindowResized(GLCore::WindowResizeEvent& event);
 private:
     uint32_t m_VAO;
+    uint32_t m_LightCubeVAO;
     uint32_t m_VBO;
     uint32_t m_EBO;
     
@@ -43,6 +44,7 @@ private:
 
     // TODO : Use Shader Library
     std::unique_ptr<GLCore::Shader> m_Shader;
+    std::unique_ptr<GLCore::Shader> m_FlatColorShader;
 
     //Camera
     std::unique_ptr<FirstPersonCamera> m_Camera;
@@ -50,5 +52,6 @@ private:
     // Lights
     std::unique_ptr<DirectionalLight> m_DirectionalLight;
     std::array<std::unique_ptr<PointLight>, NR_POINT_LIGHTS> m_PointLights;
+    std::unique_ptr<SpotLight> m_FlashLight;
 };
 
