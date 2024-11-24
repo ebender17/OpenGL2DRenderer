@@ -1,8 +1,19 @@
 #pragma once
 
+#define NR_POINT_LIGHTS 4
+
 #include <GLCore.h>
 
 #include "3D/Camera/FirstPersonCamera.h"
+#include "3D/Lighting/Light.h"
+
+struct Material
+{
+    uint32_t DiffuseId;
+    uint32_t SpecularId;
+    uint32_t EmissionId;
+    float Shininess;
+};
 
 class RawOpenGLSandbox : public GLCore::Layer
 {
@@ -18,22 +29,29 @@ public:
     virtual void OnEvent(GLCore::Event& event) override;
 
 private:
+    void InitLights();
     void InitCamera();
+    void GenerateTexture2D(const std::string& filepath, uint32_t* texture);
 
     bool OnWindowResized(GLCore::WindowResizeEvent& event);
 private:
     uint32_t m_VAO;
+    uint32_t m_LightCubeVAO;
     uint32_t m_VBO;
     uint32_t m_EBO;
-    uint32_t m_CheckerboardTexture;
+    
+    Material m_Material;
 
     // TODO : Use Shader Library
     std::unique_ptr<GLCore::Shader> m_Shader;
+    std::unique_ptr<GLCore::Shader> m_FlatColorShader;
 
     //Camera
     std::unique_ptr<FirstPersonCamera> m_Camera;
 
-    // Light
-    glm::vec3 lightPos = glm::vec3(1.2f, 1.0f, 2.0f);
+    // Lights
+    std::unique_ptr<DirectionalLight> m_DirectionalLight;
+    std::array<std::unique_ptr<PointLight>, NR_POINT_LIGHTS> m_PointLights;
+    std::unique_ptr<SpotLight> m_FlashLight;
 };
 

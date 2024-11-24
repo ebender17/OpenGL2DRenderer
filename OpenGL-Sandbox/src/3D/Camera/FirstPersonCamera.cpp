@@ -135,11 +135,16 @@ glm::mat4 FirstPersonCamera::GetViewProjectionMatrix() const
     return m_PerspectiveProj * GetViewMatrix();
 }
 
+glm::vec3 FirstPersonCamera::GetForward() const
+{
+    glm::mat4 view = GetViewMatrix();
+    return glm::vec3(view[0][2], view[1][2], view[2][2]);
+}
+
 void FirstPersonCamera::SetUpVector()
 {
     // Disables rotation around z-axis, no roll
-    glm::mat4 view = GetViewMatrix();
-    glm::vec3 forward = glm::vec3(view[0][2], view[1][2], view[2][2]);
+    glm::vec3 forward = GetForward();
 
     if ((CAMERA_LEFT_HANDED))
     {
