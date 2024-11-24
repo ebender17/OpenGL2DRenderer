@@ -1,4 +1,4 @@
-#include "RawOpenGLSandbox.h"
+#include "Basic3DLightingSandbox.h"
 
 #include "Platform/OpenGL/Debug/OpenGLDebug.h"
 #include "Platform/OpenGL/Renderer/OpenGLShader.h"
@@ -16,12 +16,12 @@
 
 using namespace GLCore;
 
-RawOpenGLSandbox::RawOpenGLSandbox()
+Basic3DLightingSandbox::Basic3DLightingSandbox()
     : Layer("Sandbox2D")
 {
 }
 
-void RawOpenGLSandbox::OnAttach()
+void Basic3DLightingSandbox::OnAttach()
 {
     EnableGLDebugging();
     SetGLDebugLogLevel(DebugLogLevel::Notification);
@@ -150,14 +150,14 @@ void RawOpenGLSandbox::OnAttach()
     glBindVertexArray(0);
 }
 
-void RawOpenGLSandbox::OnDetach()
+void Basic3DLightingSandbox::OnDetach()
 {
     glDeleteVertexArrays(1, &m_VAO);
     glDeleteBuffers(1, &m_VBO);
     glDeleteBuffers(1, &m_EBO);
 }
 
-void RawOpenGLSandbox::OnUpdate(GLCore::Timestep timestep)
+void Basic3DLightingSandbox::OnUpdate(GLCore::Timestep timestep)
 {
     // Update
     m_Camera->OnUpdate(timestep);
@@ -226,17 +226,17 @@ void RawOpenGLSandbox::OnUpdate(GLCore::Timestep timestep)
     // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
-void RawOpenGLSandbox::OnImGuiRender()
+void Basic3DLightingSandbox::OnImGuiRender()
 {
 }
 
-void RawOpenGLSandbox::OnEvent(GLCore::Event& event)
+void Basic3DLightingSandbox::OnEvent(GLCore::Event& event)
 {
     EventDispatcher dispatcher(event);
-    dispatcher.Dispatch<WindowResizeEvent>(GLCORE_BIND_EVENT_FN(RawOpenGLSandbox::OnWindowResized));
+    dispatcher.Dispatch<WindowResizeEvent>(GLCORE_BIND_EVENT_FN(Basic3DLightingSandbox::OnWindowResized));
 }
 
-void RawOpenGLSandbox::InitLights()
+void Basic3DLightingSandbox::InitLights()
 {
     m_DirectionalLight = std::make_unique<DirectionalLight>(glm::vec3(-0.2f, -1.0f, -0.3f),
         glm::vec3(0.05f, 0.05f, 0.1f),
@@ -272,14 +272,14 @@ void RawOpenGLSandbox::InitLights()
         1.0f, 0.09f, 0.032f, glm::cos(glm::radians(10.0f)), glm::cos(glm::radians(15.0f)));
 }
 
-void RawOpenGLSandbox::InitCamera()
+void Basic3DLightingSandbox::InitCamera()
 {
     PerspectiveProjInfo persProjInfo = { 45.0f, (float)1280, (float)720, 0.1f, 1000.0f };
     m_Camera = std::make_unique<FirstPersonCamera>(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 1.0f, 0.0f), persProjInfo);
 }
 
-void RawOpenGLSandbox::GenerateTexture2D(const std::string& filepath, uint32_t* texture)
+void Basic3DLightingSandbox::GenerateTexture2D(const std::string& filepath, uint32_t* texture)
 {
     int width, height, channels;
     stbi_set_flip_vertically_on_load(true);
@@ -327,7 +327,7 @@ void RawOpenGLSandbox::GenerateTexture2D(const std::string& filepath, uint32_t* 
     stbi_image_free(data);
 }
 
-bool RawOpenGLSandbox::OnWindowResized(GLCore::WindowResizeEvent& event)
+bool Basic3DLightingSandbox::OnWindowResized(GLCore::WindowResizeEvent& event)
 {
     unsigned int width = event.GetWidth();
     unsigned int height = event.GetHeight();
