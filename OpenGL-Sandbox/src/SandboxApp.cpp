@@ -3,7 +3,8 @@
 
 #include "SandboxLayer.h"
 #include "Sandbox2D.h"
-#include "RawOpenGLSandbox.h"
+#include "Basic3DLightingSandbox.h"
+#include "OpenGLSandbox.h"
 
 class Sandbox : public GLCore::Application
 {
@@ -12,7 +13,8 @@ public:
     {
         // PushLayer(new SandboxLayer());
         // PushLayer(new Sandbox2D());
-        PushLayer(new RawOpenGLSandbox());
+        // PushLayer(new Basic3DLightingSandbox());
+        PushLayer(new OpenGLSandbox());
     }
 
     ~Sandbox()

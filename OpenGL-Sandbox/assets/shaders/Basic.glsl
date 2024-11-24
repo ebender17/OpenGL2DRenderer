@@ -92,12 +92,12 @@ void main()
 
     vec3 result = CalcDirLight(u_DirLight, norm, viewDir);
 
-    for (int i = 0; i < 4; i++)
+    /* for (int i = 0; i < 4; i++)
     {
         result += CalcPointLight(u_PointLights[i], norm, v_FragPos, viewDir);
     }
 
-    result += CalcSpotLight(u_SpotLight, norm, v_FragPos, viewDir);
+    result += CalcSpotLight(u_SpotLight, norm, v_FragPos, viewDir); */
     color = vec4(result, 1.0);
 }
 

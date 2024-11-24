@@ -1,4 +1,4 @@
-#include "Basic3DLightingSandbox.h"
+#include "OpenGLSandbox.h"
 
 #include "Platform/OpenGL/Debug/OpenGLDebug.h"
 #include "Platform/OpenGL/Renderer/OpenGLShader.h"
@@ -16,12 +16,12 @@
 
 using namespace GLCore;
 
-Basic3DLightingSandbox::Basic3DLightingSandbox()
-    : Layer("Basic3DLightingSandbox")
+OpenGLSandbox::OpenGLSandbox()
+    : Layer("OpenGLSandbox")
 {
 }
 
-void Basic3DLightingSandbox::OnAttach()
+void OpenGLSandbox::OnAttach()
 {
     EnableGLDebugging();
     SetGLDebugLogLevel(DebugLogLevel::Notification);
@@ -32,7 +32,7 @@ void Basic3DLightingSandbox::OnAttach()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
+
     // vertex position, tex coords, normals
     float vertices[] = {
         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,  0.0f,  0.0f, -1.0f,
@@ -87,7 +87,7 @@ void Basic3DLightingSandbox::OnAttach()
 
     glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
- 
+
     // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
     // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
@@ -101,17 +101,17 @@ void Basic3DLightingSandbox::OnAttach()
     // Load and create textures
     GenerateTexture2D("assets/textures/wooden-box-diffuse.png", &m_Material.DiffuseId);
     GenerateTexture2D("assets/textures/wooden-box-specular.png", &m_Material.SpecularId);
-    GenerateTexture2D("assets/textures/box-emissive.png", &m_Material.EmissionId);
+    // GenerateTexture2D("assets/textures/box-emissive.png", &m_Material.EmissionId);
 
     // Shaders
     m_FlatColorShader = std::make_unique<OpenGLShader>("assets/shaders/FlatColor.glsl");
     m_FlatColorShader->Bind();
 
-    m_Shader = std::make_unique<OpenGLShader>("assets/shaders/Basic.glsl");
+    m_Shader = std::make_unique<OpenGLShader>("assets/shaders/BasicDirLightOnly.glsl");
     m_Shader->Bind();
     m_Shader->SetInt("u_Material.diffuse", 0);
     m_Shader->SetInt("u_Material.specular", 1);
-    m_Shader->SetInt("u_Material.emission", 2);
+    // m_Shader->SetInt("u_Material.emission", 2);
     m_Shader->SetFloat("u_Material.shininess", 32.0f);
 
     // Shader lighting uniforms
@@ -119,26 +119,6 @@ void Basic3DLightingSandbox::OnAttach()
     m_Shader->SetFloat3("u_DirLight.ambient", m_DirectionalLight->Ambient);
     m_Shader->SetFloat3("u_DirLight.diffuse", m_DirectionalLight->Diffuse);
     m_Shader->SetFloat3("u_DirLight.specular", m_DirectionalLight->Specular);
-
-    for (int i = 0; i < 4; i++)
-    {
-        m_Shader->SetFloat3(std::format("u_PointLights[{}].position", i), m_PointLights[i]->Position);
-        m_Shader->SetFloat3(std::format("u_PointLights[{}].ambient", i), m_PointLights[i]->Ambient);
-        m_Shader->SetFloat3(std::format("u_PointLights[{}].diffuse", i), m_PointLights[i]->Diffuse);
-        m_Shader->SetFloat3(std::format("u_PointLights[{}].specular", i), m_PointLights[i]->Specular);
-        m_Shader->SetFloat(std::format("u_PointLights[{}].constant", i), m_PointLights[i]->Constant);
-        m_Shader->SetFloat(std::format("u_PointLights[{}].linear", i),m_PointLights[i]->Linear);
-        m_Shader->SetFloat(std::format("u_PointLights[{}].quadratic", i), m_PointLights[i]->Quadratic);
-    }
-
-    m_Shader->SetFloat3("u_SpotLight.ambient", m_FlashLight->Ambient);
-    m_Shader->SetFloat3("u_SpotLight.diffuse", m_FlashLight->Diffuse);
-    m_Shader->SetFloat3("u_SpotLight.specular", m_FlashLight->Specular);
-    m_Shader->SetFloat("u_SpotLight.constant", m_FlashLight->Constant);
-    m_Shader->SetFloat("u_SpotLight.linear", m_FlashLight->Linear);
-    m_Shader->SetFloat("u_SpotLight.quadratic", m_FlashLight->Quadratic);
-    m_Shader->SetFloat("u_SpotLight.innerCutOff", m_FlashLight->InnerCutOff);
-    m_Shader->SetFloat("u_SpotLight.outerCutOff", m_FlashLight->OuterCutOff);
 
     glGenVertexArrays(1, &m_LightCubeVAO);
     glBindVertexArray(m_LightCubeVAO);
@@ -150,14 +130,14 @@ void Basic3DLightingSandbox::OnAttach()
     glBindVertexArray(0);
 }
 
-void Basic3DLightingSandbox::OnDetach()
+void OpenGLSandbox::OnDetach()
 {
     glDeleteVertexArrays(1, &m_VAO);
     glDeleteBuffers(1, &m_VBO);
     glDeleteBuffers(1, &m_EBO);
 }
 
-void Basic3DLightingSandbox::OnUpdate(GLCore::Timestep timestep)
+void OpenGLSandbox::OnUpdate(GLCore::Timestep timestep)
 {
     // Update
     m_Camera->OnUpdate(timestep);
@@ -172,9 +152,6 @@ void Basic3DLightingSandbox::OnUpdate(GLCore::Timestep timestep)
     m_Shader->SetMat4("u_ViewProjection", viewProjectionMatrix);
     m_Shader->SetFloat3("u_ViewPos", camPos);
     m_Shader->SetFloat("u_Time", glfwGetTime());
-
-    m_Shader->SetFloat3("u_SpotLight.position", camPos);
-    m_Shader->SetFloat3("u_SpotLight.direction", m_Camera->GetForward());
 
     // Model matrix
     // TODO : move outside of update loop
@@ -209,77 +186,40 @@ void Basic3DLightingSandbox::OnUpdate(GLCore::Timestep timestep)
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
 
-    m_FlatColorShader->Bind();
-    m_FlatColorShader->SetMat4("u_ViewProjection", viewProjectionMatrix);
-    glBindVertexArray(m_LightCubeVAO);
-    for (unsigned int i = 0; i < m_PointLights.size(); i++)
-    {
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, m_PointLights[i]->Position);
-        model = glm::scale(model, glm::vec3(0.2f));
-        m_FlatColorShader->SetMat4("u_Transform", model);
-        glm::vec3 color = m_PointLights[i]->Diffuse;
-        m_FlatColorShader->SetFloat4("u_Color", { color.x, color.y, color.z, 1.0 });
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-    }
+    // TODO : draw outlines
+    // m_FlatColorShader->Bind();
+    // m_FlatColorShader->SetMat4("u_ViewProjection", viewProjectionMatrix);
 
     // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
-void Basic3DLightingSandbox::OnImGuiRender()
+void OpenGLSandbox::OnImGuiRender()
 {
 }
 
-void Basic3DLightingSandbox::OnEvent(GLCore::Event& event)
+void OpenGLSandbox::OnEvent(GLCore::Event& event)
 {
     EventDispatcher dispatcher(event);
-    dispatcher.Dispatch<WindowResizeEvent>(GLCORE_BIND_EVENT_FN(Basic3DLightingSandbox::OnWindowResized));
+    dispatcher.Dispatch<WindowResizeEvent>(GLCORE_BIND_EVENT_FN(OpenGLSandbox::OnWindowResized));
 }
 
-void Basic3DLightingSandbox::InitLights()
+void OpenGLSandbox::InitLights()
 {
     m_DirectionalLight = std::make_unique<DirectionalLight>(glm::vec3(-0.2f, -1.0f, -0.3f),
-        glm::vec3(0.05f, 0.05f, 0.1f),
-        glm::vec3(0.2f, 0.2f, 0.7),
-        glm::vec3(0.7f, 0.7f, 0.7f));
+        glm::vec3(0.3f, 0.24f, 0.14f),
+        glm::vec3(0.7f, 0.42f, 0.26f),
+        glm::vec3(0.5f, 0.5f, 0.5f));
 
-    float constant = 1.0f;
-    float linear = 0.09f;
-    float quadratic = 0.032f;
-    glm::vec3 pointLightColors[] = {
-        glm::vec3(0.2f, 0.2f, 0.6f),
-        glm::vec3(0.3f, 0.3f, 0.7f),
-        glm::vec3(0.0f, 0.0f, 0.3f),
-        glm::vec3(0.4f, 0.4f, 0.4f)
-    };
-
-    m_PointLights = {
-        std::make_unique<PointLight>(glm::vec3(0.7f,  0.2f,  2.0f),
-        pointLightColors[0] * glm::vec3(0.1f), pointLightColors[0], pointLightColors[0], constant, linear, quadratic),
-        std::make_unique<PointLight>(glm::vec3(2.3f, -3.3f, -4.0f),
-        pointLightColors[1] * glm::vec3(0.1f), pointLightColors[1], pointLightColors[1], constant, linear, quadratic),
-        std::make_unique<PointLight>(glm::vec3(-4.0f,  2.0f, -12.0f),
-        pointLightColors[2] * glm::vec3(0.1f), pointLightColors[2], pointLightColors[2], constant, linear, quadratic),
-        std::make_unique<PointLight>(glm::vec3(0.0f,  0.0f, -3.0f),
-        pointLightColors[3] * glm::vec3(0.1f), pointLightColors[3], pointLightColors[3], constant, linear, quadratic),
-    };
-
-    m_FlashLight = std::make_unique<SpotLight>(glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(1.0f, 1.0f, 1.0f),
-        glm::vec3(1.0f, 1.0f, 1.0f),
-        1.0f, 0.09f, 0.032f, glm::cos(glm::radians(10.0f)), glm::cos(glm::radians(15.0f)));
 }
 
-void Basic3DLightingSandbox::InitCamera()
+void OpenGLSandbox::InitCamera()
 {
     PerspectiveProjInfo persProjInfo = { 45.0f, (float)1280, (float)720, 0.1f, 1000.0f };
     m_Camera = std::make_unique<FirstPersonCamera>(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 1.0f, 0.0f), persProjInfo);
 }
 
-void Basic3DLightingSandbox::GenerateTexture2D(const std::string& filepath, uint32_t* texture)
+void OpenGLSandbox::GenerateTexture2D(const std::string& filepath, uint32_t* texture)
 {
     int width, height, channels;
     stbi_set_flip_vertically_on_load(true);
@@ -327,7 +267,7 @@ void Basic3DLightingSandbox::GenerateTexture2D(const std::string& filepath, uint
     stbi_image_free(data);
 }
 
-bool Basic3DLightingSandbox::OnWindowResized(GLCore::WindowResizeEvent& event)
+bool OpenGLSandbox::OnWindowResized(GLCore::WindowResizeEvent& event)
 {
     unsigned int width = event.GetWidth();
     unsigned int height = event.GetHeight();
