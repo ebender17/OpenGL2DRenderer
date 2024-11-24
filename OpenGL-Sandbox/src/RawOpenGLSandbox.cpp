@@ -106,7 +106,6 @@ void RawOpenGLSandbox::OnAttach()
     // Shaders
     m_FlatColorShader = std::make_unique<OpenGLShader>("assets/shaders/FlatColor.glsl");
     m_FlatColorShader->Bind();
-    m_FlatColorShader->SetFloat4("u_Color", { 1.0, 1.0, 1.0, 1.0 });
 
     m_Shader = std::make_unique<OpenGLShader>("assets/shaders/Basic.glsl");
     m_Shader->Bind();
@@ -115,6 +114,7 @@ void RawOpenGLSandbox::OnAttach()
     m_Shader->SetInt("u_Material.emission", 2);
     m_Shader->SetFloat("u_Material.shininess", 32.0f);
 
+    // Shader lighting uniforms
     m_Shader->SetFloat3("u_DirLight.direction", m_DirectionalLight->Direction);
     m_Shader->SetFloat3("u_DirLight.ambient", m_DirectionalLight->Ambient);
     m_Shader->SetFloat3("u_DirLight.diffuse", m_DirectionalLight->Diffuse);
@@ -174,7 +174,7 @@ void RawOpenGLSandbox::OnUpdate(GLCore::Timestep timestep)
     m_Shader->SetFloat("u_Time", glfwGetTime());
 
     m_Shader->SetFloat3("u_SpotLight.position", camPos);
-    m_Shader->SetFloat3("u_SpotLight.direction", m_Camera->GetFront());
+    m_Shader->SetFloat3("u_SpotLight.direction", m_Camera->GetForward());
 
     // Model matrix
     // TODO : move outside of update loop
@@ -218,6 +218,8 @@ void RawOpenGLSandbox::OnUpdate(GLCore::Timestep timestep)
         model = glm::translate(model, m_PointLights[i]->Position);
         model = glm::scale(model, glm::vec3(0.2f));
         m_FlatColorShader->SetMat4("u_Transform", model);
+        glm::vec3 color = m_PointLights[i]->Diffuse;
+        m_FlatColorShader->SetFloat4("u_Color", { color.x, color.y, color.z, 1.0 });
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
 
@@ -237,26 +239,29 @@ void RawOpenGLSandbox::OnEvent(GLCore::Event& event)
 void RawOpenGLSandbox::InitLights()
 {
     m_DirectionalLight = std::make_unique<DirectionalLight>(glm::vec3(-0.2f, -1.0f, -0.3f),
-        glm::vec3(0.05f, 0.05f, 0.05f),
-        glm::vec3(0.4f, 0.4f, 0.4f),
-        glm::vec3(0.5f, 0.5f, 0.5f));
+        glm::vec3(0.05f, 0.05f, 0.1f),
+        glm::vec3(0.2f, 0.2f, 0.7),
+        glm::vec3(0.7f, 0.7f, 0.7f));
 
-    glm::vec3 ambient = glm::vec3(0.05f, 0.05f, 0.05f);
-    glm::vec3 diffuse = glm::vec3(0.8f, 0.8f, 0.8f);
-    glm::vec3 specular = glm::vec3(1.0f, 1.0f, 1.0f);
     float constant = 1.0f;
     float linear = 0.09f;
     float quadratic = 0.032f;
+    glm::vec3 pointLightColors[] = {
+        glm::vec3(0.2f, 0.2f, 0.6f),
+        glm::vec3(0.3f, 0.3f, 0.7f),
+        glm::vec3(0.0f, 0.0f, 0.3f),
+        glm::vec3(0.4f, 0.4f, 0.4f)
+    };
 
     m_PointLights = {
         std::make_unique<PointLight>(glm::vec3(0.7f,  0.2f,  2.0f),
-        ambient, diffuse, specular, constant, linear, quadratic),
+        pointLightColors[0] * glm::vec3(0.1f), pointLightColors[0], pointLightColors[0], constant, linear, quadratic),
         std::make_unique<PointLight>(glm::vec3(2.3f, -3.3f, -4.0f),
-        ambient, diffuse, specular, constant, linear, quadratic),
+        pointLightColors[1] * glm::vec3(0.1f), pointLightColors[1], pointLightColors[1], constant, linear, quadratic),
         std::make_unique<PointLight>(glm::vec3(-4.0f,  2.0f, -12.0f),
-        ambient, diffuse, specular, constant, linear, quadratic),
+        pointLightColors[2] * glm::vec3(0.1f), pointLightColors[2], pointLightColors[2], constant, linear, quadratic),
         std::make_unique<PointLight>(glm::vec3(0.0f,  0.0f, -3.0f),
-        ambient, diffuse, specular, constant, linear, quadratic),
+        pointLightColors[3] * glm::vec3(0.1f), pointLightColors[3], pointLightColors[3], constant, linear, quadratic),
     };
 
     m_FlashLight = std::make_unique<SpotLight>(glm::vec3(0.0f, 0.0f, 0.0f),
@@ -264,7 +269,7 @@ void RawOpenGLSandbox::InitLights()
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(1.0f, 1.0f, 1.0f),
         glm::vec3(1.0f, 1.0f, 1.0f),
-        1.0f, 0.09f, 0.032f, glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f)));
+        1.0f, 0.09f, 0.032f, glm::cos(glm::radians(10.0f)), glm::cos(glm::radians(15.0f)));
 }
 
 void RawOpenGLSandbox::InitCamera()
