@@ -30,7 +30,10 @@ void OpenGLSandbox::OnAttach()
     InitCamera();
 
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
+    glEnable(GL_STENCIL_TEST);
+    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+;   glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // vertex position, tex coords, normals
@@ -106,6 +109,7 @@ void OpenGLSandbox::OnAttach()
     // Shaders
     m_FlatColorShader = std::make_unique<OpenGLShader>("assets/shaders/FlatColor.glsl");
     m_FlatColorShader->Bind();
+    m_FlatColorShader->SetFloat4("u_Color", { 0.0f, 0.8f, 0.9f, 1.0f });
 
     m_Shader = std::make_unique<OpenGLShader>("assets/shaders/BasicDirLightOnly.glsl");
     m_Shader->Bind();
@@ -144,7 +148,7 @@ void OpenGLSandbox::OnUpdate(GLCore::Timestep timestep)
 
     // Render
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     glm::mat4 viewProjectionMatrix = m_Camera->GetViewProjectionMatrix();
     glm::vec3 camPos = m_Camera->GetPosition();
@@ -153,44 +157,57 @@ void OpenGLSandbox::OnUpdate(GLCore::Timestep timestep)
     m_Shader->SetFloat3("u_ViewPos", camPos);
     m_Shader->SetFloat("u_Time", glfwGetTime());
 
-    // Model matrix
-    // TODO : move outside of update loop
-    glm::vec3 cubePositions[] = {
-        glm::vec3(0.0f,  0.0f,  0.0f),
-        glm::vec3(2.0f,  5.0f, -15.0f),
-        glm::vec3(-1.5f, -2.2f, -2.5f),
-        glm::vec3(-3.8f, -2.0f, -12.3f),
-        glm::vec3(2.4f, -0.4f, -3.5f),
-        glm::vec3(-1.7f,  3.0f, -7.5f),
-        glm::vec3(1.3f, -2.0f, -2.5f),
-        glm::vec3(1.5f,  2.0f, -2.5f),
-        glm::vec3(1.5f,  0.2f, -1.5f),
-        glm::vec3(-1.3f,  1.0f, -1.5f)
-    };
+    // TODO : draw floor
+
+    // First render pass. Draw objects as normal and write to stencil buffer.
+    glStencilFunc(GL_ALWAYS, 1, 0xFF);
+    glStencilMask(0xFF); // enable writing to stencil buffer
+
+    glBindVertexArray(m_VAO);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_Material.DiffuseId);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, m_Material.SpecularId);
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, m_Material.EmissionId);
+    // glActiveTexture(GL_TEXTURE2);
+    // glBindTexture(GL_TEXTURE_2D, m_Material.EmissionId);
 
-    glBindVertexArray(m_VAO);
-    for (unsigned int i = 0; i < 10; i++)
-    {
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, cubePositions[i]);
-        float angle = 20.0f * i;
-        model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-        m_Shader->SetMat4("u_Model", model);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-    }
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
+    m_Shader->SetMat4("u_Model", model);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
 
-    // TODO : draw outlines
-    // m_FlatColorShader->Bind();
-    // m_FlatColorShader->SetMat4("u_ViewProjection", viewProjectionMatrix);
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
+    m_Shader->SetMat4("u_Model", model);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    
 
-    // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    // Second render pass. Draw slightly scaled version of objects without writing to stencil buffer.
+    // Only draw parts of object where stencil buffer does not equal 1. Gives us an outline.
+    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+    glStencilMask(0x00); // disable writing to stencil buffer
+    glDisable(GL_DEPTH_TEST);
+    m_FlatColorShader->Bind();
+    m_FlatColorShader->SetMat4("u_ViewProjection", viewProjectionMatrix);
+    float scale = 1.1f;
+
+    model = glm::mat4(1.0f);
+    model = glm::scale(model, { scale, scale, scale });
+    model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
+    m_Shader->SetMat4("u_Model", model);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    model = glm::mat4(1.0f);
+    model = glm::scale(model, { scale, scale, scale });
+    model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
+    m_Shader->SetMat4("u_Model", model);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    glBindVertexArray(0);
+    glStencilMask(0xFF);
+    glStencilFunc(GL_ALWAYS, 0, 0xFF);
+    glEnable(GL_DEPTH_TEST);
 }
 
 void OpenGLSandbox::OnImGuiRender()
