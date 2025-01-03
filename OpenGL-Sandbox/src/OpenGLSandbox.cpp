@@ -171,6 +171,7 @@ void OpenGLSandbox::OnUpdate(GLCore::Timestep timestep)
     modelFloor = glm::rotate(modelFloor, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     modelFloor = glm::scale(modelFloor, glm::vec3(7.0f, 7.0f, 1.0f));
     m_Shader->SetMat4("u_Model", modelFloor);
+    m_Shader->SetFloat("u_TilingFactor", 7.0f);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
     // Draw boxes
@@ -179,6 +180,7 @@ void OpenGLSandbox::OnUpdate(GLCore::Timestep timestep)
     glBindVertexArray(m_CubeVAO);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_TileTexture);
+    m_Shader->SetFloat("u_TilingFactor", 1.0f);
     glm::mat4 model1 = glm::mat4(1.0f);
     model1 = glm::translate(model1, glm::vec3(-1.0f, 0.0f, -1.0f));
     m_Shader->SetMat4("u_Model", model1);
