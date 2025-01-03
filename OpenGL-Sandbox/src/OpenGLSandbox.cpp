@@ -78,16 +78,22 @@ void OpenGLSandbox::OnAttach()
         -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
-    // positions, tex coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
+    // positions, tex coords
     float quadVertices[] = {
-         5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
-        -5.0f, -0.5f,  5.0f,  0.0f, 0.0f,
-        -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
-
-         5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
-        -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
-         5.0f, -0.5f, -5.0f,  2.0f, 2.0f
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
     };
+
+    m_VegetationPositions.reserve(5);
+    m_VegetationPositions.emplace_back(glm::vec3(-1.5f, -0.1f, 0.5f));
+    m_VegetationPositions.emplace_back(glm::vec3(1.5f, -0.1f, 1.2f));
+    m_VegetationPositions.emplace_back(glm::vec3(0.0f, -0.1f, 0.7f));
+    m_VegetationPositions.emplace_back(glm::vec3(-0.3f, -0.1f, -2.3f));
+    m_VegetationPositions.emplace_back(glm::vec3(0.5f, -0.1f, -0.6f));
 
     // Setup buffers
     glGenVertexArrays(1, &m_CubeVAO);
@@ -113,8 +119,9 @@ void OpenGLSandbox::OnAttach()
     glBindVertexArray(0);
 
     // Load and create textures
-    GenerateTexture2D("assets/textures/tile.png", &m_TileTexture);
-    GenerateTexture2D("assets/textures/metal.png", &m_MetalTexture);
+    GenerateTexture2D("assets/textures/tile.png", &m_TileTexture, GL_REPEAT);
+    GenerateTexture2D("assets/textures/metal.png", &m_MetalTexture, GL_REPEAT);
+    GenerateTexture2D("assets/textures/flat-grass-sprite.png", &m_GrassSpriteTexture, GL_CLAMP_TO_EDGE);
 
     // Shaders
     m_FlatColorShader = std::make_unique<OpenGLShader>("assets/shaders/FlatColor.glsl");
@@ -123,6 +130,10 @@ void OpenGLSandbox::OnAttach()
     m_Shader = std::make_unique<OpenGLShader>("assets/shaders/FlatTexture.glsl");
     m_Shader->Bind();
     m_Shader->SetInt("u_Texture", 0);
+    m_AlphaClippedShader = std::make_unique<OpenGLShader>("assets/shaders/AlphaClippedTexture.glsl");
+    m_AlphaClippedShader->Bind();
+    m_AlphaClippedShader->SetFloat("u_AlphaThreshold", 0.1f);
+    m_AlphaClippedShader->SetFloat4("u_Color", { 0.09f, 0.73f, 0.47f, 1.0f });
 
     glBindBuffer(GL_ARRAY_BUFFER, m_CubeVBO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
@@ -151,13 +162,16 @@ void OpenGLSandbox::OnUpdate(GLCore::Timestep timestep)
     m_Shader->Bind();
     m_Shader->SetMat4("u_ViewProjection", viewProjectionMatrix);
 
+    // Floor
     glStencilMask(0x00);
     glBindVertexArray(m_QuadVAO);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_MetalTexture);
-    m_Shader->SetMat4("u_Model", glm::mat4(1.0f));
+    glm::mat4 modelFloor = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.1f, 0.0f));
+    modelFloor = glm::rotate(modelFloor, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    modelFloor = glm::scale(modelFloor, glm::vec3(7.0f, 7.0f, 1.0f));
+    m_Shader->SetMat4("u_Model", modelFloor);
     glDrawArrays(GL_TRIANGLES, 0, 6);
-    glBindVertexArray(0);
 
     // Draw boxes
     glStencilFunc(GL_ALWAYS, 1, 0xFF);
@@ -188,10 +202,24 @@ void OpenGLSandbox::OnUpdate(GLCore::Timestep timestep)
     m_FlatColorShader->SetMat4("u_Model", model2);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
-    glBindVertexArray(0);
     glStencilMask(0xFF);
     glStencilFunc(GL_ALWAYS, 0, 0xFF);
     glEnable(GL_DEPTH_TEST);
+
+    // Vegetation
+    glBindVertexArray(m_QuadVAO);
+    m_AlphaClippedShader->Bind();
+    m_AlphaClippedShader->SetMat4("u_ViewProjection", viewProjectionMatrix);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_GrassSpriteTexture);
+    for (glm::vec3 position : m_VegetationPositions)
+    {
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, position);
+        m_AlphaClippedShader->SetMat4("u_Model", model);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+    }
+    glBindVertexArray(0);
 }
 
 void OpenGLSandbox::OnImGuiRender()
@@ -211,7 +239,7 @@ void OpenGLSandbox::InitCamera()
         glm::vec3(0.0f, 1.0f, 0.0f), persProjInfo);
 }
 
-void OpenGLSandbox::GenerateTexture2D(const std::string& filepath, uint32_t* texture)
+void OpenGLSandbox::GenerateTexture2D(const std::string& filepath, uint32_t* texture, uint32_t wrapOption)
 {
     int width, height, channels;
     stbi_set_flip_vertically_on_load(true);
@@ -248,8 +276,8 @@ void OpenGLSandbox::GenerateTexture2D(const std::string& filepath, uint32_t* tex
     glGenTextures(1, texture);
     glBindTexture(GL_TEXTURE_2D, *texture);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapOption);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapOption);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 

@@ -23,7 +23,7 @@ public:
 
 private:
     void InitCamera();
-    void GenerateTexture2D(const std::string& filepath, uint32_t* texture);
+    void GenerateTexture2D(const std::string& filepath, uint32_t* texture, uint32_t wrapOption);
 
     bool OnWindowResized(GLCore::WindowResizeEvent& event);
 private:
@@ -34,14 +34,18 @@ private:
 
     uint32_t m_TileTexture;
     uint32_t m_MetalTexture;
+    uint32_t m_GrassSpriteTexture;
 
     Material m_Material;
 
     // TODO : Use Shader Library
     std::unique_ptr<GLCore::Shader> m_Shader;
     std::unique_ptr<GLCore::Shader> m_FlatColorShader;
+    std::unique_ptr<GLCore::Shader> m_AlphaClippedShader;
 
     //Camera
     std::unique_ptr<FirstPersonCamera> m_Camera;
+
+    std::vector<glm::vec3> m_VegetationPositions;
 };
 
