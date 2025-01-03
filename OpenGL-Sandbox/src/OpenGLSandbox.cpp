@@ -26,7 +26,6 @@ void OpenGLSandbox::OnAttach()
     EnableGLDebugging();
     SetGLDebugLogLevel(DebugLogLevel::Notification);
 
-    InitLights();
     InitCamera();
 
     glEnable(GL_DEPTH_TEST);
@@ -34,102 +33,98 @@ void OpenGLSandbox::OnAttach()
     glEnable(GL_STENCIL_TEST);
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-    // glEnable(GL_BLEND);
-    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    // vertex position, tex coords, normals
+    // vertex position, tex coords
     float vertices[] = {
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,  0.0f,  0.0f, -1.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,  0.0f,  0.0f, -1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,  0.0f,  0.0f, -1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,  0.0f,  0.0f, -1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,  0.0f,  0.0f, -1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,  0.0f,  0.0f, -1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,  0.0f,  0.0f,  1.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,  0.0f,  0.0f,  1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,  0.0f,  0.0f,  1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,  0.0f,  0.0f,  1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,  0.0f,  0.0f,  1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,  0.0f,  0.0f,  1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
 
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f, -1.0f,  0.0f,  0.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f, -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, -1.0f,  0.0f,  0.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f, -1.0f,  0.0f,  0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,  1.0f,  0.0f,  0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,  1.0f,  0.0f,  0.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,  1.0f,  0.0f,  0.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,  1.0f,  0.0f,  0.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,  1.0f,  0.0f,  0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,  1.0f,  0.0f,  0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,  0.0f, -1.0f,  0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,  0.0f, -1.0f,  0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,  0.0f, -1.0f,  0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,  0.0f, -1.0f,  0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,  0.0f, -1.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,  0.0f, -1.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
 
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,  0.0f,  1.0f,  0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,  0.0f,  1.0f,  0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,  0.0f,  1.0f,  0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,  0.0f,  1.0f,  0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,  0.0f,  1.0f,  0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,  0.0f,  1.0f,  0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+    };
+    // positions, tex coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
+    float quadVertices[] = {
+         5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
+        -5.0f, -0.5f,  5.0f,  0.0f, 0.0f,
+        -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
+
+         5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
+        -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
+         5.0f, -0.5f, -5.0f,  2.0f, 2.0f
     };
 
     // Setup buffers
-    glGenVertexArrays(1, &m_VAO);
-    glBindVertexArray(m_VAO);
-
-    glGenBuffers(1, &m_EBO);
-    glGenBuffers(1, &m_VBO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+    glGenVertexArrays(1, &m_CubeVAO);
+    glBindVertexArray(m_CubeVAO);
+    glGenBuffers(1, &m_CubeVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, m_CubeVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
-    // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, false, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 2, GL_FLOAT, false, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(0, 3, GL_FLOAT, false, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(2, 3, GL_FLOAT, false, 8 * sizeof(float), (void*)(5 * sizeof(float)));
-    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(1, 2, GL_FLOAT, false, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glBindVertexArray(0);
+
+    glGenVertexArrays(1, &m_QuadVAO);
+    glBindVertexArray(m_QuadVAO);
+    glGenBuffers(1, &m_QuadVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, m_QuadVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, false, 5 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, false, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glBindVertexArray(0);
 
     // Load and create textures
-    GenerateTexture2D("assets/textures/wooden-box-diffuse.png", &m_Material.DiffuseId);
-    GenerateTexture2D("assets/textures/wooden-box-specular.png", &m_Material.SpecularId);
-    // GenerateTexture2D("assets/textures/box-emissive.png", &m_Material.EmissionId);
+    GenerateTexture2D("assets/textures/tile.png", &m_TileTexture);
+    GenerateTexture2D("assets/textures/metal.png", &m_MetalTexture);
 
     // Shaders
     m_FlatColorShader = std::make_unique<OpenGLShader>("assets/shaders/FlatColor.glsl");
     m_FlatColorShader->Bind();
-    m_FlatColorShader->SetFloat4("u_Color", { 0.0f, 0.8f, 0.9f, 1.0f });
-
-    m_Shader = std::make_unique<OpenGLShader>("assets/shaders/BasicDirLightOnly.glsl");
+    m_FlatColorShader->SetFloat4("u_Color", { 0.65f, 1.0f, 0.51f, 1.0f });
+    m_Shader = std::make_unique<OpenGLShader>("assets/shaders/FlatTexture.glsl");
     m_Shader->Bind();
-    m_Shader->SetInt("u_Material.diffuse", 0);
-    m_Shader->SetInt("u_Material.specular", 1);
-    // m_Shader->SetInt("u_Material.emission", 2);
-    m_Shader->SetFloat("u_Material.shininess", 32.0f);
+    m_Shader->SetInt("u_Texture", 0);
 
-    // Shader lighting uniforms
-    m_Shader->SetFloat3("u_DirLight.direction", m_DirectionalLight->Direction);
-    m_Shader->SetFloat3("u_DirLight.ambient", m_DirectionalLight->Ambient);
-    m_Shader->SetFloat3("u_DirLight.diffuse", m_DirectionalLight->Diffuse);
-    m_Shader->SetFloat3("u_DirLight.specular", m_DirectionalLight->Specular);
-
-    glGenVertexArrays(1, &m_LightCubeVAO);
-    glBindVertexArray(m_LightCubeVAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-    // TODO : need glBufferData?
+    glBindBuffer(GL_ARRAY_BUFFER, m_CubeVBO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
@@ -138,9 +133,8 @@ void OpenGLSandbox::OnAttach()
 
 void OpenGLSandbox::OnDetach()
 {
-    glDeleteVertexArrays(1, &m_VAO);
-    glDeleteBuffers(1, &m_VBO);
-    glDeleteBuffers(1, &m_EBO);
+    glDeleteVertexArrays(1, &m_CubeVAO);
+    glDeleteBuffers(1, &m_CubeVBO);
 }
 
 void OpenGLSandbox::OnUpdate(GLCore::Timestep timestep)
@@ -156,54 +150,42 @@ void OpenGLSandbox::OnUpdate(GLCore::Timestep timestep)
     glm::vec3 camPos = m_Camera->GetPosition();
     m_Shader->Bind();
     m_Shader->SetMat4("u_ViewProjection", viewProjectionMatrix);
-    m_Shader->SetFloat3("u_ViewPos", camPos);
-    m_Shader->SetFloat("u_Time", glfwGetTime());
 
-    // TODO : draw floor
+    glStencilMask(0x00);
+    glBindVertexArray(m_QuadVAO);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_MetalTexture);
+    m_Shader->SetMat4("u_Model", glm::mat4(1.0f));
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glBindVertexArray(0);
 
-    // First render pass. Draw objects as normal and write to stencil buffer.
+    // Draw boxes
     glStencilFunc(GL_ALWAYS, 1, 0xFF);
     glStencilMask(0xFF); // enable writing to stencil buffer
-
-    glBindVertexArray(m_VAO);
-
+    glBindVertexArray(m_CubeVAO);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_Material.DiffuseId);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, m_Material.SpecularId);
-    // glActiveTexture(GL_TEXTURE2);
-    // glBindTexture(GL_TEXTURE_2D, m_Material.EmissionId);
-
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
-    m_Shader->SetMat4("u_Model", model);
+    glBindTexture(GL_TEXTURE_2D, m_TileTexture);
+    glm::mat4 model1 = glm::mat4(1.0f);
+    model1 = glm::translate(model1, glm::vec3(-1.0f, 0.0f, -1.0f));
+    m_Shader->SetMat4("u_Model", model1);
     glDrawArrays(GL_TRIANGLES, 0, 36);
-
-    model = glm::mat4(1.0f); // TODO : use different matrix so we can re-use translate below?
-    model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
-    m_Shader->SetMat4("u_Model", model);
+    glm::mat4 model2 = glm::mat4(1.0f);
+    model2 = glm::translate(model2, glm::vec3(2.0f, 0.0f, 0.0f));
+    m_Shader->SetMat4("u_Model", model2);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     
-
-    // Second render pass. Draw slightly scaled version of objects without writing to stencil buffer.
-    // Only draw parts of object where stencil buffer does not equal 1. Gives us an outline.
+    // Draw outlines
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
     glStencilMask(0x00); // disable writing to stencil buffer
     glDisable(GL_DEPTH_TEST);
     m_FlatColorShader->Bind();
     m_FlatColorShader->SetMat4("u_ViewProjection", viewProjectionMatrix);
     float scale = 1.1f;
-
-    model = glm::mat4(1.0f);
-    model = glm::scale(model, { scale, scale, scale }) * 
-        glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
-    m_FlatColorShader->SetMat4("u_Model", model);
+    model1 = glm::scale(model1, glm::vec3(scale, scale, scale));
+    m_FlatColorShader->SetMat4("u_Model", model1);
     glDrawArrays(GL_TRIANGLES, 0, 36);
-
-    model = glm::mat4(1.0f);
-    model = glm::scale(model, { scale, scale, scale }) * 
-        glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
-    m_FlatColorShader->SetMat4("u_Model", model);
+    model2 = glm::scale(model2, glm::vec3(scale, scale, scale));
+    m_FlatColorShader->SetMat4("u_Model", model2);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
     glBindVertexArray(0);
@@ -220,15 +202,6 @@ void OpenGLSandbox::OnEvent(GLCore::Event& event)
 {
     EventDispatcher dispatcher(event);
     dispatcher.Dispatch<WindowResizeEvent>(GLCORE_BIND_EVENT_FN(OpenGLSandbox::OnWindowResized));
-}
-
-void OpenGLSandbox::InitLights()
-{
-    m_DirectionalLight = std::make_unique<DirectionalLight>(glm::vec3(-0.2f, -1.0f, -0.3f),
-        glm::vec3(0.3f, 0.24f, 0.14f),
-        glm::vec3(0.7f, 0.42f, 0.26f),
-        glm::vec3(0.5f, 0.5f, 0.5f));
-
 }
 
 void OpenGLSandbox::InitCamera()

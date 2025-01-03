@@ -22,16 +22,18 @@ public:
     virtual void OnEvent(GLCore::Event& event) override;
 
 private:
-    void InitLights();
     void InitCamera();
     void GenerateTexture2D(const std::string& filepath, uint32_t* texture);
 
     bool OnWindowResized(GLCore::WindowResizeEvent& event);
 private:
-    uint32_t m_VAO;
-    uint32_t m_LightCubeVAO;
-    uint32_t m_VBO;
-    uint32_t m_EBO;
+    uint32_t m_CubeVAO;
+    uint32_t m_CubeVBO;
+    uint32_t m_QuadVAO;
+    uint32_t m_QuadVBO;
+
+    uint32_t m_TileTexture;
+    uint32_t m_MetalTexture;
 
     Material m_Material;
 
@@ -41,8 +43,5 @@ private:
 
     //Camera
     std::unique_ptr<FirstPersonCamera> m_Camera;
-
-    // Lights
-    std::unique_ptr<DirectionalLight> m_DirectionalLight;
 };
 
