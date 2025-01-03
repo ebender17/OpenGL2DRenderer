@@ -30,11 +30,12 @@ void OpenGLSandbox::OnAttach()
     InitCamera();
 
     glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
     glEnable(GL_STENCIL_TEST);
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-;   glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // glEnable(GL_BLEND);
+    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // vertex position, tex coords, normals
     float vertices[] = {
@@ -128,6 +129,7 @@ void OpenGLSandbox::OnAttach()
     glBindVertexArray(m_LightCubeVAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+    // TODO : need glBufferData?
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
@@ -177,7 +179,7 @@ void OpenGLSandbox::OnUpdate(GLCore::Timestep timestep)
     m_Shader->SetMat4("u_Model", model);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
-    model = glm::mat4(1.0f);
+    model = glm::mat4(1.0f); // TODO : use different matrix so we can re-use translate below?
     model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
     m_Shader->SetMat4("u_Model", model);
     glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -193,15 +195,15 @@ void OpenGLSandbox::OnUpdate(GLCore::Timestep timestep)
     float scale = 1.1f;
 
     model = glm::mat4(1.0f);
-    model = glm::scale(model, { scale, scale, scale });
-    model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
-    m_Shader->SetMat4("u_Model", model);
+    model = glm::scale(model, { scale, scale, scale }) * 
+        glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
+    m_FlatColorShader->SetMat4("u_Model", model);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
     model = glm::mat4(1.0f);
-    model = glm::scale(model, { scale, scale, scale });
-    model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
-    m_Shader->SetMat4("u_Model", model);
+    model = glm::scale(model, { scale, scale, scale }) * 
+        glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
+    m_FlatColorShader->SetMat4("u_Model", model);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
     glBindVertexArray(0);
