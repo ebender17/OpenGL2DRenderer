@@ -6,20 +6,13 @@
 
 #include "3D/Camera/FirstPersonCamera.h"
 #include "3D/Lighting/Light.h"
+#include "3D/Lighting/Material.h"
 
-struct Material
-{
-    uint32_t DiffuseId;
-    uint32_t SpecularId;
-    uint32_t EmissionId;
-    float Shininess;
-};
-
-class RawOpenGLSandbox : public GLCore::Layer
+class Basic3DLightingSandbox : public GLCore::Layer
 {
 public:
-    RawOpenGLSandbox();
-    virtual ~RawOpenGLSandbox() = default;
+    Basic3DLightingSandbox();
+    virtual ~Basic3DLightingSandbox() = default;
 
     virtual void OnAttach() override;
     virtual void OnDetach() override;
