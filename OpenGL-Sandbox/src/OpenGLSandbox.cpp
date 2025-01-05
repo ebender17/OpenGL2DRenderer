@@ -33,6 +33,8 @@ void OpenGLSandbox::OnAttach()
     glEnable(GL_STENCIL_TEST);
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // vertex position, tex coords
     float vertices[] = {
@@ -95,6 +97,10 @@ void OpenGLSandbox::OnAttach()
     m_VegetationPositions.emplace_back(glm::vec3(-0.3f, -0.1f, -2.3f));
     m_VegetationPositions.emplace_back(glm::vec3(0.5f, -0.1f, -0.6f));
 
+    m_WindowPositions.reserve(2);
+    m_WindowPositions.emplace_back(glm::vec3(-1.0f, 0.0f, 0.01f));
+    m_WindowPositions.emplace_back(glm::vec3(1.0f, 0.0f, -1.0f));
+
     // Setup buffers
     glGenVertexArrays(1, &m_CubeVAO);
     glBindVertexArray(m_CubeVAO);
@@ -122,6 +128,7 @@ void OpenGLSandbox::OnAttach()
     GenerateTexture2D("assets/textures/tile.png", &m_TileTexture, GL_REPEAT);
     GenerateTexture2D("assets/textures/metal.png", &m_MetalTexture, GL_REPEAT);
     GenerateTexture2D("assets/textures/flat-grass-sprite.png", &m_GrassSpriteTexture, GL_CLAMP_TO_EDGE);
+    GenerateTexture2D("assets/textures/transparent-window.png", &m_TransparentWindow, GL_CLAMP_TO_EDGE);
 
     // Shaders
     m_FlatColorShader = std::make_unique<OpenGLShader>("assets/shaders/FlatColor.glsl");
@@ -221,6 +228,25 @@ void OpenGLSandbox::OnUpdate(GLCore::Timestep timestep)
         m_AlphaClippedShader->SetMat4("u_Model", model);
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }
+
+    // Windows (from farthest to nearest to solve depth issues)
+    std::map<float, glm::vec3> sortedWindows;
+    for (glm::vec3 position : m_WindowPositions)
+    {
+        glm::vec3 difference = m_Camera->GetPosition() - position;
+        float sqrMagnitude = glm::dot(difference, difference);
+        sortedWindows[sqrMagnitude] = position;
+    }
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_TransparentWindow);
+    for (std::map<float, glm::vec3>::reverse_iterator it = sortedWindows.rbegin(); it != sortedWindows.rend(); ++it)
+    {
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, it->second);
+        m_AlphaClippedShader->SetMat4("u_Model", model);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+    }
+
     glBindVertexArray(0);
 }
 

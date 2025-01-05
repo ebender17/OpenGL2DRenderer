@@ -35,6 +35,7 @@ private:
     uint32_t m_TileTexture;
     uint32_t m_MetalTexture;
     uint32_t m_GrassSpriteTexture;
+    uint32_t m_TransparentWindow;
 
     Material m_Material;
 
@@ -47,5 +48,6 @@ private:
     std::unique_ptr<FirstPersonCamera> m_Camera;
 
     std::vector<glm::vec3> m_VegetationPositions;
+    std::vector<glm::vec3> m_WindowPositions;
 };
 
