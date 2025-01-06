@@ -1,6 +1,6 @@
 #pragma once
 
-#include <GLCore.h>
+#include <GLCore.h> // TODO : do we need this include here?
 
 #include "TileLayer.h"
 
@@ -12,7 +12,7 @@ public:
     virtual void OnUpdate(GLCore::Timestep timestep);
     void OnRender();
 
-    std::vector<TileLayer*>& GetMapLayers() { return m_Layers; }
+    std::vector<GLCore::Ref<TileLayer>>& GetMapLayers() { return m_Layers; }
 private:
-    std::vector<TileLayer*> m_Layers; // TODO : convert to smart pointers
+    std::vector< GLCore::Ref<TileLayer>> m_Layers;
 };

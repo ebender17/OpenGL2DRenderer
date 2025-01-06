@@ -11,7 +11,7 @@ struct Tileset {
     GLCore::Ref<GLCore::Texture2D> Texture;
 };
 
-using TilesetList = std::vector<Tileset*>; // TODO : convert to smart pointers
+using TilesetList = std::vector<GLCore::Ref<Tileset>>;
 using TileMap = std::vector<std::vector<int> >;
 
 class TileLayer

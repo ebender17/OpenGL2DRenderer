@@ -27,13 +27,13 @@ void TileLayer::OnRender()
             if (tileId == 0)
                 continue;
 
-            int tilesetIndex = 1;
+            int tilesetIndex = 0;
             // find tileset and tileId if using more than one tileset
             if (m_Tilesets.size() > 1) // TODO : test loading map with more than one tileset
             {
                 for (int i = 1; i < m_Tilesets.size(); i++)
                 {
-                    Tileset* tileset = m_Tilesets[tilesetIndex];
+                    auto tileset = m_Tilesets[tilesetIndex];
                     if (tileId >= tileset->FirstId && tileId <= tileset->LastId)
                     {
                         tileId = tileId + tileset->TileCount - tileset->LastId;
@@ -43,7 +43,7 @@ void TileLayer::OnRender()
                 }
             }
 
-            Tileset* ts = m_Tilesets[tilesetIndex];
+            auto ts = m_Tilesets[tilesetIndex];
             int tileRow = tileId / ts->ColumnCount;
             int tileColumn = tileId - tileRow * ts->ColumnCount - 1;
 

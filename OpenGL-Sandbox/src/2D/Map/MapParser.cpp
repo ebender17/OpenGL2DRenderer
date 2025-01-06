@@ -1,6 +1,7 @@
 #include "MapParser.h"
 
 using namespace tinyxml2;
+using namespace GLCore;
 
 static MapParser* s_Instance = nullptr;
 
@@ -17,19 +18,9 @@ void MapParser::Shutdown()
     s_Instance = nullptr;
 }
 
-bool MapParser::Load(const std::string& id, const std::string& source)
+Ref<GameMap> MapParser::Load(const std::string& source)
 {
-    return Parse(id, source);
-}
-
-void MapParser::Clean()
-{
-    for (auto entry : m_MapDict)
-    {
-        // TODO : delete pointer
-        entry.second = nullptr;
-    }
-    m_MapDict.clear();
+    return Parse(source);
 }
 
 MapParser& MapParser::GetInstance()
@@ -38,7 +29,7 @@ MapParser& MapParser::GetInstance()
     return *s_Instance;
 }
 
-bool MapParser::Parse(const std::string& id, const std::string& source)
+Ref<GameMap> MapParser::Parse(const std::string& source)
 {
     XMLDocument xml;
     xml.LoadFile(source.c_str());
@@ -46,7 +37,7 @@ bool MapParser::Parse(const std::string& id, const std::string& source)
     if (xml.Error())
     {
         LOG_ERROR("TileMap XML file could not be loaded!");
-        return false;
+        return nullptr;
     }
 
     XMLElement* root = xml.RootElement();
@@ -67,23 +58,22 @@ bool MapParser::Parse(const std::string& id, const std::string& source)
     }
 
     // Parse TileLayers
-    GameMap* gamemap = new GameMap(7); // TODO : get rid of magic number
+    auto gamemap = CreateRef<GameMap>(7); // TODO : get rid of magic number
     for (XMLElement* element = root->FirstChildElement(); element != nullptr; element = element->NextSiblingElement())
     {
         if (strcmp(element->Value(), "layer") == 0)
         {
-            TileLayer* tileLayer = ParseTileLayer(element, tilesets, tileWidth, tileHeight, rowCount, columnCount);
+            auto tileLayer = ParseTileLayer(element, tilesets, tileWidth, tileHeight, rowCount, columnCount);
             gamemap->GetMapLayers().emplace_back(tileLayer);
         }
     }
 
-    m_MapDict[id] = gamemap;
-    return true;
+    return gamemap;
 }
 
-Tileset* MapParser::ParseTileset(XMLElement* xmlTileset)
+Ref<Tileset> MapParser::ParseTileset(XMLElement* xmlTileset)
 {
-    Tileset* tileset = new Tileset();
+    auto tileset = CreateRef<Tileset>();
     tileset->Name = xmlTileset->Attribute("name");
 
     tileset->FirstId = xmlTileset->IntAttribute("firstgid");
@@ -101,7 +91,7 @@ Tileset* MapParser::ParseTileset(XMLElement* xmlTileset)
     return tileset;
 }
 
-TileLayer* MapParser::ParseTileLayer(XMLElement* xmlLayer, TilesetList tilesets, int tileWidth, int tileHeight, int rowCount, int columnCount)
+Ref<TileLayer> MapParser::ParseTileLayer(XMLElement* xmlLayer, TilesetList tilesets, int tileWidth, int tileHeight, int rowCount, int columnCount)
 {
     XMLElement* data;
     for (XMLElement* element = xmlLayer->FirstChildElement(); element != nullptr; element = element->NextSiblingElement())
@@ -132,5 +122,5 @@ TileLayer* MapParser::ParseTileLayer(XMLElement* xmlLayer, TilesetList tilesets,
                 break;
         }
     }
-    return (new TileLayer(tileWidth, tileHeight, rowCount, columnCount, tilemap, tilesets));
+    return CreateRef<TileLayer>(tileWidth, tileHeight, rowCount, columnCount, tilemap, tilesets);
 }
