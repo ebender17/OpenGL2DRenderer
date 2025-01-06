@@ -5,6 +5,8 @@
 #include "2D/Player/PlayerController.h"
 #include "2D/Camera/TargetCamera2DController.h"
 
+#include "2D/Map/MapParser.h"
+
 class Sandbox2D : public GLCore::Layer
 {
 public:
@@ -24,11 +26,6 @@ private:
     glm::vec4 m_TextureErrorColor = { 0.992f, 0.242f, 0.707f, 1.0f };
     
     GLCore::Ref<PlayerController> m_Player;
-
-    GLCore::Ref<GLCore::Texture2D> m_TilesetOutside;
-
-    uint32_t m_MapWidth = 0;
-    uint32_t m_MapHeight = 0;
-    std::unordered_map<char, GLCore::Ref<GLCore::SubTexture2D>> m_TexCoordsMap;
+    GLCore::Ref<GameMap> m_GameMap;
 };
 

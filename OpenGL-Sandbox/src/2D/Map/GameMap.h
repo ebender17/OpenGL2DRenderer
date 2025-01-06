@@ -2,7 +2,7 @@
 
 #include <GLCore.h>
 
-#include "MapLayer.h"
+#include "TileLayer.h"
 
 class GameMap
 {
@@ -12,7 +12,7 @@ public:
     virtual void OnUpdate(GLCore::Timestep timestep);
     void OnRender();
 
-    std::vector<MapLayer*>& GetMapLayers() { return m_MapLayers; }
+    std::vector<TileLayer*>& GetMapLayers() { return m_Layers; }
 private:
-    std::vector<MapLayer*> m_MapLayers; // TODO : convert to smart pointers
+    std::vector<TileLayer*> m_Layers; // TODO : convert to smart pointers
 };

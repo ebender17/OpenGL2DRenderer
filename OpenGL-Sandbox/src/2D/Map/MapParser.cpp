@@ -4,34 +4,37 @@ using namespace tinyxml2;
 
 static MapParser* s_Instance = nullptr;
 
-// TODO : make sure to call this!
 void MapParser::Init()
 {
-    GLCORE_ASSERT(s_Instance != nullptr, "Already initialized MapParser!");
+    GLCORE_ASSERT(s_Instance == nullptr, "Already initialized MapParser!");
 
     s_Instance = new MapParser();
 }
 
-// TODO : make sure to call this!
 void MapParser::Shutdown()
 {
     delete s_Instance;
     s_Instance = nullptr;
 }
 
-bool MapParser::Load()
+bool MapParser::Load(const std::string& id, const std::string& source)
 {
-    // TODO : pass in level name & filepath
-    return Parse("level1", "assets/textures/trainer - sapphire.png");
+    return Parse(id, source);
 }
 
 void MapParser::Clean()
 {
+    for (auto entry : m_MapDict)
+    {
+        // TODO : delete pointer
+        entry.second = nullptr;
+    }
+    m_MapDict.clear();
 }
 
 MapParser& MapParser::GetInstance()
 {
-    GLCORE_ASSERT(s_Instance == nullptr, "MapParser was not initialized!");
+    GLCORE_ASSERT(s_Instance != nullptr, "MapParser was not initialized!");
     return *s_Instance;
 }
 
@@ -47,28 +50,29 @@ bool MapParser::Parse(const std::string& id, const std::string& source)
     }
 
     XMLElement* root = xml.RootElement();
-    int rowCount, columnCount, tileSize;
+    int rowCount = 0, columnCount = 0, tileWidth = 0, tileHeight = 0;
 
-    root->IntAttribute("width", columnCount);
-    root->IntAttribute("height", rowCount);
-    root->IntAttribute("tilewidth", tileSize);
+    columnCount = root->IntAttribute("width");
+    rowCount = root->IntAttribute("height");
+    tileWidth = root->IntAttribute("tilewidth");
+    tileHeight = root->IntAttribute("tileheight");
 
     // Parse Tilesets
     TilesetList tilesets;
-    tilesets.reserve(5); // TODO : get rid of magic number? how many tilesets do we normally use?
+    tilesets.reserve(1); // TODO : get rid of magic number
     for (XMLElement* element = root->FirstChildElement(); element != nullptr; element = element->NextSiblingElement())
     {
-        if (element->Value() == "tileset")
+        if (strcmp(element->Value(), "tileset") == 0)
             tilesets.emplace_back(ParseTileset(element));
     }
 
     // Parse TileLayers
-    GameMap* gamemap = new GameMap(7); // TODO : get rid of magic number? how many layers do we normally have?
+    GameMap* gamemap = new GameMap(7); // TODO : get rid of magic number
     for (XMLElement* element = root->FirstChildElement(); element != nullptr; element = element->NextSiblingElement())
     {
-        if (element->Value() == "layer")
+        if (strcmp(element->Value(), "layer") == 0)
         {
-            TileLayer* tileLayer = ParseTileLayer(element, tilesets, tileSize, rowCount, columnCount);
+            TileLayer* tileLayer = ParseTileLayer(element, tilesets, tileWidth, tileHeight, rowCount, columnCount);
             gamemap->GetMapLayers().emplace_back(tileLayer);
         }
     }
@@ -81,28 +85,28 @@ Tileset* MapParser::ParseTileset(XMLElement* xmlTileset)
 {
     Tileset* tileset = new Tileset();
     tileset->Name = xmlTileset->Attribute("name");
-    xmlTileset->IntAttribute("firstgid", tileset->FirstId);
 
-    xmlTileset->IntAttribute("tilecount", tileset->TileCount);
-    tileset->LastId = (tileset->FirstId + tileset->TileCount);
+    tileset->FirstId = xmlTileset->IntAttribute("firstgid");
 
-    xmlTileset->IntAttribute("columns", tileset->ColumnCount);
+    tileset->TileCount = xmlTileset->IntAttribute("tilecount");
+    tileset->LastId = (tileset->FirstId - 1) + tileset->TileCount; // first id == 1, cannot just set == tilecount if more than one tileset in a map
+
+    tileset->ColumnCount = xmlTileset->IntAttribute("columns");
     tileset->RowCount = tileset->TileCount / tileset->ColumnCount;
-    xmlTileset->IntAttribute("tilewidth", tileset->TileSize);
+    tileset->TileWidth = xmlTileset->IntAttribute("tilewidth");
 
     XMLElement* image = xmlTileset->FirstChildElement();
     tileset->Source = image->Attribute("source");
 
-    // TODO : check these strings have no typos
     return tileset;
 }
 
-TileLayer* MapParser::ParseTileLayer(XMLElement* xmlLayer, TilesetList tilesets, int tileSize, int rowCount, int columnCount)
+TileLayer* MapParser::ParseTileLayer(XMLElement* xmlLayer, TilesetList tilesets, int tileWidth, int tileHeight, int rowCount, int columnCount)
 {
     XMLElement* data;
     for (XMLElement* element = xmlLayer->FirstChildElement(); element != nullptr; element = element->NextSiblingElement())
     {
-        if (element->Value() == "data")
+        if (strcmp(element->Value(), "data") == 0)
         {
             data = element;
             break; // should only be 1 'data' element per layer
@@ -114,13 +118,13 @@ TileLayer* MapParser::ParseTileLayer(XMLElement* xmlLayer, TilesetList tilesets,
     std::istringstream iss(matrix);
     std::string id;
 
-    TileMap tilemap(rowCount, std::vector<int>(columnCount, 0));
+    TileMap tilemap(rowCount, std::vector<int>(columnCount, 0)); // TODO : since this is stack allocated, will it cause issues when initializing the layer?
 
     for (int row = 0; row < rowCount; row++)
     {
         for (int col = 0; col < columnCount; col++)
         {
-            getline(iss, id, ','); // all ids are seperate by a comma
+            getline(iss, id, ','); // all tile ids are seperate by a comma
             std::stringstream converter(id);
             converter >> tilemap[row][col];
 
@@ -128,5 +132,5 @@ TileLayer* MapParser::ParseTileLayer(XMLElement* xmlLayer, TilesetList tilesets,
                 break;
         }
     }
-    return (new TileLayer(tileSize, rowCount, columnCount, tilemap, tilesets));
+    return (new TileLayer(tileWidth, tileHeight, rowCount, columnCount, tilemap, tilesets));
 }
