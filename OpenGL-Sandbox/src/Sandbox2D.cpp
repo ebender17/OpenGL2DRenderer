@@ -25,7 +25,7 @@ void Sandbox2D::OnAttach()
 
     m_CameraController->SetZoomLevel(5.5f);
 
-    m_GameMap = MapParser::GetInstance().Load("assets/2D/tilemaps/island-level.tmx");
+    m_GameMap = MapParser::GetInstance().Load("assets/2D/tilemaps/tilemap-test.tmx");
 
     // m_MapWidth = s_MapWidth;
     // m_MapHeight = strlen(s_MapTiles) / s_MapWidth;

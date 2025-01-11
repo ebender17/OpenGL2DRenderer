@@ -44,35 +44,25 @@ void TileLayer::OnRender()
             }
 
             auto ts = m_Tilesets[tilesetIndex];
-            int tileRow = tileId / ts->ColumnCount;
-            int tileColumn = tileId - tileRow * ts->ColumnCount - 1;
+            float tileRow = ts->RowCount - 1 - (tileId / ts->ColumnCount);
+            float tileColumn = (tileId % ts->ColumnCount) - 1;
 
-            // if this tile is on the last column
-            if (tileId % ts->ColumnCount == 0)
-            {
-                tileRow--;
-                tileColumn = ts->ColumnCount - 1;
-            }
 
-            glm::vec3 position = glm::vec3(x, y, -0.05);
-            glm::vec2 size = glm::vec2(1.0f);
             glm::vec2 spriteSize = glm::vec2(1.0f);
-
-            // 2. TODO : make sure tex coords are correct
             // TODO : cache texCoords for tiles using a map
-            auto texture = ts->Texture;
-            glm::vec2 minTexCoord = { (tileRow * ts->TileWidth) / texture->GetWidth(), (tileColumn * ts->TileHeight) / texture->GetHeight() };
-            glm::vec2 maxTexCoord = { ((tileRow + spriteSize.x) * ts->TileWidth) / texture->GetWidth(), ((tileColumn + spriteSize.y) * ts->TileHeight) / texture->GetHeight() };
+            float minU = static_cast<float>(tileColumn) / ts->ColumnCount;
+            float minV = static_cast<float>(tileRow) / ts->RowCount;
+            float maxU = static_cast<float>(tileColumn + spriteSize.x) / ts->ColumnCount;
+            float maxV = static_cast<float>(tileRow + spriteSize.y) / ts->RowCount;
             glm::vec2 texCoords[4] = {
-                { minTexCoord.x, minTexCoord.y },
-                { maxTexCoord.x, minTexCoord.y },
-                { maxTexCoord.x, maxTexCoord.y },
-                { minTexCoord.x, maxTexCoord.y }
-            }; // TODO
-            Renderer2D::DrawQuad(position, size, ts->Texture, texCoords);
-
-            // TODO : render error tile?
-            // Renderer2D::DrawQuad({ x, y, -0.05f }, { 1.0f, 1.0f }, m_TextureErrorColor);
+                { minU, minV },
+                { maxU, minV },
+                { maxU, maxV },
+                { minU, maxV }
+            };
+            glm::vec3 position = glm::vec3(y, (m_ColumnCount - 1) - x, -0.05);
+            auto texture = ts->Texture;
+            Renderer2D::DrawQuad(position, { 1.0f, 1.0f }, ts->Texture, texCoords);
         }
     }
 }

@@ -84,6 +84,7 @@ Ref<Tileset> MapParser::ParseTileset(XMLElement* xmlTileset)
     tileset->ColumnCount = xmlTileset->IntAttribute("columns");
     tileset->RowCount = tileset->TileCount / tileset->ColumnCount;
     tileset->TileWidth = xmlTileset->IntAttribute("tilewidth");
+    tileset->TileHeight = xmlTileset->IntAttribute("tileheight");
 
     XMLElement* image = xmlTileset->FirstChildElement();
     tileset->Source = image->Attribute("source");
