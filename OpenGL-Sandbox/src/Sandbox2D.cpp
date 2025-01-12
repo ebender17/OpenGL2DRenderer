@@ -34,7 +34,7 @@ void Sandbox2D::OnAttach()
     // float mapBounds[4] = { 0.0f, m_MapWidth, 0.0f, m_MapHeight };
     // m_CameraController->SetBounds(mapBounds);
 
-    m_Player = CreateRef<PlayerController>(glm::vec3(0.0f, 0.0f, 0.5f), "assets/textures/trainer-sapphire.png");
+    m_Player = CreateRef<PlayerController>(glm::vec3(0.0f, 0.0f, 0.5f), "assets/2D/tilesets/trainer-sapphire.png");
     m_Player->LoadAssets();
 }
 
