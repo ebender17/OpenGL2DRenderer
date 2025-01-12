@@ -36,11 +36,6 @@ void Sandbox2D::OnAttach()
 
     m_Player = CreateRef<PlayerController>(glm::vec3(0.0f, 0.0f, 0.5f), "assets/textures/trainer-sapphire.png");
     m_Player->LoadAssets();
-
-    // grass
-    // m_TexCoordsMap['G'] = SubTexture2D::CreateFromCoords(m_TilesetOutside, { 1, 501 }, { 32, 32 });
-    // water
-    // m_TexCoordsMap['W'] = SubTexture2D::CreateFromCoords(m_TilesetOutside, { 6, 414 }, {32, 32});
 }
 
 void Sandbox2D::OnDetach()
@@ -89,7 +84,6 @@ void Sandbox2D::OnImGuiRender()
     ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
     ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
 
-    // ImGui::ColorEdit4("Quad Color", glm::value_ptr(m_QuadColor));
     ImGui::End();
 }
 
