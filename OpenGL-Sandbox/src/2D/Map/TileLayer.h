@@ -24,9 +24,12 @@ public:
 
     const TileMap GetTileMap() const { return m_TileMap; } // TODO : do not return as copy
 private:
+    void ComputeTileTexCoords();
+private:
     int m_TileWidth, m_TileHeight;
     int m_RowCount, m_ColumnCount;
     TileMap m_TileMap;
     TilesetList m_Tilesets;
+    std::unordered_map<int, std::array<glm::vec2, 4>> m_TileTexCoords;
 };
 
