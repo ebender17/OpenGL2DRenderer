@@ -15,12 +15,13 @@ project "OpenGL-Sandbox"
 
     includedirs
     {
-        "../OpenGL-Core/vendor/spdlog/include",
         "../OpenGL-Core/src",
-        "../OpenGL-Core/vendor",
-        "../OpenGL-Core/%{IncludeDir.glm}",
+        "../OpenGL-Core/%{IncludeDir.GLFW}",
         "../OpenGL-Core/%{IncludeDir.Glad}",
-        "../OpenGL-Core/%{IncludeDir.ImGui}"
+        "../OpenGL-Core/%{IncludeDir.glm}",
+        "../OpenGL-Core/%{IncludeDir.ImGui}",
+        "../OpenGL-Core/vendor",
+        "../OpenGL-Core/vendor/spdlog/include",
     }
 
     links
