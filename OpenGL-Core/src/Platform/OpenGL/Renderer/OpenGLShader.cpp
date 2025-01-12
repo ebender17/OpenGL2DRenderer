@@ -1,4 +1,5 @@
 #include "glpch.h"
+#include "GLCore/Utils/FilePath.h"
 #include "Platform/OpenGL/Renderer/OpenGLShader.h"
 
 #include <fstream>
@@ -27,12 +28,7 @@ namespace GLCore {
         auto shaderSources = PreProcess(source);
         CompileShaderProgram(shaderSources);
 
-        // Extract name from filepath
-        auto lastSlash = filepath.find_last_of("/\\");
-        lastSlash = lastSlash == std::string::npos ? 0 : lastSlash + 1; // handle no slashes
-        auto lastDot = filepath.rfind('.');
-        auto count = lastDot == std::string::npos ? filepath.size() - lastSlash : lastDot - lastSlash;
-        m_Name = filepath.substr(lastSlash, count);
+        m_Name = GLCore::Utils::ExtractNameFromFilePath(filepath);
     }
 
     OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)

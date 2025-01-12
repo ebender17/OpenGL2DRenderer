@@ -17,28 +17,28 @@ void PlayerController::LoadAssets()
     m_Animator = CreateRef<AnimatorTopDown>();
 
     // IDLE DOWN
-    SetupAnimation(m_IdleDown, false, {32, 48}, 3, 1, 0.1f);
+    SetupAnimation(m_IdleDown, false, {32, 48}, 3, 1, 0.1f, 1);
 
     // WALK DOWN
-    SetupAnimation(m_WalkDown, true, {32, 48}, 3, 4, 0.15f);
+    SetupAnimation(m_WalkDown, true, {32, 48}, 3, 4, 0.15f, 4);
 
     // IDLE UP
-    SetupAnimation(m_IdleUp, false, {32, 48}, 0, 1, 0.1f);
+    SetupAnimation(m_IdleUp, false, {32, 48}, 0, 1, 0.1f, 1);
 
     // WALK UP
-    SetupAnimation(m_WalkUp, true, {32, 48}, 0, 4, 0.15f);
+    SetupAnimation(m_WalkUp, true, {32, 48}, 0, 4, 0.15f, 4);
 
     // IDLE LEFT
-    SetupAnimation(m_IdleLeft, false, {32, 48}, 2, 1, 0.1f);
+    SetupAnimation(m_IdleLeft, false, {32, 48}, 2, 1, 0.1f, 1);
 
     // WALK LEFT
-    SetupAnimation(m_WalkLeft, true, {32, 48}, 2, 4, 0.15f);
+    SetupAnimation(m_WalkLeft, true, {32, 48}, 2, 4, 0.15f, 4);
 
     // IDLE RIGHT
-    SetupAnimation(m_IdleRight, false, {32, 48}, 1, 1, 0.1f);
+    SetupAnimation(m_IdleRight, false, {32, 48}, 1, 1, 0.1f, 1);
 
     // WALK RIGHT
-    SetupAnimation(m_WalkRight, true, {32, 48}, 1, 4, 0.15f);
+    SetupAnimation(m_WalkRight, true, {32, 48}, 1, 4, 0.15f, 4);
 }
 
 void PlayerController::OnUpdate(GLCore::Timestep timestep)
@@ -125,9 +125,9 @@ void PlayerController::Move(Timestep timestep)
     }
 }
 
-void PlayerController::SetupAnimation(const char* animationName, bool isLoop, const glm::vec2& spriteSize, unsigned int row, size_t frameCount, float frameDuration)
+void PlayerController::SetupAnimation(const char* animationName, bool isLoop, const glm::vec2& spriteSize, unsigned int row, size_t frameCount, float frameDuration, unsigned int reserveFrameCount)
 {
-    Ref<AnimationTopDown> animation = CreateRef<AnimationTopDown>(animationName, isLoop);
+    Ref<AnimationTopDown> animation = CreateRef<AnimationTopDown>(animationName, isLoop, reserveFrameCount);
     for (int i = 0; i < frameCount; i++)
     {
         auto subTexture = SubTexture2D::CreateFromCoords(m_SpriteSheet, { i, row }, spriteSize);

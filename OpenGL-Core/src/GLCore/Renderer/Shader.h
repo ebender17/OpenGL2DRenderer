@@ -29,6 +29,7 @@ namespace GLCore {
         static Ref<Shader> Create(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource);
     };
 
+    // TODO : create a template 'AssetLibrary' to replace this & ShaderLibrary
     class ShaderLibrary
     {
     public:
