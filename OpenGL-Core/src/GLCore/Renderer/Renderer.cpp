@@ -39,7 +39,7 @@ namespace GLCore {
     {
         shader->Bind();
         std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_ViewProjection", s_SceneData->ViewProjectionMatrix);
-        std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_Transform", transform);
+        std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_Model", transform);
         vertexArray->Bind();
         RenderCommand::DrawIndexed(vertexArray);
     }

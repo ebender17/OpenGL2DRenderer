@@ -26,6 +26,6 @@ private:
 
     InputCamera2DController m_CameraController;
 
-    glm::vec3 m_QuadColor = { 0.0549, 0.0824, 0.227 };
+    glm::vec4 m_QuadColor = { 0.0549, 0.0824, 0.227, 1.0f };
 };
 
