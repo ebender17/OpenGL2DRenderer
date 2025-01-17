@@ -11,9 +11,8 @@ void TargetCamera2DController::OnUpdate(GLCore::Timestep timestep)
 
     float width = m_Bounds.GetWidth();
     float height = m_Bounds.GetHeight();
-    // TODO : set camera bounds
-    // m_Target.x = glm::clamp(m_Target.x, m_MapBounds[0] + (width / 2.0f), (m_MapBounds[1] / 2.0f));
-    // m_Target.y = glm::clamp(m_Target.y, m_MapBounds[2] + (height / 2.0f), (m_MapBounds[3] / 2.0f));
+    m_Target.x = glm::clamp(m_Target.x, m_MapBounds[0] + (width / 2.0f), (m_MapBounds[1] / 2.0f));
+    m_Target.y = glm::clamp(m_Target.y, m_MapBounds[2] + (height / 2.0f), (m_MapBounds[3] / 2.0f));
 
     m_Camera.SetPosition({ m_Target.x, m_Target.y, 0.0f });
 }

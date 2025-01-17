@@ -26,16 +26,15 @@ void SandboxLayer::OnAttach()
 
     m_TriVertexArray = VertexArray::Create();
 
-    float vertices[3 * 7] = {
-        -0.5f, -0.5f, 0.0f, 0.8f, 0.2f, 0.8f, 1.0f,
-        0.5f, -0.5f, 0.0f, 0.2f, 0.3f, 0.8f, 1.0f,
-        0.0f,  0.5f, 0.0f, 0.8f, 0.8f, 0.2f, 1.0f
+    float vertices[3 * 3] = {
+        -0.5f, -0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f,
+        0.0f,  0.5f, 0.0f,
     };
 
     Ref<VertexBuffer> triVertexBuffer = VertexBuffer::Create(vertices, sizeof(vertices));
     BufferLayout triLayout = {
-        { ShaderDataType::Float3, "a_Position" },
-        { ShaderDataType::Float4, "a_Color" }
+        { ShaderDataType::Float3, "a_Position" }
     };
     triVertexBuffer->SetLayout(triLayout);
     m_TriVertexArray->AddVertexBuffer(triVertexBuffer);
@@ -70,14 +69,14 @@ void SandboxLayer::OnAttach()
         layout(location = 0) in vec3 a_Position;
 
         uniform mat4 u_ViewProjection;
-        uniform mat4 u_Transform;
+        uniform mat4 u_Model;
 
         out vec3 v_Position;
 
         void main()
         {
             v_Position = a_Position;
-            gl_Position = u_ViewProjection * u_Transform * vec4(a_Position, 1.0);	
+            gl_Position = u_ViewProjection * u_Model * vec4(a_Position, 1.0);	
         }
     )";
 
@@ -95,15 +94,15 @@ void SandboxLayer::OnAttach()
     )";
 
     m_VertexPosShader = Shader::Create("VertexPosColor", vertexSrc, fragmentSrc);
-
     m_ShaderLibrary.Load("FlatColor", "assets/shaders/FlatColor.glsl");
-    auto textureShader = m_ShaderLibrary.Load("assets/shaders/Texture.glsl");
+    auto textureShader = m_ShaderLibrary.Load("assets/shaders/FlatTexture.glsl");
 
     m_Texture = Texture2D::Create("assets/textures/checkerboard.png");
     m_CharacterSprite = Texture2D::Create("assets/textures/emily-pokemon-style.png");
 
     std::dynamic_pointer_cast<OpenGLShader>(textureShader)->Bind();
     std::dynamic_pointer_cast<OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
+    std::dynamic_pointer_cast<OpenGLShader>(textureShader)->UploadUniformFloat("u_TilingFactor", 1.0f);
 }
 
 void SandboxLayer::OnDetach()
@@ -129,10 +128,8 @@ void SandboxLayer::OnUpdate(Timestep timestep)
     glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
     auto flatColorShader = m_ShaderLibrary.Get("FlatColor");
-    auto textureShader = m_ShaderLibrary.Get("Texture");
     std::dynamic_pointer_cast<OpenGLShader>(flatColorShader)->Bind();
-    std::dynamic_pointer_cast<OpenGLShader>(flatColorShader)->UploadUniformFloat3("u_Color", m_QuadColor);
-
+    std::dynamic_pointer_cast<OpenGLShader>(flatColorShader)->UploadUniformFloat4("u_Color", m_QuadColor);
     for (int y = 0; y < 10; y++)
     {
         for (int x = 0; x < 10; x++)
@@ -143,12 +140,15 @@ void SandboxLayer::OnUpdate(Timestep timestep)
         }
     }
 
+    auto textureShader = m_ShaderLibrary.Get("FlatTexture");
+    glm::mat4 translation = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+    std::dynamic_pointer_cast<OpenGLShader>(textureShader)->Bind();
     m_Texture->Bind();
-    Renderer::Submit(textureShader, m_QuadVertexArray);
+    Renderer::Submit(textureShader, m_QuadVertexArray, translation);
+    translation = glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f, 0.0f, 0.0f));
     m_CharacterSprite->Bind();
-    Renderer::Submit(textureShader, m_QuadVertexArray);
-
-    glm::mat4 translation = glm::translate(glm::mat4(1.0f), glm::vec3(1.5f, 0.0f, 0.0f));
+    Renderer::Submit(textureShader, m_QuadVertexArray, translation);
+    translation = glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     Renderer::Submit(m_VertexPosShader, m_TriVertexArray, translation);
 
     Renderer::EndScene();
@@ -157,6 +157,6 @@ void SandboxLayer::OnUpdate(Timestep timestep)
 void SandboxLayer::OnImGuiRender()
 {
     ImGui::Begin("Settings");
-    ImGui::ColorEdit3("Square Color", glm::value_ptr(m_QuadColor));
+    ImGui::ColorEdit4("Square Color", glm::value_ptr(m_QuadColor));
     ImGui::End();
 }

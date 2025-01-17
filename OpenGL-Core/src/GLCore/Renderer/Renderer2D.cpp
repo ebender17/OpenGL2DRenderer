@@ -90,7 +90,7 @@ namespace GLCore {
         uint32_t whiteTextureData = 0xffffffff;
         s_Data.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
 
-        s_Data.QuadShader = Shader::Create("assets/shaders/Texture.glsl");
+        s_Data.QuadShader = Shader::Create("assets/shaders/BatchedTexture.glsl");
         s_Data.QuadShader->Bind();
         s_Data.QuadShader->SetIntArray("u_Textures", samplers, s_Data.MaxTextureSlots);
 

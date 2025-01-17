@@ -107,7 +107,7 @@ void Basic3DLightingSandbox::OnAttach()
     m_FlatColorShader = std::make_unique<OpenGLShader>("assets/shaders/FlatColor.glsl");
     m_FlatColorShader->Bind();
 
-    m_Shader = std::make_unique<OpenGLShader>("assets/shaders/Basic.glsl");
+    m_Shader = std::make_unique<OpenGLShader>("assets/shaders/PhongLighting.glsl");
     m_Shader->Bind();
     m_Shader->SetInt("u_Material.diffuse", 0);
     m_Shader->SetInt("u_Material.specular", 1);
