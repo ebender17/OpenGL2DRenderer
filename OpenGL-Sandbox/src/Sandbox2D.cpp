@@ -25,16 +25,14 @@ void Sandbox2D::OnAttach()
 
     m_CameraController->SetZoomLevel(5.5f);
 
-    m_GameMap = MapParser::GetInstance().Load("assets/2D/tilemaps/tilemap-test.tmx");
+    m_GameMap = MapParser::GetInstance().Load("assets/2D/tilemaps/forest-town.tmx");
 
-    // m_MapWidth = s_MapWidth;
-    // m_MapHeight = strlen(s_MapTiles) / s_MapWidth;
+    float mapWidth = 39.4f; // TODO : magic number
+    float mapHeight = 48.f; // TODO : magic number
+    float mapBounds[4] = { -0.5f, mapWidth, -0.5f, mapHeight };
+    m_CameraController->SetBounds(mapBounds);
 
-    // TODO : figure out the actual bounds we want, left off here
-    // float mapBounds[4] = { 0.0f, m_MapWidth, 0.0f, m_MapHeight };
-    // m_CameraController->SetBounds(mapBounds);
-
-    m_Player = CreateRef<PlayerController>(glm::vec3(0.0f, 0.0f, 0.5f), "assets/2D/tilesets/trainer-sapphire.png");
+    m_Player = CreateRef<PlayerController>(glm::vec3(18.f, 3.2f, 0.5f), "assets/2D/tilesets/trainer-sapphire.png");
     m_Player->LoadAssets();
 }
 
