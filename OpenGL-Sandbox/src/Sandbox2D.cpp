@@ -51,6 +51,7 @@ void Sandbox2D::OnUpdate(GLCore::Timestep timestep)
 
     m_Player->OnUpdate(timestep);
     m_GameMap->OnUpdate(timestep);
+    m_GameMap->SolveCollision(*m_Player);
     m_CameraController->SetTarget(m_Player->GetPosition());
     m_CameraController->OnUpdate(timestep);
 

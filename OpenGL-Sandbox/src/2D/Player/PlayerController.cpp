@@ -3,7 +3,7 @@
 using namespace GLCore;
 
 PlayerController::PlayerController(const glm::vec3& position, const char* textureFilepath)
-    : m_Position(position), m_TextureFilepath(textureFilepath), m_InitialPosition(position)
+    : GameObject2D(position), m_TextureFilepath(textureFilepath)
 {
 }
 
@@ -14,31 +14,35 @@ PlayerController::~PlayerController()
 void PlayerController::LoadAssets()
 {
     m_SpriteSheet = Texture2D::Create(m_TextureFilepath);
+    float invTextureWidth = 1.0f / m_SpriteSheet->GetWidth();
+    float invTextureHeight = 1.0f / m_SpriteSheet->GetHeight();
+    m_Width = m_SpriteSize.x * invTextureWidth; // TODO : check these are correct
+    m_Height = m_SpriteSize.y * invTextureHeight;
     m_Animator = CreateRef<AnimatorTopDown>();
 
     // IDLE DOWN
-    SetupAnimation(m_IdleDown, false, {32, 48}, 3, 1, 0.1f, 1);
+    SetupAnimation(m_IdleDown, false, 3, 1, 0.1f, 1);
 
     // WALK DOWN
-    SetupAnimation(m_WalkDown, true, {32, 48}, 3, 4, 0.15f, 4);
+    SetupAnimation(m_WalkDown, true, 3, 4, 0.15f, 4);
 
     // IDLE UP
-    SetupAnimation(m_IdleUp, false, {32, 48}, 0, 1, 0.1f, 1);
+    SetupAnimation(m_IdleUp, false, 0, 1, 0.1f, 1);
 
     // WALK UP
-    SetupAnimation(m_WalkUp, true, {32, 48}, 0, 4, 0.15f, 4);
+    SetupAnimation(m_WalkUp, true, 0, 4, 0.15f, 4);
 
     // IDLE LEFT
-    SetupAnimation(m_IdleLeft, false, {32, 48}, 2, 1, 0.1f, 1);
+    SetupAnimation(m_IdleLeft, false, 2, 1, 0.1f, 1);
 
     // WALK LEFT
-    SetupAnimation(m_WalkLeft, true, {32, 48}, 2, 4, 0.15f, 4);
+    SetupAnimation(m_WalkLeft, true, 2, 4, 0.15f, 4);
 
     // IDLE RIGHT
-    SetupAnimation(m_IdleRight, false, {32, 48}, 1, 1, 0.1f, 1);
+    SetupAnimation(m_IdleRight, false, 1, 1, 0.1f, 1);
 
     // WALK RIGHT
-    SetupAnimation(m_WalkRight, true, {32, 48}, 1, 4, 0.15f, 4);
+    SetupAnimation(m_WalkRight, true, 1, 4, 0.15f, 4);
 }
 
 void PlayerController::OnUpdate(GLCore::Timestep timestep)
@@ -98,7 +102,6 @@ void PlayerController::ProcessPlayerInput()
         }
         else
         {
-            m_InitialPosition = m_Position;
             m_PlayerState = PlayerState::Walking;
         }
     }
@@ -113,24 +116,24 @@ void PlayerController::Move(Timestep timestep)
     m_PercentMovedToNextTile += m_Speed * timestep;
     if (m_PercentMovedToNextTile >= 1.0)
     {
-        m_Position.x = m_InitialPosition.x + m_InputDirection.x;
-        m_Position.y = m_InitialPosition.y + m_InputDirection.y;
+        m_Position.x = m_Position.x + m_InputDirection.x;
+        m_Position.y = m_Position.y + m_InputDirection.y;
         m_PercentMovedToNextTile = 0.0f;
         m_PlayerState = PlayerState::Idle;
     }
     else
     {
-        m_Position.x = m_InitialPosition.x + m_InputDirection.x * m_PercentMovedToNextTile;
-        m_Position.y = m_InitialPosition.y + m_InputDirection.y * m_PercentMovedToNextTile;
+        m_Position.x = m_Position.x + m_InputDirection.x * m_PercentMovedToNextTile;
+        m_Position.y = m_Position.y + m_InputDirection.y * m_PercentMovedToNextTile;
     }
 }
 
-void PlayerController::SetupAnimation(const char* animationName, bool isLoop, const glm::vec2& spriteSize, unsigned int row, size_t frameCount, float frameDuration, unsigned int reserveFrameCount)
+void PlayerController::SetupAnimation(const char* animationName, bool isLoop, unsigned int row, size_t frameCount, float frameDuration, unsigned int reserveFrameCount)
 {
     Ref<AnimationTopDown> animation = CreateRef<AnimationTopDown>(animationName, isLoop, reserveFrameCount);
     for (int i = 0; i < frameCount; i++)
     {
-        auto subTexture = SubTexture2D::CreateFromCoords(m_SpriteSheet, { i, row }, spriteSize);
+        auto subTexture = SubTexture2D::CreateFromCoords(m_SpriteSheet, { i, row }, m_SpriteSize);
         Ref<AnimationFrame> frame = CreateRef<AnimationFrame>(subTexture, frameDuration);
         animation->AddFrame(frame);
     }
