@@ -1,4 +1,4 @@
-#include "OpenGLSandbox.h"
+#include "FramebuffersSandbox.h"
 
 #include "Platform/OpenGL/Debug/OpenGLDebug.h"
 #include "Platform/OpenGL/Renderer/OpenGLShader.h"
@@ -12,14 +12,16 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <format> // TODO : delete in both projects?
+
 using namespace GLCore;
 
-OpenGLSandbox::OpenGLSandbox()
-    : Layer("OpenGLSandbox")
+FramebuffersSandbox::FramebuffersSandbox()
+    : Layer("FramebuffersSandbox")
 {
 }
 
-void OpenGLSandbox::OnAttach()
+void FramebuffersSandbox::OnAttach()
 {
     EnableGLDebugging();
     SetGLDebugLogLevel(DebugLogLevel::Notification);
@@ -28,11 +30,8 @@ void OpenGLSandbox::OnAttach()
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
-    glEnable(GL_STENCIL_TEST);
-    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glCullFace(GL_BACK); // default
+    glFrontFace(GL_CW); // default is GL_CCW
 
     // vertex position, tex coords
     float vertices[] = {
@@ -80,7 +79,7 @@ void OpenGLSandbox::OnAttach()
          -0.5f,  0.5f,  0.5f,  0.0f, 0.0f  // bottom-left
     };
     // positions, tex coords
-    float quadVertices[] = {
+    float planeVertices[] = {
         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
          0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
          0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
@@ -88,17 +87,16 @@ void OpenGLSandbox::OnAttach()
         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
     };
+    float quadVertices[] = {
+        // positions   // texCoords
+        -1.0f,  1.0f,  0.0f, 1.0f,
+        -1.0f, -1.0f,  0.0f, 0.0f,
+         1.0f, -1.0f,  1.0f, 0.0f,
 
-    m_VegetationPositions.reserve(5);
-    m_VegetationPositions.emplace_back(glm::vec3(-1.5f, -0.1f, 0.5f));
-    m_VegetationPositions.emplace_back(glm::vec3(1.5f, -0.1f, 1.2f));
-    m_VegetationPositions.emplace_back(glm::vec3(0.0f, -0.1f, 0.7f));
-    m_VegetationPositions.emplace_back(glm::vec3(-0.3f, -0.1f, -2.3f));
-    m_VegetationPositions.emplace_back(glm::vec3(0.5f, -0.1f, -0.6f));
-
-    m_WindowPositions.reserve(2);
-    m_WindowPositions.emplace_back(glm::vec3(-1.0f, 0.0f, 0.01f));
-    m_WindowPositions.emplace_back(glm::vec3(1.0f, 0.0f, -1.0f));
+        -1.0f,  1.0f,  0.0f, 1.0f,
+         1.0f, -1.0f,  1.0f, 0.0f,
+         1.0f,  1.0f,  1.0f, 1.0f
+    };
 
     // Setup buffers
     glGenVertexArrays(1, &m_CubeVAO);
@@ -112,167 +110,136 @@ void OpenGLSandbox::OnAttach()
     glVertexAttribPointer(1, 2, GL_FLOAT, false, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glBindVertexArray(0);
 
-    glGenVertexArrays(1, &m_QuadVAO);
-    glBindVertexArray(m_QuadVAO);
-    glGenBuffers(1, &m_QuadVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, m_QuadVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
+    glGenVertexArrays(1, &m_PlaneVAO);
+    glBindVertexArray(m_PlaneVAO);
+    glGenBuffers(1, &m_PlaneVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, m_PlaneVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), planeVertices, GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, false, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, false, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glBindVertexArray(0);
 
+    glGenVertexArrays(1, &m_QuadVAO);
+    glGenBuffers(1, &m_QuadVBO);
+    glBindVertexArray(m_QuadVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, m_QuadVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, false, 4 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, false, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+    glBindVertexArray(0);
+
     // Load and create textures
-    GenerateTexture2D("assets/textures/tile.png", &m_TileTexture, GL_REPEAT);
+    GenerateTexture2D("assets/textures/wooden-box-diffuse.png", &m_WoodenBoxTexture, GL_REPEAT);
     GenerateTexture2D("assets/textures/metal.png", &m_MetalTexture, GL_REPEAT);
-    GenerateTexture2D("assets/textures/flat-grass-sprite.png", &m_GrassSpriteTexture, GL_CLAMP_TO_EDGE);
-    GenerateTexture2D("assets/textures/transparent-window.png", &m_TransparentWindow, GL_CLAMP_TO_EDGE);
 
     // Shaders
-    m_FlatColorShader = std::make_unique<OpenGLShader>("assets/shaders/FlatColor.glsl");
-    m_FlatColorShader->Bind();
-    m_FlatColorShader->SetFloat4("u_Color", { 0.65f, 1.0f, 0.51f, 1.0f });
     m_Shader = std::make_unique<OpenGLShader>("assets/shaders/FlatTexture.glsl");
     m_Shader->Bind();
     m_Shader->SetInt("u_Texture", 0);
-    m_AlphaClippedShader = std::make_unique<OpenGLShader>("assets/shaders/AlphaClippedTexture.glsl");
-    m_AlphaClippedShader->Bind();
-    m_AlphaClippedShader->SetFloat("u_AlphaThreshold", 0.1f);
-    m_AlphaClippedShader->SetFloat4("u_Color", { 0.09f, 0.73f, 0.47f, 1.0f });
+
+    m_FullScreenQuadShader = std::make_unique<OpenGLShader>("assets/shaders/PostProcess.glsl");
+    m_FullScreenQuadShader->Bind();
+    m_FullScreenQuadShader->SetInt("u_ScreenTexture", 0);
 
     glBindBuffer(GL_ARRAY_BUFFER, m_CubeVBO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
     glBindVertexArray(0);
+
+    // Generate framebuffer
+    glGenFramebuffers(1, &m_FBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
+    GenerateTextureFramebuffer(&m_FramebufferTexture);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_FramebufferTexture, 0);
+    glGenRenderbuffers(1, &m_RBO);
+    glBindRenderbuffer(GL_RENDERBUFFER, m_RBO);
+    // TODO : replace with window width and height
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 1280.0f, 720.0f);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_RBO);
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+    {
+        LOG_ERROR("Framebuffer is not complete!");
+    }
+    // bind default framebuffer (main window)
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void OpenGLSandbox::OnDetach()
+void FramebuffersSandbox::OnDetach()
 {
     glDeleteVertexArrays(1, &m_CubeVAO);
     glDeleteBuffers(1, &m_CubeVBO);
     glDeleteVertexArrays(1, &m_QuadVAO);
     glDeleteBuffers(1, &m_QuadVBO);
+    glDeleteFramebuffers(1, &m_FBO);
+    glDeleteRenderbuffers(1, &m_RBO);
 }
 
-void OpenGLSandbox::OnUpdate(GLCore::Timestep timestep)
+void FramebuffersSandbox::OnUpdate(GLCore::Timestep timestep)
 {
     // Update
     m_Camera->OnUpdate(timestep);
 
     // Render
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-    glm::mat4 viewProjectionMatrix = m_Camera->GetViewProjectionMatrix();
-    glm::vec3 camPos = m_Camera->GetPosition();
-    m_Shader->Bind();
-    m_Shader->SetMat4("u_ViewProjection", viewProjectionMatrix);
-
-    // Floor
-    glStencilMask(0x00);
-    glBindVertexArray(m_QuadVAO);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_MetalTexture);
-    glm::mat4 modelFloor = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.1f, 0.0f));
-    modelFloor = glm::rotate(modelFloor, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    modelFloor = glm::scale(modelFloor, glm::vec3(7.0f, 7.0f, 1.0f));
-    m_Shader->SetMat4("u_Model", modelFloor);
-    m_Shader->SetFloat("u_TilingFactor", 7.0f);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-
-    // Draw boxes
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK); // default
-    glFrontFace(GL_CW); // default is GL_CCW
-    glStencilFunc(GL_ALWAYS, 1, 0xFF);
-    glStencilMask(0xFF); // enable writing to stencil buffer
-    glBindVertexArray(m_CubeVAO);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_TileTexture);
-    m_Shader->SetFloat("u_TilingFactor", 1.0f);
-    glm::mat4 model1 = glm::mat4(1.0f);
-    model1 = glm::translate(model1, glm::vec3(-1.0f, 0.0f, -1.0f));
-    m_Shader->SetMat4("u_Model", model1);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-    glm::mat4 model2 = glm::mat4(1.0f);
-    model2 = glm::translate(model2, glm::vec3(2.0f, 0.0f, 0.0f));
-    m_Shader->SetMat4("u_Model", model2);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-    
-    // Draw outlines
-    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-    glStencilMask(0x00); // disable writing to stencil buffer
-    glDisable(GL_DEPTH_TEST);
-    m_FlatColorShader->Bind();
-    m_FlatColorShader->SetMat4("u_ViewProjection", viewProjectionMatrix);
-    float scale = 1.1f;
-    model1 = glm::scale(model1, glm::vec3(scale, scale, scale));
-    m_FlatColorShader->SetMat4("u_Model", model1);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-    model2 = glm::scale(model2, glm::vec3(scale, scale, scale));
-    m_FlatColorShader->SetMat4("u_Model", model2);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-
-    glStencilMask(0xFF);
-    glStencilFunc(GL_ALWAYS, 0, 0xFF);
+    // first pass
+    glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
     glEnable(GL_DEPTH_TEST);
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    DrawScene();
 
-    // Vegetation
+    // second pass
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    
+    m_FullScreenQuadShader->Bind();
+    m_FullScreenQuadShader->SetInt("u_PostProcessOption", (int)m_PostProcessOption);
     glBindVertexArray(m_QuadVAO);
-    m_AlphaClippedShader->Bind();
-    m_AlphaClippedShader->SetMat4("u_ViewProjection", viewProjectionMatrix);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_GrassSpriteTexture);
-    for (glm::vec3 position : m_VegetationPositions)
-    {
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, position);
-        m_AlphaClippedShader->SetMat4("u_Model", model);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-    }
 
-    // Windows (from farthest to nearest to solve depth issues)
-    std::map<float, glm::vec3> sortedWindows;
-    for (glm::vec3 position : m_WindowPositions)
-    {
-        glm::vec3 difference = m_Camera->GetPosition() - position;
-        float sqrMagnitude = glm::dot(difference, difference);
-        sortedWindows[sqrMagnitude] = position;
-    }
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_TransparentWindow);
-    for (std::map<float, glm::vec3>::reverse_iterator it = sortedWindows.rbegin(); it != sortedWindows.rend(); ++it)
-    {
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, it->second);
-        m_AlphaClippedShader->SetMat4("u_Model", model);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-    }
-
-    glBindVertexArray(0);
+    glBindTexture(GL_TEXTURE_2D, m_FramebufferTexture);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-void OpenGLSandbox::OnImGuiRender()
+void FramebuffersSandbox::OnImGuiRender()
 {
+    static int currentOption = 0;
+    ImGui::Begin("Post Process Settings");
+    if (ImGui::RadioButton("Inversion", currentOption == 0))
+        currentOption = 0;
+    if (ImGui::RadioButton("Grayscale", currentOption == 1))
+        currentOption = 1;
+    if (ImGui::RadioButton("Sharpen", currentOption == 2))
+        currentOption = 2;
+    if (ImGui::RadioButton("Blur", currentOption == 3))
+        currentOption = 3;
+    
+    m_PostProcessOption = PostProcesOptions(currentOption);
+    ImGui::End();
 }
 
-void OpenGLSandbox::OnEvent(GLCore::Event& event)
+void FramebuffersSandbox::OnEvent(GLCore::Event& event)
 {
     EventDispatcher dispatcher(event);
-    dispatcher.Dispatch<WindowResizeEvent>(GLCORE_BIND_EVENT_FN(OpenGLSandbox::OnWindowResized));
+    dispatcher.Dispatch<WindowResizeEvent>(GLCORE_BIND_EVENT_FN(FramebuffersSandbox::OnWindowResized));
 }
 
-void OpenGLSandbox::InitCamera()
+void FramebuffersSandbox::InitCamera()
 {
     PerspectiveProjInfo persProjInfo = { 45.0f, (float)1280, (float)720, 0.1f, 1000.0f };
     m_Camera = std::make_unique<FirstPersonCamera>(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 1.0f, 0.0f), persProjInfo);
 }
 
-void OpenGLSandbox::GenerateTexture2D(const std::string& filepath, uint32_t* texture, uint32_t wrapOption)
+// TODO : make utility function & replace where duplicated in sandboxes
+void FramebuffersSandbox::GenerateTexture2D(const std::string& filepath, uint32_t* texture, uint32_t wrapOption)
 {
     int width, height, channels;
     stbi_set_flip_vertically_on_load(true);
@@ -321,12 +288,61 @@ void OpenGLSandbox::GenerateTexture2D(const std::string& filepath, uint32_t* tex
     stbi_image_free(data);
 }
 
-bool OpenGLSandbox::OnWindowResized(GLCore::WindowResizeEvent& event)
+void FramebuffersSandbox::GenerateTextureFramebuffer(uint32_t* texture)
 {
-    unsigned int width = event.GetWidth();
-    unsigned int height = event.GetHeight();
+    glGenTextures(1, texture);
+    glBindTexture(GL_TEXTURE_2D, *texture);
 
-    m_Camera->SetAspectRatio(width, height);
-    glViewport(0, 0, width, height);
+    // TODO : replace with window width and height
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1280.0f, 720.0f, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+bool FramebuffersSandbox::OnWindowResized(GLCore::WindowResizeEvent& event)
+{
+    m_WindowWidth = event.GetWidth();
+    m_WindowHeight = event.GetHeight();
+
+    m_Camera->SetAspectRatio(m_WindowWidth, m_WindowHeight);
+    glViewport(0, 0, m_WindowWidth, m_WindowHeight);
     return false;
+}
+
+void FramebuffersSandbox::DrawScene()
+{
+    glm::mat4 viewProjectionMatrix = m_Camera->GetViewProjectionMatrix();
+    glm::vec3 camPos = m_Camera->GetPosition();
+    m_Shader->Bind();
+    m_Shader->SetMat4("u_ViewProjection", viewProjectionMatrix);
+
+    // Floor
+    glDisable(GL_CULL_FACE);
+    glBindVertexArray(m_PlaneVAO);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_MetalTexture);
+    glm::mat4 modelFloor = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.1f, 0.0f));
+    modelFloor = glm::rotate(modelFloor, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    modelFloor = glm::scale(modelFloor, glm::vec3(7.0f, 7.0f, 1.0f));
+    m_Shader->SetMat4("u_Model", modelFloor);
+    m_Shader->SetFloat("u_TilingFactor", 7.0f);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    // Draw boxes
+    glEnable(GL_CULL_FACE);
+    glBindVertexArray(m_CubeVAO);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_WoodenBoxTexture);
+    m_Shader->SetFloat("u_TilingFactor", 1.0f);
+    glm::mat4 model1 = glm::mat4(1.0f);
+    model1 = glm::translate(model1, glm::vec3(-1.0f, 0.0f, -1.0f));
+    m_Shader->SetMat4("u_Model", model1);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glm::mat4 model2 = glm::mat4(1.0f);
+    model2 = glm::translate(model2, glm::vec3(2.0f, 0.0f, 0.0f));
+    m_Shader->SetMat4("u_Model", model2);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    glBindVertexArray(0);
 }
