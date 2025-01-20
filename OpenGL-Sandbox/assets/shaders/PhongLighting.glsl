@@ -92,12 +92,12 @@ void main()
 
     vec3 result = CalcDirLight(u_DirLight, norm, viewDir);
 
-    /* for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++)
     {
         result += CalcPointLight(u_PointLights[i], norm, v_FragPos, viewDir);
     }
 
-    result += CalcSpotLight(u_SpotLight, norm, v_FragPos, viewDir); */
+    result += CalcSpotLight(u_SpotLight, norm, v_FragPos, viewDir);
     color = vec4(result, 1.0);
 }
 
@@ -112,11 +112,11 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), u_Material.shininess);
 
     vec3 emission = vec3(0.0);
-    if (specularMap.r == 0.0) // check for mask
+    /* if (specularMap.r == 0.0) // check for mask
     {
         emission = texture(u_Material.emission, v_TexCoords).rgb;
         emission = emission * (sin(u_Time) * 0.5 + 0.5) * 2.0;  // fading
-    }
+    } */
 
     vec3 ambient  = light.ambient  * vec3(texture(u_Material.diffuse, v_TexCoords));
     vec3 diffuse  = light.diffuse  * diff * vec3(texture(u_Material.diffuse, v_TexCoords));
