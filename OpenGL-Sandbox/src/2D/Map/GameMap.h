@@ -1,7 +1,6 @@
 #pragma once
 
-#include <GLCore.h> // TODO : do we need this include here?
-
+#include "../General/GameObject2D.h"
 #include "TileLayer.h"
 
 class GameMap
@@ -10,6 +9,7 @@ public:
     GameMap(unsigned int reserveLayerCount);
 
     virtual void OnUpdate(GLCore::Timestep timestep);
+    virtual void OnEvent(GLCore::Event& event);
     void OnRender();
 
     void SolveCollision(GameObject2D& obj) const;

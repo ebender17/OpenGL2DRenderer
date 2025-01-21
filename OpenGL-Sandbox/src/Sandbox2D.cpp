@@ -32,8 +32,10 @@ void Sandbox2D::OnAttach()
     float mapBounds[4] = { -0.5f, mapWidth, -0.5f, mapHeight };
     m_CameraController->SetBounds(mapBounds);
 
-    m_Player = CreateRef<PlayerController>(glm::vec3(18.f, 3.2f, 0.5f), "assets/2D/tilesets/trainer-sapphire.png");
+    m_Player = CreateRef<PlayerController>(glm::vec3(18.f, 3.2f, 0.5f), glm::vec2(1.0f, 1.5f),
+        "assets/2D/tilesets/trainer-sapphire.png");
     m_Player->LoadAssets();
+    m_PlayerDebugBox = CreateRef<LineBox2D>();
 }
 
 void Sandbox2D::OnDetach()
@@ -70,6 +72,9 @@ void Sandbox2D::OnUpdate(GLCore::Timestep timestep)
         m_GameMap->OnRender();
         Renderer2D::EndScene();
     }
+    m_PlayerDebugBox->DrawCollider(*m_Player, *m_CameraController);
+    // TODO : add line rendering into Renderer2D instead of DebugBox2D?
+    // something like Renderer2D::DrawBox
 }
 
 void Sandbox2D::OnImGuiRender()
@@ -89,4 +94,6 @@ void Sandbox2D::OnImGuiRender()
 void Sandbox2D::OnEvent(GLCore::Event& event)
 {
     m_CameraController->OnEvent(event);
+    m_Player->OnEvent(event);
+    m_GameMap->OnEvent(event);
 }

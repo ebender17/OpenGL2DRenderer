@@ -2,7 +2,7 @@
 
 #include <GLCore.h>
 
-#include "../GameObject2D.h"
+#include "../General/GameObject2D.h"
 #include "../Animation/AnimatorTopDown.h"
 
 class PlayerController : public GameObject2D
@@ -23,7 +23,7 @@ public:
         Right
     };
 public:
-    PlayerController(const glm::vec3& position, const char* textureFilepath);
+    PlayerController(const glm::vec3& position, const glm::vec2& spriteSize, const char* textureFilepath);
     ~PlayerController();
 
     void LoadAssets();
@@ -61,6 +61,6 @@ private:
     const char* m_WalkLeft = "walk-left";
     const char* m_WalkRight = "walk-right";
 
-    const glm::vec2 m_SpriteSize = { 32, 48 };
+    const glm::vec2 m_SpriteSizePixels = { 32, 48 };
 };
 

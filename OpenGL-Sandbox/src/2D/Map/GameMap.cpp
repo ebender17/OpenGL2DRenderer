@@ -11,6 +11,12 @@ void GameMap::OnUpdate(GLCore::Timestep timestep)
         m_Layers[i]->OnUpdate(timestep);
 }
 
+void GameMap::OnEvent(GLCore::Event& event)
+{
+    for (unsigned int i = 0; i < m_Layers.size(); i++)
+        m_Layers[i]->OnEvent(event);
+}
+
 void GameMap::OnRender()
 {
     for (unsigned int i = 0; i < m_Layers.size(); i++)

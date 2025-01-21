@@ -2,8 +2,10 @@
 
 using namespace GLCore;
 
-PlayerController::PlayerController(const glm::vec3& position, const char* textureFilepath)
-    : GameObject2D(position), m_TextureFilepath(textureFilepath)
+PlayerController::PlayerController(const glm::vec3& position, const glm::vec2& spriteSize,
+    const char* textureFilepath)
+    : GameObject2D(position, spriteSize, m_SpriteSizePixels.x, m_SpriteSizePixels.y),
+    m_TextureFilepath(textureFilepath)
 {
 }
 
@@ -14,10 +16,6 @@ PlayerController::~PlayerController()
 void PlayerController::LoadAssets()
 {
     m_SpriteSheet = Texture2D::Create(m_TextureFilepath);
-    float invTextureWidth = 1.0f / m_SpriteSheet->GetWidth();
-    float invTextureHeight = 1.0f / m_SpriteSheet->GetHeight();
-    m_Width = m_SpriteSize.x * invTextureWidth; // TODO : check these are correct
-    m_Height = m_SpriteSize.y * invTextureHeight;
     m_Animator = CreateRef<AnimatorTopDown>();
 
     // IDLE DOWN
@@ -63,7 +61,7 @@ void PlayerController::OnUpdate(GLCore::Timestep timestep)
 void PlayerController::OnRender()
 {
     auto currentFrame = m_Animator->GetCurrentFrame()->SubTexture;
-    Renderer2D::DrawQuad({ m_Position.x, m_Position.y, 0.5f }, { 1.0f, 1.5f }, currentFrame->GetTexture(), currentFrame->GetTexCoords());
+    Renderer2D::DrawQuad({ m_Position.x, m_Position.y, 0.5f }, m_Rect.SpriteSize, currentFrame->GetTexture(), currentFrame->GetTexCoords());
 }
 
 void PlayerController::ProcessPlayerInput()
@@ -133,7 +131,7 @@ void PlayerController::SetupAnimation(const char* animationName, bool isLoop, un
     Ref<AnimationTopDown> animation = CreateRef<AnimationTopDown>(animationName, isLoop, reserveFrameCount);
     for (int i = 0; i < frameCount; i++)
     {
-        auto subTexture = SubTexture2D::CreateFromCoords(m_SpriteSheet, { i, row }, m_SpriteSize);
+        auto subTexture = SubTexture2D::CreateFromCoords(m_SpriteSheet, { i, row }, m_SpriteSizePixels);
         Ref<AnimationFrame> frame = CreateRef<AnimationFrame>(subTexture, frameDuration);
         animation->AddFrame(frame);
     }
