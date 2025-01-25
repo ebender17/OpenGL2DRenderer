@@ -19,6 +19,12 @@ void AnimationTopDown::OnUpdate(Timestep timestep)
 {
     if (!m_IsRunning || m_Frames.empty()) { return; }
 
+    if (m_Frames[m_CurrentFrameIndex]->FrameIsSpriteSwap)
+    {
+        Stop();
+        return;
+    }
+
     m_TimeSinceLastFrame += timestep;
 
     if (m_TimeSinceLastFrame > m_Frames[m_CurrentFrameIndex]->FrameDuration) // time to change current frame

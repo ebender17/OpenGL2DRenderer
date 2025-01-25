@@ -17,13 +17,14 @@ public:
 
     enum class Direction
     {
-        Down = 0,
-        Up,
-        Left,
-        Right
+        South = 0,
+        North,
+        West,
+        East
     };
 public:
-    PlayerController(const glm::vec3& position, const glm::vec2& spriteSize, const char* textureFilepath);
+    PlayerController(const glm::vec3& position, const glm::vec2& spriteSize,
+        float width, float height, const char* textureFilepath);
     ~PlayerController();
 
     void LoadAssets();
@@ -45,10 +46,15 @@ private:
     GLCore::Ref<AnimatorTopDown> m_Animator;
     PlayerState m_PlayerState = PlayerState::Idle;
 
-    float m_Speed = 10.0f;
+    float m_Speed = 5.0f;
     glm::vec2 m_InputDirection = glm::vec2(0.0);
-    Direction m_Direction = Direction::Down;
-    float m_PercentMovedToNextTile = 0.0f;
+    Direction m_CurrentDirection = Direction::South;
+    bool m_IsMoving = false;
+    float m_Progress = 0.0f;          // Progress of the movement [0, 1]
+    glm::vec3 m_StartPos;
+    glm::vec3 m_EndPos;
+    float m_MoveDelay = 0.2f;          // Delay duration in seconds (adjust as needed)
+    float m_RemainingMoveDelay = 0.0f; // Remaining delay time
 
     // Animation Names
     const char* m_IdleDown = "idle-down";
