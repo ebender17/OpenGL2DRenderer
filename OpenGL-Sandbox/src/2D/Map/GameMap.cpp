@@ -11,12 +11,6 @@ void GameMap::OnUpdate(GLCore::Timestep timestep)
         m_Layers[i]->OnUpdate(timestep);
 }
 
-void GameMap::OnEvent(GLCore::Event& event)
-{
-    for (unsigned int i = 0; i < m_Layers.size(); i++)
-        m_Layers[i]->OnEvent(event);
-}
-
 void GameMap::OnRender()
 {
     for (unsigned int i = 0; i < m_Layers.size(); i++)
@@ -27,9 +21,14 @@ void GameMap::SolveCollision(GameObject2D& obj) const
 {
     for (unsigned int i = 0; i < m_Layers.size(); i++)
     {
-        if (m_Layers[i]->GetCollision())
+        if (m_Layers[i]->GetIsCollisionEnabled())
         {
-            m_Layers[i]->SolveCollision(obj);
+            if (m_Layers[i]->SolveCollision(obj))
+            {
+                obj.SetIsColliding(true);
+                return;
+            }
         }
     }
+    obj.SetIsColliding(false);
 }

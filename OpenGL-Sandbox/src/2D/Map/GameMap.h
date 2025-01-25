@@ -9,7 +9,6 @@ public:
     GameMap(unsigned int reserveLayerCount);
 
     virtual void OnUpdate(GLCore::Timestep timestep);
-    virtual void OnEvent(GLCore::Event& event);
     void OnRender();
 
     void SolveCollision(GameObject2D& obj) const;

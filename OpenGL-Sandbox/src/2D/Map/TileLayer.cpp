@@ -1,5 +1,7 @@
 #include "TileLayer.h"
 
+#include <cmath>
+
 using namespace GLCore;
 
 TileLayer::TileLayer(int tileWidth, int tileHeight, int rowCount, int columnCount, const TileMap& tileMap, const TilesetList& tilesets)
@@ -44,22 +46,9 @@ void TileLayer::OnUpdate(GLCore::Timestep timestep)
 {
 }
 
-void TileLayer::OnEvent(GLCore::Event& event)
-{
-    // TODO : is there a way to get window width & height from app inside of relyinh on events?
-    GLCore::EventDispatcher dispatcher(event);
-    dispatcher.Dispatch<GLCore::WindowResizeEvent>(GLCORE_BIND_EVENT_FN(TileLayer::OnWindowResized));
-}
-
-bool TileLayer::OnWindowResized(GLCore::WindowResizeEvent& event)
-{
-    m_WindowWidth = event.GetWidth();
-    m_WindowHeight = event.GetHeight();
-    return false;
-}
-
 void TileLayer::OnRender()
 {
+    // TODO : only render tiles inside camera rect to save on performance
     for (unsigned int y = 0; y < m_ColumnCount; y++)
     {
         for (unsigned int x = 0; x < m_RowCount; x++)
@@ -69,7 +58,8 @@ void TileLayer::OnRender()
                 continue;
 
             int tilesetIndex = 0;
-            auto ts = m_Tilesets[0]; // TODO : support for multiple tilesets
+            auto ts = m_Tilesets[0];
+            // TODO : support for multiple tilesets
 
             // TODO : map with multiple tilesets
             /* if (m_Tilesets.size() > 1)
@@ -87,7 +77,7 @@ void TileLayer::OnRender()
                 }
             } */
 
-            glm::vec3 position = glm::vec3(y, (m_ColumnCount - 1) - x, -0.05f); // TODO : magic number for z
+            glm::vec3 position = glm::vec3(y, x, -0.05f); // TODO : magic number for z
             m_TileData[tileId].Position = position;
             Renderer2D::DrawQuad(position, c_SpriteSize, ts->Texture, m_TileData[tileId].TexCoords);
         }
@@ -96,29 +86,35 @@ void TileLayer::OnRender()
 
 bool TileLayer::SolveCollision(GameObject2D& obj)
 {
-    // TODO : still runs very slow with this commented out. Try to get ride of gameobject on each tile
-    // TODO : left off here -> make more efficient. then test 1. intersects, 2. ResolveCollision
-    /* for (unsigned int y = 0; y < m_ColumnCount; y++)
-    {
-        for (unsigned int x = 0; x < m_RowCount; x++)
-        {
+    // TODO : support for multiple tilesets
+    int tilesetIndex = 0;
+    auto ts = m_Tilesets[0];
+
+    // Convert object's bounding box to tile indices
+    auto objPosition = obj.GetPosition();
+    int startX = std::floor(objPosition.y) - 1;
+    int startY = std::floor(objPosition.x);
+    int endX = std::ceil(objPosition.y + (obj.GetHeight() / m_TileHeight));
+    int endY = std::ceil(objPosition.x + (obj.GetWidth() / m_TileWidth));
+
+    // Clamp to tile map bounds
+    startX = std::max(0, startX);
+    startY = std::max(0, startY);
+    endX = std::min(static_cast<int>(m_RowCount - 1), endX);
+    endY = std::min(static_cast<int>(m_ColumnCount - 1), endY);
+
+    for (int y = startY; y <= endY; ++y) {
+        for (int x = startX; x <= endX; ++x) {
             int tileId = m_TileMap[x][y];
-            if (tileId == 0)
-                continue;
-
-            int tilesetIndex = 0;
-            auto ts = m_Tilesets[0]; // TODO : support for multiple tilesets
-
-
-            if (m_TileData[tileId]->GameObject->Intersects(obj))
-            {
-                // auto objPosition = obj.GetPosition();
-                // auto resolution = m_TileData[tileId]->Obj.ResolveCollision(obj);
-                // obj.SetPosition(objPosition.x + resolution.x, objPosition.y + resolution.y);
-                // LOG_INFO("Player repositioned to: ({0}, {1})", objPosition.x + resolution.x, objPosition.y + resolution.y);
-                return true;
+            if (tileId != 0) {
+                auto position = m_TileData[tileId].Position;
+                if (obj.IntersectsTile(position))
+                {
+                    LOG_INFO("Player intersection with tile at row: {0}, and col: {1}", y, x);
+                    return true;
+                }
             }
         }
-    } */
+    }
     return false;
 }

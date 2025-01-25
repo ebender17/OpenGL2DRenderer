@@ -12,10 +12,10 @@ struct TileData
 
 struct Tileset
 {
-    int FirstId, LastId;
-    int RowCount, ColumnCount;
-    int TileCount;
-    int TileWidth, TileHeight;
+    unsigned int FirstId, LastId;
+    unsigned int RowCount, ColumnCount;
+    unsigned int TileCount;
+    unsigned int TileWidth, TileHeight;
     std::string Name, Source;
     GLCore::Ref<GLCore::Texture2D> Texture;
 };
@@ -30,27 +30,25 @@ public:
         const TileMap& tileMap, const TilesetList& tilesets);
 
     void OnUpdate(GLCore::Timestep timestep);
-    void OnEvent(GLCore::Event& event);
     void OnRender();
 
     bool SolveCollision(GameObject2D& obj);
 
     const TileMap& GetTileMap() const { return m_TileMap; }
 
-    void SetCollision(bool isEnabled) { m_isCollisionsEnabled = isEnabled; }
-    bool GetCollision() const { return m_isCollisionsEnabled; }
+    void SetIsCollisionEnabled(bool isEnabled) { m_isCollisionsEnabled = isEnabled; }
+    bool GetIsCollisionEnabled() const { return m_isCollisionsEnabled; }
 private:
     void ComputeTileTexCoords();
-    bool OnWindowResized(GLCore::WindowResizeEvent& event);
 private:
     int m_TileWidth, m_TileHeight;
     int m_RowCount, m_ColumnCount;
     TileMap m_TileMap;
-    TilesetList m_Tilesets;
+    TilesetList m_Tilesets; // TODO : only support one tileset for now
 
     bool m_isCollisionsEnabled;
+
     std::unordered_map<int, TileData> m_TileData; // TODO : make a scoped pointer
-    float m_WindowWidth, m_WindowHeight;
 
     const glm::vec2 c_SpriteSize = { 1.0f, 1.0f };
 };

@@ -36,7 +36,7 @@ Ref<GameMap> MapParser::Parse(const std::string& source)
 
     if (xml.Error())
     {
-        LOG_ERROR("TileMap XML file could not be loaded!");
+        GLCORE_ASSERT(false, "TileMap XML file could not be loaded!");
         return nullptr;
     }
 
@@ -65,7 +65,7 @@ Ref<GameMap> MapParser::Parse(const std::string& source)
         {
             bool enableCollisions = element->BoolAttribute("collision", false);
             auto tileLayer = ParseTileLayer(element, tilesets, tileWidth, tileHeight, rowCount, columnCount);
-            tileLayer->SetCollision(enableCollisions);
+            tileLayer->SetIsCollisionEnabled(enableCollisions);
             gamemap->GetMapLayers().emplace_back(tileLayer);
         }
     }
@@ -119,7 +119,7 @@ Ref<TileLayer> MapParser::ParseTileLayer(XMLElement* xmlLayer, TilesetList tiles
         {
             getline(iss, id, ','); // all tile ids are seperate by a comma
             std::stringstream converter(id);
-            converter >> tilemap[row][col];
+            converter >> tilemap[(rowCount - 1) - row][col];
 
             if (!iss.good()) // check for end of file
                 break;

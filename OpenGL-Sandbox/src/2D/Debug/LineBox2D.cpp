@@ -64,7 +64,7 @@ LineBox2D::~LineBox2D()
 void LineBox2D::DrawCollider(const GameObject2D& obj, const Camera2DBaseController& cameraController)
 {
     glm::mat4 model = glm::translate(glm::mat4(1.0f), obj.GetPosition())
-        * glm::scale(glm::mat4(1.0f), { obj.GetRect().SpriteSize.x, obj.GetRect().SpriteSize.y, 1.0f});
+        * glm::scale(glm::mat4(1.0f), { obj.GetSpriteSize().x, obj.GetSpriteSize().y, 1.0f});
     m_VertexPosShader->Bind();
     m_VertexPosShader->SetMat4("u_ViewProjection", cameraController.GetCamera().GetViewProjectionMatrix());
     m_VertexPosShader->SetMat4("u_Model", model);
