@@ -11,7 +11,7 @@ public:
     virtual void OnUpdate(GLCore::Timestep timestep);
     void OnRender();
 
-    void SolveCollision(GameObject2D& obj) const;
+    bool CheckCollision(const glm::vec2& objPosition, float width, float height) const;
 
     std::vector<GLCore::Ref<TileLayer>>& GetMapLayers() { return m_Layers; }
 private:

@@ -10,8 +10,11 @@
 
 using namespace GLCore;
 
+const float INITIAL_SCREEN_WIDTH = 1280.f;
+const float INITIAL_SCREEN_HEIGHT = 720.f;
+
 Sandbox2D::Sandbox2D()
-    : Layer("Sandbox2D"), m_CameraController(CreateRef<TargetCamera2DController>(1280.f / 720.0f, -2.0f, 2.0f))
+    : Layer("Sandbox2D"), m_CameraController(CreateRef<TargetCamera2DController>(INITIAL_SCREEN_WIDTH / INITIAL_SCREEN_HEIGHT, -2.0f, 2.0f))
 {
     MapParser::Init();
 }
@@ -26,14 +29,13 @@ void Sandbox2D::OnAttach()
     m_CameraController->SetZoomLevel(5.5f);
 
     m_GameMap = MapParser::GetInstance().Load("assets/2D/tilemaps/forest-town.tmx");
-
     float mapWidth = 39.4f; // TODO : magic number
     float mapHeight = 48.f; // TODO : magic number
     float mapBounds[4] = { -0.5f, mapWidth, -0.5f, mapHeight };
     m_CameraController->SetBounds(mapBounds);
 
     m_Player = CreateRef<PlayerController>(glm::vec3(18.f, 3.2f, 0.5f), glm::vec2(1.0f, 1.5f),
-        "assets/2D/tilesets/trainer-sapphire.png");
+        32, 48, "assets/2D/tilesets/trainer-sapphire.png", m_GameMap);
     m_Player->LoadAssets();
     m_PlayerDebugBox = CreateRef<LineBox2D>();
 }
@@ -50,10 +52,8 @@ void Sandbox2D::OnUpdate(GLCore::Timestep timestep)
     PROFILE_FUNCTION();
 
     // Update
-
-    m_Player->OnUpdate(timestep);
     m_GameMap->OnUpdate(timestep);
-    m_GameMap->SolveCollision(*m_Player);
+    m_Player->OnUpdate(timestep);
     m_CameraController->SetTarget(m_Player->GetPosition());
     m_CameraController->OnUpdate(timestep);
 
@@ -94,6 +94,4 @@ void Sandbox2D::OnImGuiRender()
 void Sandbox2D::OnEvent(GLCore::Event& event)
 {
     m_CameraController->OnEvent(event);
-    m_Player->OnEvent(event);
-    m_GameMap->OnEvent(event);
 }

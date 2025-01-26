@@ -32,14 +32,15 @@ public:
     void OnUpdate(GLCore::Timestep timestep);
     void OnRender();
 
-    bool SolveCollision(GameObject2D& obj);
+    bool CheckCollision(const glm::vec2& objPosition, float width, float height);
 
     const TileMap& GetTileMap() const { return m_TileMap; }
+    bool GetIsCollisionEnabled() const { return m_isCollisionsEnabled; }
 
     void SetIsCollisionEnabled(bool isEnabled) { m_isCollisionsEnabled = isEnabled; }
-    bool GetIsCollisionEnabled() const { return m_isCollisionsEnabled; }
 private:
     void ComputeTileTexCoords();
+    bool IntersectsTile(const glm::vec2& tilePosition, const glm::vec2& objPosition) const;
 private:
     int m_TileWidth, m_TileHeight;
     int m_RowCount, m_ColumnCount;

@@ -84,18 +84,17 @@ void TileLayer::OnRender()
     }
 }
 
-bool TileLayer::SolveCollision(GameObject2D& obj)
+bool TileLayer::CheckCollision(const glm::vec2& objPosition, float width, float height)
 {
     // TODO : support for multiple tilesets
     int tilesetIndex = 0;
     auto ts = m_Tilesets[0];
 
     // Convert object's bounding box to tile indices
-    auto objPosition = obj.GetPosition();
     int startX = std::floor(objPosition.y) - 1;
     int startY = std::floor(objPosition.x);
-    int endX = std::ceil(objPosition.y + (obj.GetHeight() / m_TileHeight));
-    int endY = std::ceil(objPosition.x + (obj.GetWidth() / m_TileWidth));
+    int endX = std::ceil(objPosition.y + (width / m_TileHeight));
+    int endY = std::ceil(objPosition.x + (height / m_TileWidth));
 
     // Clamp to tile map bounds
     startX = std::max(0, startX);
@@ -108,7 +107,7 @@ bool TileLayer::SolveCollision(GameObject2D& obj)
             int tileId = m_TileMap[x][y];
             if (tileId != 0) {
                 auto position = m_TileData[tileId].Position;
-                if (obj.IntersectsTile(position))
+                if (IntersectsTile(position, objPosition))
                 {
                     LOG_INFO("Player intersection with tile at row: {0}, and col: {1}", y, x);
                     return true;
@@ -117,4 +116,13 @@ bool TileLayer::SolveCollision(GameObject2D& obj)
         }
     }
     return false;
+}
+
+bool TileLayer::IntersectsTile(const glm::vec2& tilePosition, const glm::vec2& objPosition) const
+{
+    // collision x-axis
+    bool collisionX = objPosition.x >= tilePosition.x;
+    // collision y-axis
+    bool collisionY = objPosition.y >= tilePosition.y + 1.0f; // (other.height / other.height) = 1.0f
+    return collisionX && collisionY;
 }

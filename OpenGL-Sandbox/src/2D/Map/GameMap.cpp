@@ -17,18 +17,17 @@ void GameMap::OnRender()
         m_Layers[i]->OnRender();
 }
 
-void GameMap::SolveCollision(GameObject2D& obj) const
+bool GameMap::CheckCollision(const glm::vec2& objPosition, float width, float height) const
 {
     for (unsigned int i = 0; i < m_Layers.size(); i++)
     {
         if (m_Layers[i]->GetIsCollisionEnabled())
         {
-            if (m_Layers[i]->SolveCollision(obj))
+            if (m_Layers[i]->CheckCollision(objPosition, width, height))
             {
-                obj.SetIsColliding(true);
-                return;
+                return true;
             }
         }
     }
-    obj.SetIsColliding(false);
+    return false;
 }

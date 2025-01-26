@@ -4,6 +4,7 @@
 
 #include "../General/GameObject2D.h"
 #include "../Animation/AnimatorTopDown.h"
+#include "../Map/GameMap.h"
 
 class PlayerController : public GameObject2D
 {
@@ -24,7 +25,7 @@ public:
     };
 public:
     PlayerController(const glm::vec3& position, const glm::vec2& spriteSize,
-        float width, float height, const char* textureFilepath);
+        float width, float height, const char* textureFilepath, GLCore::Ref<GameMap> gameMap);
     ~PlayerController();
 
     void LoadAssets();
@@ -42,6 +43,7 @@ private:
     void SetActiveWalkAnimation();
 private:
     const char* m_TextureFilepath;
+    GLCore::Ref<GameMap> m_GameMap;
     GLCore::Ref<GLCore::Texture2D> m_SpriteSheet;
     GLCore::Ref<AnimatorTopDown> m_Animator;
     PlayerState m_PlayerState = PlayerState::Idle;
@@ -50,11 +52,11 @@ private:
     glm::vec2 m_InputDirection = glm::vec2(0.0);
     Direction m_CurrentDirection = Direction::South;
     bool m_IsMoving = false;
-    float m_Progress = 0.0f;          // Progress of the movement [0, 1]
-    glm::vec3 m_StartPos;
-    glm::vec3 m_EndPos;
-    float m_MoveDelay = 0.2f;          // Delay duration in seconds (adjust as needed)
-    float m_RemainingMoveDelay = 0.0f; // Remaining delay time
+    float m_Progress = 0.0f; // Progress of the movement [0, 1]
+    glm::vec3 m_StartPosition;
+    glm::vec3 m_EndPosition;
+    float m_MoveDelay = 0.2f;
+    float m_RemainingMoveDelay = 0.0f;
 
     // Animation Names
     const char* m_IdleDown = "idle-down";

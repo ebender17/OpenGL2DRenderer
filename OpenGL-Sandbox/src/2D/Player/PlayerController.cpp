@@ -3,8 +3,9 @@
 using namespace GLCore;
 
 PlayerController::PlayerController(const glm::vec3& position, const glm::vec2& spriteSize,
-    float width, float height, const char* textureFilepath)
-    : GameObject2D(position, spriteSize, width, height), m_TextureFilepath(textureFilepath)
+    float width, float height, const char* textureFilepath, GLCore::Ref<GameMap> gameMap)
+    : GameObject2D(position, spriteSize, width, height), m_TextureFilepath(textureFilepath),
+    m_GameMap(gameMap)
 {
 }
 
@@ -55,12 +56,12 @@ void PlayerController::OnUpdate(GLCore::Timestep timestep)
         if (m_RemainingMoveDelay > 0.0f)
         {
             m_RemainingMoveDelay -= timestep;
-            return; // Wait until the delay timer reaches 0
+            return;
         }
 
-        // After delay, return to Idle to process movement input
         m_PlayerState = PlayerState::Idle;
     }
+
 
     if (m_PlayerState == PlayerState::Idle)
         ProcessPlayerInput();
@@ -106,24 +107,20 @@ void PlayerController::ProcessPlayerInput()
     {
         if (newDirection != m_CurrentDirection)
         {
-            // Change direction, set to Turning state, and reset delay timer
             m_CurrentDirection = newDirection;
-            m_RemainingMoveDelay = m_MoveDelay; // Reset movement delay
+            m_RemainingMoveDelay = m_MoveDelay; // Reset delay
             SetActiveIdleAnimation();
             m_PlayerState = PlayerState::Turning;
             return;
         }
-        // If no delay is active and direction is the same, start movement
-        if (m_RemainingMoveDelay <= 0.0f)
-        {
-            m_IsMoving = true;
-            m_Progress = 0.0f; // Reset interpolation progress
-            m_StartPos = m_Position;
-            m_EndPos = { m_Position.x + inputDirection.x, m_Position.y + inputDirection.y, m_Position.z };
 
-            SetActiveWalkAnimation();
-            m_PlayerState = PlayerState::Walking;
-        }
+        m_IsMoving = true;
+        m_Progress = 0.0f;
+        m_StartPosition = m_Position;
+        m_EndPosition = { m_Position.x + inputDirection.x, m_Position.y + inputDirection.y, m_Position.z };;
+
+        SetActiveWalkAnimation();
+        m_PlayerState = PlayerState::Walking;
     }
     else
     {
@@ -137,10 +134,25 @@ void PlayerController::Move(Timestep timestep)
     // Increment movement progress
     m_Progress += m_Speed * timestep;
 
+    // Check if the target position is blocked
+    if (m_GameMap->CheckCollision(m_EndPosition, m_Width, m_Height))
+    {
+        // If there's a collision, block movement but keep the walk animation playing
+        m_Progress = 0.0f; // Reset progress
+        m_IsMoving = false;
+        m_PlayerState = PlayerState::Idle;
+
+        // Keep the walk animation active to give visual feedback
+        SetActiveWalkAnimation();
+
+        return;
+    }
+
+    // If no collision, continue interpolation
     if (m_Progress >= 1.0f)
     {
         // Snap to target position and stop movement
-        m_Position = m_EndPos;
+        m_Position = m_EndPosition;
         m_Progress = 0.0f;
         m_IsMoving = false;
         m_PlayerState = PlayerState::Idle;
@@ -148,7 +160,7 @@ void PlayerController::Move(Timestep timestep)
     else
     {
         // Interpolate position between start and end
-        m_Position = glm::mix(m_StartPos, m_EndPos, m_Progress);
+        m_Position = glm::mix(m_StartPosition, m_EndPosition, m_Progress);
     }
 }
 
