@@ -1,7 +1,6 @@
 #pragma once
 
-#include <GLCore.h> // TODO : do we need this include here?
-
+#include "../General/GameObject2D.h"
 #include "TileLayer.h"
 
 class GameMap
@@ -11,6 +10,8 @@ public:
 
     virtual void OnUpdate(GLCore::Timestep timestep);
     void OnRender();
+
+    bool CheckCollision(const glm::vec2& objPosition, float width, float height) const;
 
     std::vector<GLCore::Ref<TileLayer>>& GetMapLayers() { return m_Layers; }
 private:

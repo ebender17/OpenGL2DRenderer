@@ -2,9 +2,11 @@
 
 #include <GLCore.h>
 
+#include "../General/GameObject2D.h"
 #include "../Animation/AnimatorTopDown.h"
+#include "../Map/GameMap.h"
 
-class PlayerController
+class PlayerController : public GameObject2D
 {
 public:
     enum class PlayerState
@@ -16,43 +18,45 @@ public:
 
     enum class Direction
     {
-        Down = 0,
-        Up,
-        Left,
-        Right
+        South = 0,
+        North,
+        West,
+        East
     };
 public:
-    PlayerController(const glm::vec3& position, const char* textureFilepath);
+    PlayerController(const glm::vec3& position, const glm::vec2& spriteSize,
+        float width, float height, const char* textureFilepath, GLCore::Ref<GameMap> gameMap);
     ~PlayerController();
 
     void LoadAssets();
 
     void OnUpdate(GLCore::Timestep timestep);
     void OnRender();
-
-    const glm::vec3& GetPosition() const { return m_Position; }
 private:
     void ProcessPlayerInput();
     void Move(GLCore::Timestep timestep);
 
-    void SetupAnimation(const char* animationName, bool isLoop, const glm::vec2& spriteSize, unsigned int row, size_t frameCount, float frameDuration, unsigned int reserveFrameCount);
+    void SetupAnimation(const char* animationName, bool isLoop, unsigned int row, size_t frameCount, float frameDuration, unsigned int reserveFrameCount);
     void OnAnimationEnd();
 
     void SetActiveIdleAnimation();
     void SetActiveWalkAnimation();
 private:
-    glm::vec3 m_Position;
     const char* m_TextureFilepath;
-
+    GLCore::Ref<GameMap> m_GameMap;
     GLCore::Ref<GLCore::Texture2D> m_SpriteSheet;
     GLCore::Ref<AnimatorTopDown> m_Animator;
     PlayerState m_PlayerState = PlayerState::Idle;
 
-    float m_Speed = 4.0f;
-    glm::vec3 m_InitialPosition;
+    float m_Speed = 5.0f;
     glm::vec2 m_InputDirection = glm::vec2(0.0);
-    Direction m_Direction = Direction::Down;
-    float m_PercentMovedToNextTile = 0.0f;
+    Direction m_CurrentDirection = Direction::South;
+    bool m_IsMoving = false;
+    float m_Progress = 0.0f; // Progress of the movement [0, 1]
+    glm::vec3 m_StartPosition;
+    glm::vec3 m_EndPosition;
+    float m_MoveDelay = 0.2f;
+    float m_RemainingMoveDelay = 0.0f;
 
     // Animation Names
     const char* m_IdleDown = "idle-down";
@@ -64,5 +68,7 @@ private:
     const char* m_WalkUp = "walk-up";
     const char* m_WalkLeft = "walk-left";
     const char* m_WalkRight = "walk-right";
+
+    const glm::vec2 m_SpriteSizePixels = { 32, 48 };
 };
 

@@ -36,7 +36,7 @@ Ref<GameMap> MapParser::Parse(const std::string& source)
 
     if (xml.Error())
     {
-        LOG_ERROR("TileMap XML file could not be loaded!");
+        GLCORE_ASSERT(false, "TileMap XML file could not be loaded!");
         return nullptr;
     }
 
@@ -63,7 +63,9 @@ Ref<GameMap> MapParser::Parse(const std::string& source)
     {
         if (strcmp(element->Value(), "layer") == 0)
         {
+            bool enableCollisions = element->BoolAttribute("collision", false);
             auto tileLayer = ParseTileLayer(element, tilesets, tileWidth, tileHeight, rowCount, columnCount);
+            tileLayer->SetIsCollisionEnabled(enableCollisions);
             gamemap->GetMapLayers().emplace_back(tileLayer);
         }
     }
@@ -109,7 +111,7 @@ Ref<TileLayer> MapParser::ParseTileLayer(XMLElement* xmlLayer, TilesetList tiles
     std::istringstream iss(matrix);
     std::string id;
 
-    TileMap tilemap(rowCount, std::vector<int>(columnCount, 0)); // TODO : since this is stack allocated, will it cause issues when initializing the layer?
+    TileMap tilemap(rowCount, std::vector<int>(columnCount, 0));
 
     for (int row = 0; row < rowCount; row++)
     {
@@ -117,7 +119,7 @@ Ref<TileLayer> MapParser::ParseTileLayer(XMLElement* xmlLayer, TilesetList tiles
         {
             getline(iss, id, ','); // all tile ids are seperate by a comma
             std::stringstream converter(id);
-            converter >> tilemap[row][col];
+            converter >> tilemap[(rowCount - 1) - row][col];
 
             if (!iss.good()) // check for end of file
                 break;

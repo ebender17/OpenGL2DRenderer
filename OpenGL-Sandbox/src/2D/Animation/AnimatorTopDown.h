@@ -5,12 +5,14 @@
 struct AnimationFrame
 {
     GLCore::Ref<GLCore::SubTexture2D> SubTexture;
+    bool FrameIsSpriteSwap = false; // if set to true frame duration will be ignored
     float FrameDuration = 0.0f;
 
     AnimationFrame() = default;
 
-    AnimationFrame(GLCore::Ref<GLCore::SubTexture2D> subTexture, float frameDuration)
-        : SubTexture(subTexture), FrameDuration(frameDuration)
+    AnimationFrame(GLCore::Ref<GLCore::SubTexture2D> subTexture, bool frameIsSpriteSwap,
+        float frameDuration = 0.0f)
+        : SubTexture(subTexture), FrameIsSpriteSwap(frameIsSpriteSwap), FrameDuration(frameDuration)
     {
     }
 };

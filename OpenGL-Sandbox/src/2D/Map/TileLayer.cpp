@@ -1,5 +1,7 @@
 #include "TileLayer.h"
 
+#include <cmath>
+
 using namespace GLCore;
 
 TileLayer::TileLayer(int tileWidth, int tileHeight, int rowCount, int columnCount, const TileMap& tileMap, const TilesetList& tilesets)
@@ -32,12 +34,10 @@ void TileLayer::ComputeTileTexCoords()
             float maxU = (tileColumn + 1) * ts->TileWidth * invTextureWidth;
             float maxV = (tileRow + 1) * ts->TileHeight * invTextureHeight;
 
-            m_TileTexCoords[tileId] = std::array<glm::vec2, 4>{
-                glm::vec2(minU, minV),
-                glm::vec2(maxU, minV),
-                glm::vec2(maxU, maxV),
-                glm::vec2(minU, maxV)
-            };
+            m_TileData[tileId].TexCoords[0] = glm::vec2(minU, minV);
+            m_TileData[tileId].TexCoords[1] = glm::vec2(maxU, minV);
+            m_TileData[tileId].TexCoords[2] = glm::vec2(maxU, maxV);
+            m_TileData[tileId].TexCoords[3] = glm::vec2(minU, maxV);
         }
     }
 }
@@ -48,6 +48,7 @@ void TileLayer::OnUpdate(GLCore::Timestep timestep)
 
 void TileLayer::OnRender()
 {
+    // TODO : only render tiles inside camera rect to save on performance
     for (unsigned int y = 0; y < m_ColumnCount; y++)
     {
         for (unsigned int x = 0; x < m_RowCount; x++)
@@ -58,8 +59,10 @@ void TileLayer::OnRender()
 
             int tilesetIndex = 0;
             auto ts = m_Tilesets[0];
+            // TODO : support for multiple tilesets
 
-            if (m_Tilesets.size() > 1)
+            // TODO : map with multiple tilesets
+            /* if (m_Tilesets.size() > 1)
             {
                 for (int i = 1; i < m_Tilesets.size(); i++)
                 {
@@ -72,10 +75,54 @@ void TileLayer::OnRender()
                         break;
                     }
                 }
-            }
+            } */
 
-            glm::vec3 position = glm::vec3(y, (m_ColumnCount - 1) - x, -0.05f);
-            Renderer2D::DrawQuad(position, { 1.0f, 1.0f }, ts->Texture, m_TileTexCoords[tileId].data());
+            glm::vec3 position = glm::vec3(y, x, -0.05f); // TODO : magic number for z
+            m_TileData[tileId].Position = position;
+            Renderer2D::DrawQuad(position, c_SpriteSize, ts->Texture, m_TileData[tileId].TexCoords);
         }
     }
+}
+
+bool TileLayer::CheckCollision(const glm::vec2& objPosition, float width, float height)
+{
+    // TODO : support for multiple tilesets
+    int tilesetIndex = 0;
+    auto ts = m_Tilesets[0];
+
+    // Convert object's bounding box to tile indices
+    int startX = std::floor(objPosition.y) - 1;
+    int startY = std::floor(objPosition.x);
+    int endX = std::ceil(objPosition.y + (width / m_TileHeight));
+    int endY = std::ceil(objPosition.x + (height / m_TileWidth));
+
+    // Clamp to tile map bounds
+    startX = std::max(0, startX);
+    startY = std::max(0, startY);
+    endX = std::min(static_cast<int>(m_RowCount - 1), endX);
+    endY = std::min(static_cast<int>(m_ColumnCount - 1), endY);
+
+    for (int y = startY; y <= endY; ++y) {
+        for (int x = startX; x <= endX; ++x) {
+            int tileId = m_TileMap[x][y];
+            if (tileId != 0) {
+                auto position = m_TileData[tileId].Position;
+                if (IntersectsTile(position, objPosition))
+                {
+                    LOG_INFO("Player intersection with tile at row: {0}, and col: {1}", y, x);
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+bool TileLayer::IntersectsTile(const glm::vec2& tilePosition, const glm::vec2& objPosition) const
+{
+    // collision x-axis
+    bool collisionX = objPosition.x >= tilePosition.x;
+    // collision y-axis
+    bool collisionY = objPosition.y >= tilePosition.y + 1.0f; // (other.height / other.height) = 1.0f
+    return collisionX && collisionY;
 }

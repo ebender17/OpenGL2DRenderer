@@ -3,7 +3,7 @@
  <tileset firstgid="1" name="outside" tilewidth="32" tileheight="32" tilecount="704" columns="8">
   <image source="assets/2D/tilesets/outside.png" width="256" height="2816"/>
  </tileset>
-<layer id="2" name="Shallow Water" width="30" height="30">
+<layer id="2" name="Shallow Water" width="30" height="30" collision="false">
     <data encoding="csv">
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -37,7 +37,7 @@
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
     </data>
 </layer>
-<layer id="3" name="Houses" width="30" height="30" locked="1">
+<layer id="3" name="Houses" width="30" height="30" collision="true">
     <data encoding="csv">
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -71,7 +71,7 @@
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
     </data>
 </layer>
-<layer id="10" name="Fence" width="30" height="30" locked="1">
+<layer id="10" name="Fence" width="30" height="30" collision="true">
     <data encoding="csv">
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -105,7 +105,7 @@
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
     </data>
 </layer>
-<layer id="9" name="Big Tree" width="30" height="30" locked="1">
+<layer id="9" name="Big Tree" width="30" height="30" collision="true">
     <data encoding="csv">
         211,212,211,212,211,212,211,212,211,212,211,212,211,212,211,212,211,212,211,212,211,212,211,212,0,0,0,0,211,212,
         219,220,219,220,219,220,219,220,219,220,219,220,219,220,219,220,219,220,219,220,219,220,219,220,0,0,0,0,219,220,
@@ -139,7 +139,7 @@
         219,220,221,222,221,222,221,222,221,222,221,222,221,222,221,222,221,222,0,0,0,0,221,222,221,222,221,222,219,220
     </data>
 </layer>
-<layer id="11" name="Skinny Tree" width="30" height="30">
+<layer id="11" name="Skinny Tree" width="30" height="30" collision="true">
     <data encoding="csv">
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -173,7 +173,7 @@
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
     </data>
 </layer>
-<layer id="12" name="Interactables" width="30" height="30" locked="1">
+<layer id="12" name="Interactables" width="30" height="30" collision="true">
     <data encoding="csv">
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -207,7 +207,7 @@
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
     </data>
 </layer>
-<layer id="1" name="Ground" width="30" height="30">
+<layer id="1" name="Ground" width="30" height="30" collision="false">
     <data encoding="csv">
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,4,4,5,0,0,
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,0,0,

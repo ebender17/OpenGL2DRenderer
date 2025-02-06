@@ -4,8 +4,8 @@
 
 #include "2D/Player/PlayerController.h"
 #include "2D/Camera/TargetCamera2DController.h"
-
 #include "2D/Map/MapParser.h"
+#include "2D/Debug/LineBox2D.h"
 
 class Sandbox2D : public GLCore::Layer
 {
@@ -27,5 +27,6 @@ private:
     
     GLCore::Ref<PlayerController> m_Player;
     GLCore::Ref<GameMap> m_GameMap;
+    GLCore::Ref<LineBox2D> m_PlayerDebugBox;
 };
 
