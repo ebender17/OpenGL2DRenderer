@@ -2,10 +2,10 @@
 
 #include <GLCore.h>
 
-#include "2D/Player/PlayerController.h"
-#include "2D/Camera/TargetCamera2DController.h"
-#include "2D/Map/MapParser.h"
-#include "2D/Debug/LineBox2D.h"
+#include "Player/PlayerController.h"
+#include "Camera/TargetCamera2DController.h"
+#include "Map/MapParser.h"
+#include "Debug/LineBox2D.h"
 
 class Sandbox2D : public GLCore::Layer
 {
