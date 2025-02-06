@@ -47,8 +47,6 @@ namespace GLCore {
 
     void Renderer2D::Init()
     {
-        PROFILE_FUNCTION();
-
         s_Data.QuadVertexArray = VertexArray::Create();
 
         s_Data.QuadVertexBuffer = VertexBuffer::Create(s_Data.MaxVertices * sizeof(QuadVertex));
@@ -104,15 +102,11 @@ namespace GLCore {
 
     void Renderer2D::Shutdown()
     {
-        PROFILE_FUNCTION();
-
         delete[] s_Data.QuadVertexBufferBase;
     }
 
     void Renderer2D::BeginScene(const OrthographicCamera& camera)
     {
-        PROFILE_FUNCTION();
-
         s_Data.QuadShader->Bind();
         s_Data.QuadShader->SetMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
 
@@ -121,8 +115,6 @@ namespace GLCore {
 
     void Renderer2D::EndScene()
     {
-        PROFILE_FUNCTION();
-
         Flush();
     }
 
@@ -163,8 +155,6 @@ namespace GLCore {
 
     void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
     {
-        PROFILE_FUNCTION();
-
         glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
             * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
@@ -178,8 +168,6 @@ namespace GLCore {
 
     void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec2* texCoords, float tilingFactor, const glm::vec4& color)
     {
-        PROFILE_FUNCTION();
-
         glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
             * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
@@ -188,8 +176,6 @@ namespace GLCore {
 
     void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color)
     {
-        PROFILE_FUNCTION();
-
         const size_t quadVertexCount = 4;
         const float textureIndex = 0.0f; // White Texture
         const glm::vec2 textureCoords[] = { { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, { 0.0f, 1.0f } };
@@ -215,8 +201,6 @@ namespace GLCore {
 
     void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, const glm::vec2* texCoords, float tilingFactor, const glm::vec4& color)
     {
-        PROFILE_FUNCTION();
-
         if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
             NextBatch();
 
@@ -271,8 +255,6 @@ namespace GLCore {
 
     void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color)
     {
-        PROFILE_FUNCTION();
-
         if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
             NextBatch();
 
@@ -307,8 +289,6 @@ namespace GLCore {
 
     void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, const glm::vec2* texCoords, float tilingFactor, const glm::vec4& color)
     {
-        PROFILE_FUNCTION();
-
         glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
             * glm::rotate(glm::mat4(1.0f), rotation, { 0.0f, 0.0f, 1.0f })
             * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });

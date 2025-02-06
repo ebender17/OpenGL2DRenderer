@@ -12,13 +12,10 @@ Camera2DBaseController::Camera2DBaseController(float aspectRatio, float nearPlan
 
 void Camera2DBaseController::OnUpdate(Timestep timestep)
 {
-    PROFILE_FUNCTION();
 }
 
 void Camera2DBaseController::OnEvent(Event& event)
 {
-    PROFILE_FUNCTION();
-
     EventDispatcher dispatcher(event);
     dispatcher.Dispatch<WindowResizeEvent>(GLCORE_BIND_EVENT_FN(Camera2DBaseController::OnWindowResized));
 }
@@ -31,8 +28,6 @@ void Camera2DBaseController::CalculateView()
 
 bool Camera2DBaseController::OnWindowResized(WindowResizeEvent& event)
 {
-    PROFILE_FUNCTION();
-
     m_AspectRatio = (float)event.GetWidth() / (float)event.GetHeight();
     CalculateView();
     return false;

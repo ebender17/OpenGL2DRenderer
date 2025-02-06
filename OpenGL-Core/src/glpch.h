@@ -15,8 +15,6 @@
 
 #include "GLCore/Core/Log.h"
 
-#include "GLCore/Debug/Instrumentor.h"
-
 #ifdef GLCORE_PLATFORM_WINDOWS
     #include <Windows.h>
 #endif

@@ -21,8 +21,6 @@ Sandbox2D::Sandbox2D()
 
 void Sandbox2D::OnAttach()
 {
-    PROFILE_FUNCTION();
-
     EnableGLDebugging();
     SetGLDebugLogLevel(DebugLogLevel::Notification);
 
@@ -42,15 +40,11 @@ void Sandbox2D::OnAttach()
 
 void Sandbox2D::OnDetach()
 {
-    PROFILE_FUNCTION();
-
     MapParser::Shutdown();
 }
 
 void Sandbox2D::OnUpdate(GLCore::Timestep timestep)
 {
-    PROFILE_FUNCTION();
-
     // Update
     m_GameMap->OnUpdate(timestep);
     m_Player->OnUpdate(timestep);
@@ -58,20 +52,14 @@ void Sandbox2D::OnUpdate(GLCore::Timestep timestep)
     m_CameraController->OnUpdate(timestep);
 
     // Render
-    {
-        PROFILE_SCOPE("Renderer Prep");
-        RenderCommand::SetClearColor({ 1.0f, 0.0f, 0.0f, 1 });
-        RenderCommand::Clear();
-    }
+    RenderCommand::SetClearColor({ 1.0f, 0.0f, 0.0f, 1 });
+    RenderCommand::Clear();
 
     Renderer2D::ResetStats();
-    {
-        PROFILE_SCOPE("Renderer Draw");
-        Renderer2D::BeginScene(m_CameraController->GetCamera());
-        m_Player->OnRender();
-        m_GameMap->OnRender();
-        Renderer2D::EndScene();
-    }
+    Renderer2D::BeginScene(m_CameraController->GetCamera());
+    m_Player->OnRender();
+    m_GameMap->OnRender();
+    Renderer2D::EndScene();
     m_PlayerDebugBox->DrawCollider(*m_Player, *m_CameraController);
     // TODO : add line rendering into Renderer2D instead of DebugBox2D?
     // something like Renderer2D::DrawBox
