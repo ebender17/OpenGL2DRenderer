@@ -1,7 +1,7 @@
 #pragma once
 
 #include <GLCore.h>
-#include "2D/Camera/InputCamera2DController.h"
+#include "Camera/InputCamera2DController.h"
 
 class SandboxLayer : public GLCore::Layer
 {

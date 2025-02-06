@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.5" tiledversion="1.7.2" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="13" nextobjectid="1">
  <tileset firstgid="1" name="outside" tilewidth="32" tileheight="32" tilecount="704" columns="8">
-  <image source="assets/2D/tilesets/outside.png" width="256" height="2816"/>
+  <image source="assets/tilesets/outside.png" width="256" height="2816"/>
  </tileset>
 <layer id="2" name="Shallow Water" width="30" height="30" collision="false">
     <data encoding="csv">

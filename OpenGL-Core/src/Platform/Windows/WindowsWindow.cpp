@@ -23,39 +23,30 @@ namespace GLCore {
 
     WindowsWindow::WindowsWindow(const WindowProps& props)
     {
-        PROFILE_FUNCTION();
-
         Init(props);
     }
 
     WindowsWindow::~WindowsWindow()
     {
-        PROFILE_FUNCTION();
-
         Shutdown();
     }
 
     void WindowsWindow::Init(const WindowProps& props)
     {
-        PROFILE_FUNCTION();
-
+        if (s_GLFWWindowCount != 0) { return; }
         m_Data.Title = props.Title;
         m_Data.Width = props.Width;
         m_Data.Height = props.Height;
 
         if (s_GLFWWindowCount == 0)
         {
-            PROFILE_SCOPE("glfwInit");
             int success = glfwInit();
             GLCORE_ASSERT(success, "Could not initialize GLFW!");
             glfwSetErrorCallback(GLFWErrorCallback);
         }
 
-        {
-            PROFILE_SCOPE("glfwCreateWindow");
-            m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
-            ++s_GLFWWindowCount;
-        }
+        m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
+        ++s_GLFWWindowCount;
 
         m_Context = GraphicsContext::Create(m_Window);
         m_Context->Init();
@@ -148,8 +139,6 @@ namespace GLCore {
 
     void WindowsWindow::Shutdown()
     {
-        PROFILE_FUNCTION();
-
         glfwDestroyWindow(m_Window);
         --s_GLFWWindowCount;
 
@@ -161,16 +150,12 @@ namespace GLCore {
 
     void WindowsWindow::OnUpdate()
     {
-        PROFILE_FUNCTION();
-
         glfwPollEvents();
         m_Context->SwapBuffers();
     }
 
     void WindowsWindow::SetVSync(bool enabled)
     {
-        PROFILE_FUNCTION();
-
         if (enabled)
             glfwSwapInterval(1);
         else

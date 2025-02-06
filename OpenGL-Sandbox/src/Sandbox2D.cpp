@@ -21,36 +21,30 @@ Sandbox2D::Sandbox2D()
 
 void Sandbox2D::OnAttach()
 {
-    PROFILE_FUNCTION();
-
     EnableGLDebugging();
     SetGLDebugLogLevel(DebugLogLevel::Notification);
 
     m_CameraController->SetZoomLevel(5.5f);
 
-    m_GameMap = MapParser::GetInstance().Load("assets/2D/tilemaps/forest-town.tmx");
+    m_GameMap = MapParser::GetInstance().Load("assets/tilemaps/forest-town.tmx");
     float mapWidth = 39.4f; // TODO : magic number
     float mapHeight = 48.f; // TODO : magic number
     float mapBounds[4] = { -0.5f, mapWidth, -0.5f, mapHeight };
     m_CameraController->SetBounds(mapBounds);
 
     m_Player = CreateRef<PlayerController>(glm::vec3(18.f, 3.2f, 0.5f), glm::vec2(1.0f, 1.5f),
-        32, 48, "assets/2D/tilesets/trainer-sapphire.png", m_GameMap);
+        32, 48, "assets/tilesets/trainer-sapphire.png", m_GameMap);
     m_Player->LoadAssets();
     m_PlayerDebugBox = CreateRef<LineBox2D>();
 }
 
 void Sandbox2D::OnDetach()
 {
-    PROFILE_FUNCTION();
-
     MapParser::Shutdown();
 }
 
 void Sandbox2D::OnUpdate(GLCore::Timestep timestep)
 {
-    PROFILE_FUNCTION();
-
     // Update
     m_GameMap->OnUpdate(timestep);
     m_Player->OnUpdate(timestep);
@@ -58,20 +52,14 @@ void Sandbox2D::OnUpdate(GLCore::Timestep timestep)
     m_CameraController->OnUpdate(timestep);
 
     // Render
-    {
-        PROFILE_SCOPE("Renderer Prep");
-        RenderCommand::SetClearColor({ 1.0f, 0.0f, 0.0f, 1 });
-        RenderCommand::Clear();
-    }
+    RenderCommand::SetClearColor({ 1.0f, 0.0f, 0.0f, 1 });
+    RenderCommand::Clear();
 
     Renderer2D::ResetStats();
-    {
-        PROFILE_SCOPE("Renderer Draw");
-        Renderer2D::BeginScene(m_CameraController->GetCamera());
-        m_Player->OnRender();
-        m_GameMap->OnRender();
-        Renderer2D::EndScene();
-    }
+    Renderer2D::BeginScene(m_CameraController->GetCamera());
+    m_Player->OnRender();
+    m_GameMap->OnRender();
+    Renderer2D::EndScene();
     m_PlayerDebugBox->DrawCollider(*m_Player, *m_CameraController);
     // TODO : add line rendering into Renderer2D instead of DebugBox2D?
     // something like Renderer2D::DrawBox

@@ -61,8 +61,6 @@ void InputCamera2DController::OnEvent(GLCore::Event& event)
 
 bool InputCamera2DController::OnMouseScrolled(GLCore::MouseScrolledEvent& event)
 {
-    PROFILE_FUNCTION();
-
     if (!m_Zoom) { return false; }
 
     m_ZoomLevel -= event.GetYOffset() * 0.25f;

@@ -14,8 +14,6 @@ namespace GLCore {
 
     void OpenGLContext::Init()
     {
-        PROFILE_FUNCTION();
-
         glfwMakeContextCurrent(m_WindowHandle);
         int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
         GLCORE_ASSERT(status, "Failed to initialize Glad!");
@@ -33,8 +31,6 @@ namespace GLCore {
 
     void OpenGLContext::SwapBuffers()
     {
-        PROFILE_FUNCTION();
-
         glfwSwapBuffers(m_WindowHandle);
     }
 }
