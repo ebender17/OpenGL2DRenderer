@@ -25,7 +25,7 @@ void TileLayer::ComputeTileTexCoords()
         for (int tileId = ts->FirstId; tileId <= ts->LastId; tileId++)
         {
             float tileRow = (ts->RowCount - 1) - (tileId / ts->ColumnCount);
-            float tileColumn = (tileId % ts->ColumnCount) - 1;
+            float tileColumn = ((tileId - 1) % ts->ColumnCount);
             if (tileId % ts->ColumnCount == 0)
                 tileRow++;
 
@@ -48,7 +48,7 @@ void TileLayer::OnUpdate(GLCore::Timestep timestep)
 
 void TileLayer::OnRender()
 {
-    // TODO : only render tiles inside camera rect to save on performance
+    // TODO : only issue draw calls for tiles inside camera bounds
     for (unsigned int y = 0; y < m_ColumnCount; y++)
     {
         for (unsigned int x = 0; x < m_RowCount; x++)
@@ -57,9 +57,9 @@ void TileLayer::OnRender()
             if (tileId == 0)
                 continue;
 
+            // TODO : support for multiple tilesets
             int tilesetIndex = 0;
             auto ts = m_Tilesets[0];
-            // TODO : support for multiple tilesets
 
             // TODO : map with multiple tilesets
             /* if (m_Tilesets.size() > 1)
@@ -78,7 +78,6 @@ void TileLayer::OnRender()
             } */
 
             glm::vec3 position = glm::vec3(y, x, -0.05f); // TODO : magic number for z
-            m_TileData[tileId].Position = position;
             Renderer2D::DrawQuad(position, c_SpriteSize, ts->Texture, m_TileData[tileId].TexCoords);
         }
     }
@@ -106,10 +105,9 @@ bool TileLayer::CheckCollision(const glm::vec2& objPosition, float width, float 
         for (int x = startX; x <= endX; ++x) {
             int tileId = m_TileMap[x][y];
             if (tileId != 0) {
-                auto position = m_TileData[tileId].Position;
-                if (IntersectsTile(position, objPosition))
+                if (IntersectsTile(glm::vec2(y, x), objPosition))
                 {
-                    LOG_INFO("Player intersection with tile at row: {0}, and col: {1}", y, x);
+                    LOG_INFO("Player intersection with tile at row: {0}, and col: {1} tileId: {2}", y, x, tileId);
                     return true;
                 }
             }
@@ -123,6 +121,6 @@ bool TileLayer::IntersectsTile(const glm::vec2& tilePosition, const glm::vec2& o
     // collision x-axis
     bool collisionX = objPosition.x >= tilePosition.x;
     // collision y-axis
-    bool collisionY = objPosition.y >= tilePosition.y + 1.0f; // (other.height / other.height) = 1.0f
+    bool collisionY = objPosition.y >= tilePosition.y;
     return collisionX && collisionY;
 }

@@ -180,7 +180,6 @@ void PlayerController::SetupAnimation(const char* animationName, bool isLoop, un
 
 void PlayerController::OnAnimationEnd()
 {
-    LOG_INFO("Player animation ended.");
 }
 
 void PlayerController::SetActiveIdleAnimation()
