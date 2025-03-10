@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.7.2" orientation="orthogonal" renderorder="right-down" width="8" height="8" tilewidth="32" tileheight="32" infinite="0" nextlayerid="3" nextobjectid="1">
+<map version="1.5" tiledversion="1.7.2" orientation="orthogonal" renderorder="right-down" width="8" height="8" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="1">
     <tileset firstgid="1" name="outside" tilewidth="32" tileheight="32" tilecount="704" columns="8">
         <image source="assets/tilesets/outside.png" width="256" height="2816"/>
     </tileset>
-    <layer id="2" name="Collision" width="8" height="8" collision="true">
+    <layer id="3" name="Collision" width="8" height="8" collision="true">
         <data encoding="csv">
             491,0,0,0,0,0,0,0,
             499,0,0,0,0,0,0,0,
@@ -15,6 +15,18 @@
             0,0,0,0,0,0,0,0
         </data>
      </layer>
+    <layer id="2" name="Shallow Water" width="8" height="8" collision="false">
+        <data encoding="csv">
+            310,311,312,0,0,0,0,0,
+            318,319,320,0,0,0,0,0,
+            326,327,328,0,0,0,0,0,
+            0,0,0,0,0,0,0,0,
+            0,0,0,0,0,0,0,0,
+            0,0,0,0,0,0,0,0,
+            0,0,0,0,0,0,0,0,
+            0,0,0,0,0,0,0,0
+        </data>
+    </layer>
     <layer id="1" name="Grass" width="8" height="8" collision="false">
         <data encoding="csv">
             5,2,2,2,4,4,3,5,

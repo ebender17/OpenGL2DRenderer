@@ -6,7 +6,6 @@
 
 struct TileData
 {
-    glm::vec2 Position = {};
     glm::vec2 TexCoords[4] = {};
 };
 
