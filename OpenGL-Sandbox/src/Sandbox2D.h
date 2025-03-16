@@ -28,5 +28,8 @@ private:
     GLCore::Ref<PlayerController> m_Player;
     GLCore::Ref<GameMap> m_GameMap;
     GLCore::Ref<LineBox2D> m_PlayerDebugBox;
+    GLCore::Ref<GLCore::Framebuffer> m_Framebuffer;
+    GLCore::Ref<GLCore::Shader> m_FullscreenShader;
+    uint32_t m_FullscreenVAO;
 };
 

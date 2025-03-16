@@ -26,6 +26,40 @@ void Sandbox2D::OnAttach()
 
     m_CameraController->SetZoomLevel(5.5f);
 
+    // TODO : move post process framebuffer & shader into Renderer2D?
+    GLCore::FramebufferSpecification framebuffferSpec;
+    framebuffferSpec.Width = INITIAL_SCREEN_WIDTH;
+    framebuffferSpec.Height = INITIAL_SCREEN_HEIGHT;
+    m_Framebuffer = GLCore::Framebuffer::Create(framebuffferSpec);
+    m_FullscreenShader = Shader::Create("assets/shaders/FullscreenQuad.glsl");
+    m_FullscreenShader->Bind();
+    m_FullscreenShader->SetInt("u_SceneTexture", 0);
+    // TODO : set uniforms you can upfront
+
+    float quadVertices[] = {
+        // positions   // texCoords
+        -1.0f,  1.0f,  0.0f, 1.0f,
+        -1.0f, -1.0f,  0.0f, 0.0f,
+         1.0f, -1.0f,  1.0f, 0.0f,
+
+        -1.0f,  1.0f,  0.0f, 1.0f,
+         1.0f, -1.0f,  1.0f, 0.0f,
+         1.0f,  1.0f,  1.0f, 1.0f
+    };
+
+    unsigned int quadVBO;
+    glGenVertexArrays(1, &m_FullscreenVAO);
+    glGenBuffers(1, &quadVBO);
+    glBindVertexArray(m_FullscreenVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+    glBindVertexArray(0);
+    glDeleteBuffers(1, &quadVBO);
+
     m_GameMap = MapParser::GetInstance().Load("assets/tilemaps/forest-town.tmx");
     float mapWidth = 39.4f; // TODO : magic number
     float mapHeight = 48.f; // TODO : magic number
@@ -41,6 +75,7 @@ void Sandbox2D::OnAttach()
 void Sandbox2D::OnDetach()
 {
     MapParser::Shutdown();
+    glDeleteVertexArrays(1, &m_FullscreenVAO);
 }
 
 void Sandbox2D::OnUpdate(GLCore::Timestep timestep)
@@ -52,15 +87,30 @@ void Sandbox2D::OnUpdate(GLCore::Timestep timestep)
     m_CameraController->OnUpdate(timestep);
 
     // Render
+    // First pass
+    Renderer2D::ResetStats();
+    m_Framebuffer->Bind();
     RenderCommand::SetClearColor({ 1.0f, 0.0f, 0.0f, 1 });
     RenderCommand::Clear();
-
-    Renderer2D::ResetStats();
     Renderer2D::BeginScene(m_CameraController->GetCamera());
     m_Player->OnRender();
     m_GameMap->OnRender();
     Renderer2D::EndScene();
-    m_PlayerDebugBox->DrawCollider(*m_Player, *m_CameraController);
+    m_Framebuffer->Unbind();
+
+    // Second pass
+    // glDisable(GL_DEPTH_TEST); // TODO : figure out what is going on with depth test
+    RenderCommand::SetClearColor({ 1.0f, 0.0f, 0.0f, 1 });
+    RenderCommand::Clear();
+    // TODO : move post process framebuffer & shader into Renderer2D?
+    m_FullscreenShader->Bind();
+    glBindVertexArray(m_FullscreenVAO);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_Framebuffer->GetColorAttachment());
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glBindVertexArray(0);
+
+    // m_PlayerDebugBox->DrawCollider(*m_Player, *m_CameraController);
     // TODO : add line rendering into Renderer2D instead of DebugBox2D?
     // something like Renderer2D::DrawBox
 }

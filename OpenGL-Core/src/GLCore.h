@@ -22,3 +22,4 @@
 #include "GLCore/Renderer/Texture.h"
 #include "GLCore/Renderer/SubTexture2D.h"
 #include "GLCore/Renderer/VertexArray.h"
+#include "GLCore/Renderer/Framebuffer.h"
