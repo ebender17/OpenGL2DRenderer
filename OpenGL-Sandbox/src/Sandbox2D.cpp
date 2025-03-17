@@ -2,6 +2,8 @@
 
 #include "Platform/OpenGL/Debug/OpenGLDebug.h"
 
+#include <GLFW/glfw3.h>
+
 // TODO : do we need these includes?
 #include <imgui/imgui.h>
 
@@ -31,9 +33,10 @@ void Sandbox2D::OnAttach()
     framebuffferSpec.Width = INITIAL_SCREEN_WIDTH;
     framebuffferSpec.Height = INITIAL_SCREEN_HEIGHT;
     m_Framebuffer = GLCore::Framebuffer::Create(framebuffferSpec);
-    m_FullscreenShader = Shader::Create("assets/shaders/FullscreenQuad.glsl");
+    m_FullscreenShader = Shader::Create("assets/shaders/WaterReflections.glsl");
     m_FullscreenShader->Bind();
     m_FullscreenShader->SetInt("u_SceneTexture", 0);
+    m_FullscreenShader->SetInt("u_TileMap", 1);
     // TODO : set uniforms you can upfront
 
     float quadVertices[] = {
@@ -60,10 +63,10 @@ void Sandbox2D::OnAttach()
     glBindVertexArray(0);
     glDeleteBuffers(1, &quadVBO);
 
-    m_GameMap = MapParser::GetInstance().Load("assets/tilemaps/forest-town.tmx");
+    m_GameMap = MapParser::GetInstance().Load("assets/tilemaps/tilemap-test.tmx");
     float mapWidth = 39.4f; // TODO : magic number
     float mapHeight = 48.f; // TODO : magic number
-    float mapBounds[4] = { -0.5f, mapWidth, -0.5f, mapHeight };
+    float mapBounds[4] = { 0.0f, mapWidth, 0.0f, mapHeight };
     m_CameraController->SetBounds(mapBounds);
 
     m_Player = CreateRef<PlayerController>(glm::vec3(18.f, 3.2f, 0.5f), glm::vec2(1.0f, 1.5f),
@@ -107,6 +110,21 @@ void Sandbox2D::OnUpdate(GLCore::Timestep timestep)
     glBindVertexArray(m_FullscreenVAO);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_Framebuffer->GetColorAttachment());
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, m_GameMap->GetTilemapTexture());
+
+    // Pass the inverse projection-view matrix
+    glm::mat4 invProjectionView = glm::inverse(m_CameraController->GetCamera().GetViewProjectionMatrix());
+    m_FullscreenShader->SetMat4("u_InvProjectionView", invProjectionView);
+    // Set tile size in world space
+    m_FullscreenShader->SetFloat("u_TileSize", 1.0f); // TODO : make sure this is correct
+
+    m_FullscreenShader->SetFloat("u_WaveAmplitude", 0.01f);
+    m_FullscreenShader->SetFloat("u_WaveFrequency", 10.0f);
+    m_FullscreenShader->SetFloat("u_ReflectionAlpha", 0.6f);
+    m_FullscreenShader->SetFloat4("u_WaterTint", { 1.0f, 1.0f, 1.0f, 0.3f });
+    m_FullscreenShader->SetFloat("u_Time", glfwGetTime());
+
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
 

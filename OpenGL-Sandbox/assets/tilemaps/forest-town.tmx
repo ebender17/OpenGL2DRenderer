@@ -173,7 +173,7 @@
             0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
         </data>
     </layer>
-    <layer id="2" name="Shallow Water" width="30" height="30" collision="false">
+    <layer id="2" name="Shallow Water" width="30" height="30" collision="false" type="water">
         <data encoding="csv">
             0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
             0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
