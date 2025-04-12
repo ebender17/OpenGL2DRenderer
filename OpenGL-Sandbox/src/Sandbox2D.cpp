@@ -30,6 +30,7 @@ void Sandbox2D::OnAttach()
 
     // TODO : move post process framebuffer & shader into Renderer2D?
     GLCore::FramebufferSpecification framebuffferSpec;
+    framebuffferSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::Depth };
     framebuffferSpec.Width = INITIAL_SCREEN_WIDTH;
     framebuffferSpec.Height = INITIAL_SCREEN_HEIGHT;
     m_Framebuffer = GLCore::Framebuffer::Create(framebuffferSpec);
@@ -109,7 +110,7 @@ void Sandbox2D::OnUpdate(GLCore::Timestep timestep)
     m_FullscreenShader->Bind();
     glBindVertexArray(m_FullscreenVAO);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_Framebuffer->GetColorAttachment());
+    glBindTexture(GL_TEXTURE_2D, m_Framebuffer->GetColorAttachmentRendererID());
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, m_GameMap->GetTilemapTexture());
 
