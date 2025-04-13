@@ -64,7 +64,7 @@ void Sandbox2D::OnAttach()
     glBindVertexArray(0);
     glDeleteBuffers(1, &quadVBO);
 
-    m_GameMap = MapParser::GetInstance().Load("assets/tilemaps/tilemap-test.tmx");
+    m_GameMap = MapParser::GetInstance().Load("assets/tilemaps/forest-town.tmx");
     float mapWidth = 39.4f; // TODO : magic number
     float mapHeight = 48.f; // TODO : magic number
     float mapBounds[4] = { 0.0f, mapWidth, 0.0f, mapHeight };
@@ -90,44 +90,23 @@ void Sandbox2D::OnUpdate(GLCore::Timestep timestep)
     m_CameraController->SetTarget(m_Player->GetPosition());
     m_CameraController->OnUpdate(timestep);
 
-    // Render
-    // First pass
     Renderer2D::ResetStats();
-    m_Framebuffer->Bind();
     RenderCommand::SetClearColor({ 1.0f, 0.0f, 0.0f, 1 });
     RenderCommand::Clear();
     Renderer2D::BeginScene(m_CameraController->GetCamera());
-    m_Player->OnRender();
+
+    // 1. Render Water
+    m_GameMap->OnRenderWaterLayer();
+    // 2. Render Sprites, flipped upside-down above the water level and with water effects
+    m_Player->OnRenderReflection();
+    // 3. Draw the ground
     m_GameMap->OnRender();
+    // 4. Draw the player
+    m_Player->OnRender();
+
+    // TODO : use framebuffer to implement day-night cycle?
+
     Renderer2D::EndScene();
-    m_Framebuffer->Unbind();
-
-    // Second pass
-    // glDisable(GL_DEPTH_TEST); // TODO : figure out what is going on with depth test
-    RenderCommand::SetClearColor({ 1.0f, 0.0f, 0.0f, 1 });
-    RenderCommand::Clear();
-    // TODO : move post process framebuffer & shader into Renderer2D?
-    m_FullscreenShader->Bind();
-    glBindVertexArray(m_FullscreenVAO);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_Framebuffer->GetColorAttachmentRendererID());
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, m_GameMap->GetTilemapTexture());
-
-    // Pass the inverse projection-view matrix
-    glm::mat4 invProjectionView = glm::inverse(m_CameraController->GetCamera().GetViewProjectionMatrix());
-    m_FullscreenShader->SetMat4("u_InvProjectionView", invProjectionView);
-    // Set tile size in world space
-    m_FullscreenShader->SetFloat("u_TileSize", 1.0f); // TODO : make sure this is correct
-
-    m_FullscreenShader->SetFloat("u_WaveAmplitude", 0.01f);
-    m_FullscreenShader->SetFloat("u_WaveFrequency", 10.0f);
-    m_FullscreenShader->SetFloat("u_ReflectionAlpha", 0.6f);
-    m_FullscreenShader->SetFloat4("u_WaterTint", { 1.0f, 1.0f, 1.0f, 0.3f });
-    m_FullscreenShader->SetFloat("u_Time", glfwGetTime());
-
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-    glBindVertexArray(0);
 
     // m_PlayerDebugBox->DrawCollider(*m_Player, *m_CameraController);
     // TODO : add line rendering into Renderer2D instead of DebugBox2D?

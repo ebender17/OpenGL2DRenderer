@@ -49,7 +49,7 @@ void TileLayer::OnUpdate(GLCore::Timestep timestep)
 {
 }
 
-void TileLayer::OnRender()
+void TileLayer::OnRender(float zPosition)
 {
     // TODO : only issue draw calls for tiles inside camera bounds
     for (unsigned int y = 0; y < m_ColumnCount; y++)
@@ -80,7 +80,7 @@ void TileLayer::OnRender()
                 }
             } */
 
-            glm::vec3 position = glm::vec3(y, x, -0.05f); // TODO : magic number for z
+            glm::vec3 position = glm::vec3(y, x, zPosition);
             Renderer2D::DrawQuad(position, c_SpriteSize, ts->Texture, m_TileData[tileId].TexCoords);
         }
     }

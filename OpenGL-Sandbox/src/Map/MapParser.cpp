@@ -69,7 +69,6 @@ Ref<GameMap> MapParser::Parse(const std::string& source)
             gamemap->GetMapLayers().emplace_back(tileLayer);
         }
     }
-    gamemap->GenerateWaterMaskTexture();
 
     return gamemap;
 }

@@ -35,7 +35,7 @@ public:
         const TileMap& tileMap, const TilesetList& tilesets, const std::string& type);
 
     void OnUpdate(GLCore::Timestep timestep);
-    void OnRender();
+    void OnRender(float zPosition = -0.05f);
 
     bool CheckCollision(const glm::vec2& objPosition, float width, float height);
 
