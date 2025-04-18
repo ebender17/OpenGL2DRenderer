@@ -9,7 +9,9 @@ layout(location = 2) in vec2 a_TexCoord;
 layout(location = 3) in float a_TexIndex;
 layout(location = 4) in float a_TilingFactor;
 
-uniform mat4 u_ViewProjection;
+layout(std140, binding = 0) uniform CameraData {
+    mat4 u_ViewProjection;
+};
 
 struct VertexOutput
 {
