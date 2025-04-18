@@ -9,8 +9,8 @@ namespace GLCore{
     class OpenGLShader : public Shader
     {
     public:
-        OpenGLShader(const std::string& filepath);
-        OpenGLShader(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource);
+        OpenGLShader(const std::string& filepath, const std::vector<std::string>& defines = {});
+        OpenGLShader(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource, const std::vector<std::string>& defines = {});
         virtual ~OpenGLShader();
 
         virtual void Bind() const override;
@@ -41,6 +41,7 @@ namespace GLCore{
     private:
         uint32_t m_RendererID;
         std::string m_Name;
+        std::vector<std::string> m_Defines;
     };
 
 }

@@ -6,7 +6,7 @@
 
 namespace GLCore {
 
-    Ref<Shader> Shader::Create(const std::string& filepath)
+    Ref<Shader> Shader::Create(const std::string& filepath, const std::vector<std::string>& defines)
     {
         switch (Renderer::GetAPI())
         {
@@ -21,7 +21,8 @@ namespace GLCore {
         return nullptr;
     }
 
-    Ref<Shader> Shader::Create(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource)
+    Ref<Shader> Shader::Create(const std::string& name, const std::string& vertexSource,
+        const std::string& fragmentSource, const std::vector<std::string>& defines)
     {
         switch (Renderer::GetAPI())
         {

@@ -20,7 +20,8 @@ namespace GLCore {
         return 0;
     }
 
-    OpenGLShader::OpenGLShader(const std::string& filepath)
+    OpenGLShader::OpenGLShader(const std::string& filepath, const std::vector<std::string>& defines)
+        : m_Defines(defines)
     {
         std::string source = ReadFile(filepath);
         auto shaderSources = PreProcess(source);
@@ -29,8 +30,9 @@ namespace GLCore {
         m_Name = GLCore::Utils::ExtractNameFromFilePath(filepath);
     }
 
-    OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
-        : m_Name(name)
+    OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc, 
+        const std::vector<std::string>& defines)
+        : m_Name(name), m_Defines(defines)
     {
         std::unordered_map<GLenum, std::string> sources;
         sources[GL_VERTEX_SHADER] = vertexSrc;
@@ -103,9 +105,28 @@ namespace GLCore {
         int glShaderIDIndex = 0;
         for (auto&& [type, source] : shaderSources)
         {
+            std::string defineBlock;
+            for (auto& d : m_Defines)
+            {
+                defineBlock += "#define " + d + "\n";
+            }
+
+            std::string srcWithDefines;
+            if (source.rfind("#version", 0) == 0)
+            {
+                auto eol = source.find_first_of("\r\n");
+                srcWithDefines = source.substr(0, eol + 1)
+                    + defineBlock
+                    + source.substr(eol + 1);
+            }
+            else
+            {
+                srcWithDefines = defineBlock + source;
+            }
+
             GLuint shader = glCreateShader(type);
 
-            const GLchar* sourceCStr = source.c_str();
+            const GLchar* sourceCStr = srcWithDefines.c_str();
             glShaderSource(shader, 1, &sourceCStr, 0);
 
             glCompileShader(shader);
