@@ -35,6 +35,7 @@ namespace GLCore{
         void UploadUniformMat3(const std::string& name, const glm::mat3& matrix);
         void UploadUniformMat4(const std::string& name, const glm::mat4& matrix);
     private:
+        std::string ResolveIncludes(const std::string& source, const std::string& parentDir);
         std::string ReadFile(const std::string& filepath);
         std::unordered_map<GLenum, std::string> PreProcess(const std::string& source);
         void CompileShaderProgram(const std::unordered_map<GLenum, std::string>& shaderSources);
