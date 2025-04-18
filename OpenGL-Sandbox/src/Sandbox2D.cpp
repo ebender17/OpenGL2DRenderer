@@ -34,10 +34,6 @@ void Sandbox2D::OnAttach()
     framebuffferSpec.Width = INITIAL_SCREEN_WIDTH;
     framebuffferSpec.Height = INITIAL_SCREEN_HEIGHT;
     m_Framebuffer = GLCore::Framebuffer::Create(framebuffferSpec);
-    m_FullscreenShader = Shader::Create("assets/shaders/WaterReflections.glsl");
-    m_FullscreenShader->Bind();
-    m_FullscreenShader->SetInt("u_SceneTexture", 0);
-    m_FullscreenShader->SetInt("u_TileMap", 1);
     // TODO : set uniforms you can upfront
 
     float quadVertices[] = {
@@ -74,6 +70,12 @@ void Sandbox2D::OnAttach()
         32, 48, "assets/tilesets/trainer-sapphire.png", m_GameMap);
     m_Player->LoadAssets();
     m_PlayerDebugBox = CreateRef<LineBox2D>();
+
+    m_WaterReflectionShader = Shader::Create("assets/shaders/BatchedTexture.glsl", { "WATER_REFLECTION" });
+    m_WaterReflectionShader->Bind();
+    m_WaterReflectionShader->SetFloat3("u_WaterReflectionColor", { 0.0, 0.369, 1.0 });
+    m_WaterReflectionShader->SetFloat("u_WaterReflectionColorMix", 0.31);
+    m_WaterReflectionShader->SetFloat("u_WaterReflectionAlpha", 0.75);
 }
 
 void Sandbox2D::OnDetach()
@@ -98,13 +100,14 @@ void Sandbox2D::OnUpdate(GLCore::Timestep timestep)
     // 1. Render Water
     m_GameMap->OnRenderWaterLayer();
     // 2. Render Sprites, flipped upside-down above the water level and with water effects
+    Renderer2D::SetShader(m_WaterReflectionShader);
+    m_WaterReflectionShader->SetFloat("u_Time", glfwGetTime());
     m_Player->OnRenderReflection();
+    Renderer2D::SetShader();
     // 3. Draw the ground
     m_GameMap->OnRender();
     // 4. Draw the player
     m_Player->OnRender();
-
-    // TODO : use framebuffer to implement day-night cycle?
 
     Renderer2D::EndScene();
 
