@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GLCore/Renderer/OrthographicCamera.h"
+#include "GLCore/Renderer/Shader.h"
 #include "GLCore/Renderer/Texture.h"
 #include "GLCore/Renderer/SubTexture2D.h"
 
@@ -9,35 +10,22 @@ namespace GLCore {
     class Renderer2D
     {
     public:
-        // TODO : use struct?
-        /* struct TexturedQuadData
-        {
-            glm::vec3 Position;
-            glm::vec2 Size;
-            const Ref<Texture2D>& texture;
-            std::array<glm::vec2, 4>& texCoords;
-            float TilingFactor = 1.0f;
-            glm::vec4 color = glm::vec4(1.0f);
-        }; */
-    public:
         static void Init();
         static void Shutdown();
 
-        static void BeginScene(const OrthographicCamera& camera);
+        static void BeginScene(const OrthographicCamera& camera,
+            const GLCore::Ref<Shader>& shader = nullptr);
         static void EndScene();
         static void Flush();
+        static void SetShader(const Ref<Shader>& shader = nullptr);
 
         // Primitives
         static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color);
         static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color);
 
-        // TODO : Remove these & just use struct?
         static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec2* texCoords, float tilingFactor = 1.0f, const glm::vec4& color = glm::vec4(1.0f));
         static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec2* texCoords, float tilingFactor = 1.0f, const glm::vec4& color = glm::vec4(1.0f));
 
-        // static void DrawQuad(const TexturedQuadData& quadData);
-
-        // TODO - Make a struct for these arguements?
         static void DrawQuad(const glm::mat4& transform, const glm::vec4& color);
         static void DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, const glm::vec2* texCoords, float tilingFactor = 1.0f, const glm::vec4& color = glm::vec4(1.0f));
 

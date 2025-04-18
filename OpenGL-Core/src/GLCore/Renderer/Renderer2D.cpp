@@ -2,10 +2,10 @@
 #include "Renderer2D.h"
 
 #include "GLCore/Renderer/VertexArray.h"
-#include "GLCore/Renderer/Shader.h"
 #include "GLCore/Renderer/RenderCommand.h"
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace GLCore {
 
@@ -28,7 +28,9 @@ namespace GLCore {
 
         Ref<VertexArray> QuadVertexArray;
         Ref<VertexBuffer> QuadVertexBuffer;
-        Ref<Shader> QuadShader;
+        Ref<Shader> DefaultQuadShader;
+        Ref<Shader> QuadShader = nullptr;
+        Ref<UniformBuffer> QuadCameraUniformBuffer;
         Ref<Texture2D> WhiteTexture;
 
         uint32_t QuadIndexCount = 0;
@@ -88,7 +90,8 @@ namespace GLCore {
         uint32_t whiteTextureData = 0xffffffff;
         s_Data.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
 
-        s_Data.QuadShader = Shader::Create("assets/shaders/BatchedTexture.glsl");
+        s_Data.DefaultQuadShader = Shader::Create("assets/shaders/BatchedTexture.glsl");
+        s_Data.QuadShader = s_Data.DefaultQuadShader;
         s_Data.QuadShader->Bind();
         s_Data.QuadShader->SetIntArray("u_Textures", samplers, s_Data.MaxTextureSlots);
 
@@ -98,6 +101,8 @@ namespace GLCore {
         s_Data.QuadVertexPositions[1] = {  1.0f, 0.0f, 0.0f, 1.0f };
         s_Data.QuadVertexPositions[2] = {  1.0f,  1.0f, 0.0f, 1.0f };
         s_Data.QuadVertexPositions[3] = { 0.0f,  1.0f, 0.0f, 1.0f };
+
+        s_Data.QuadCameraUniformBuffer = UniformBuffer::Create(sizeof(glm::mat4), 0);
     }
 
     void Renderer2D::Shutdown()
@@ -105,10 +110,12 @@ namespace GLCore {
         delete[] s_Data.QuadVertexBufferBase;
     }
 
-    void Renderer2D::BeginScene(const OrthographicCamera& camera)
+    void Renderer2D::BeginScene(const OrthographicCamera& camera, const GLCore::Ref<Shader>& shader)
     {
-        s_Data.QuadShader->Bind();
-        s_Data.QuadShader->SetMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
+        s_Data.QuadCameraUniformBuffer->Bind();
+        s_Data.QuadCameraUniformBuffer->SetData(glm::value_ptr(camera.GetViewProjectionMatrix()), sizeof(glm::mat4), 0);
+        s_Data.QuadCameraUniformBuffer->Unbind();
+        SetShader(shader);
 
         StartBatch();
     }
@@ -122,8 +129,6 @@ namespace GLCore {
     {
         s_Data.QuadIndexCount = 0;
         s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
-
-        s_Data.TextureSlotIndex = 1;
     }
 
     void Renderer2D::Flush()
@@ -146,6 +151,25 @@ namespace GLCore {
     {
         Flush();
         StartBatch();
+    }
+
+    void Renderer2D::SetShader(const Ref<Shader>& shader)
+    {
+        if (s_Data.QuadShader == shader) return;
+
+        NextBatch();
+
+        s_Data.QuadShader = shader ? shader : s_Data.DefaultQuadShader;
+        s_Data.QuadShader->Bind();
+
+        // reset texture slots
+        int32_t samplers[Renderer2DData::MaxTextureSlots];
+        for (uint32_t i = 0; i < Renderer2DData::MaxTextureSlots; i++)
+            samplers[i] = i;
+        s_Data.QuadShader->SetIntArray("u_Textures", samplers, Renderer2DData::MaxTextureSlots);
+
+        s_Data.TextureSlots[0] = s_Data.WhiteTexture;
+        s_Data.TextureSlotIndex = 1;
     }
 
     void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
