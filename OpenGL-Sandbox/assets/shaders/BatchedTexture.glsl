@@ -21,33 +21,17 @@ out VS_OUT
     float TilingFactor;
 } vs_out;
 
-#ifdef WATER_REFLECTION
-    // TODO : add needed uniforms
-#endif
-
 void main()
 {
-    vec3 position = a_Position;
-
-#ifdef WATER_REFLECTION
-    // TODO : expand a_Position so sprite is not clipped
-#endif
-
     vs_out.Color = a_Color;
     vs_out.TexCoord = a_TexCoord;
     vs_out.TexIndex = a_TexIndex;
     vs_out.TilingFactor = a_TilingFactor;
-
-
-    gl_Position = u_ViewProjection * vec4(position, 1.0);
+    gl_Position = u_ViewProjection * vec4(a_Position, 1.0);
 }
 
 #type fragment
 #version 460 core
-
-#ifdef WATER_REFLECTION
-    #include "WaterReflections.glsl"
-#endif
 
 layout(location = 0) out vec4 color;
 
@@ -63,8 +47,19 @@ layout (binding = 0) uniform sampler2D u_Textures[32];
 
 #ifdef WATER_REFLECTION
 uniform float u_Time;
+uniform float u_DisplacementUV;
 
-// TODO : add needed uniforms
+uniform int u_hFrames;
+uniform int u_vFrames;
+
+uniform float u_TimeGap; // Time in seconds that left side movement will wait to move
+uniform float u_Speed;
+
+// SideRelationTime determines the time ratio spent in each step.
+// For example, with a value of 0.25, a quarter of the time is spent in the normal position,
+// and the remaining three-quarters in the shifted position.
+uniform float u_LeftSideRelationTime;
+uniform float u_RightSideRelationTime;
 
 uniform vec3 u_WaterReflectionColor;
 uniform float u_WaterReflectionColorMix;
@@ -74,10 +69,21 @@ uniform float u_WaterReflectionAlpha;
 void main()
 {
     vec4 texColor = fs_in.Color;
-
     vec2 uv = fs_in.TexCoord;
+
     #ifdef WATER_REFLECTION
-        // TODO : adjust UVs
+        vec2 numberFrames = vec2(float(u_hFrames), float(u_vFrames));
+        vec2 normalizedUV = mod(uv * numberFrames, vec2(1.0));
+
+        float shift = u_DisplacementUV;
+        if (normalizedUV.x <= 0.5) {
+            //left side
+            uv.x -= shift * step(mod((u_Time + u_TimeGap) * u_Speed, 1.0), u_LeftSideRelationTime);
+        }
+        else {
+            //right side
+            uv.x -= shift * step(mod(u_Time * u_Speed, 1.0), u_RightSideRelationTime);
+        }
 
         texColor.rgb = mix(texColor.rgb, u_WaterReflectionColor, u_WaterReflectionColorMix);
         texColor.a *= u_WaterReflectionAlpha;

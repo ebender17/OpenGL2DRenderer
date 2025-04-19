@@ -70,7 +70,6 @@ private:
     const char* c_WalkLeft = "walk-left";
     const char* c_WalkRight = "walk-right";
 
-    const glm::vec2 c_SpriteSizePixels = { 32, 48 };
     const float c_ReflectionZPosition = -0.06f;
 };
 

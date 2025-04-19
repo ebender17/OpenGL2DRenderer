@@ -66,13 +66,20 @@ void Sandbox2D::OnAttach()
     float mapBounds[4] = { 0.0f, mapWidth, 0.0f, mapHeight };
     m_CameraController->SetBounds(mapBounds);
 
-    m_Player = CreateRef<PlayerController>(glm::vec3(18.f, 3.2f, 0.5f), glm::vec2(1.0f, 1.5f),
-        32, 48, "assets/tilesets/trainer-sapphire.png", m_GameMap);
+    m_Player = CreateRef<PlayerController>(glm::vec3(18.f, 3.2f, 0.5f), glm::vec2(1.3f, 1.3f),
+        48, 48, "assets/tilesets/trainer-sapphire.png", m_GameMap);
     m_Player->LoadAssets();
     m_PlayerDebugBox = CreateRef<LineBox2D>();
 
     m_WaterReflectionShader = Shader::Create("assets/shaders/BatchedTexture.glsl", { "WATER_REFLECTION" });
     m_WaterReflectionShader->Bind();
+    m_WaterReflectionShader->SetFloat("u_DisplacementUV", 0.01);
+    m_WaterReflectionShader->SetInt("u_hFrames", 4);
+    m_WaterReflectionShader->SetInt("u_vFrames", 4);
+    m_WaterReflectionShader->SetFloat("u_TimeGap", 0.4);
+    m_WaterReflectionShader->SetFloat("u_Speed", 2.0);
+    m_WaterReflectionShader->SetFloat("u_LeftSideRelationTime", 0.3);
+    m_WaterReflectionShader->SetFloat("u_RightSideRelationTime", 0.3);
     m_WaterReflectionShader->SetFloat3("u_WaterReflectionColor", { 0.0, 0.369, 1.0 });
     m_WaterReflectionShader->SetFloat("u_WaterReflectionColorMix", 0.31);
     m_WaterReflectionShader->SetFloat("u_WaterReflectionAlpha", 0.75);

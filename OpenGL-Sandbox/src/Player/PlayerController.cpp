@@ -201,7 +201,7 @@ void PlayerController::SetupAnimation(const char* animationName, bool isLoop, un
     bool frameIsSpriteSwap = frameDuration == 0.0f;
     for (int i = 0; i < frameCount; i++)
     {
-        auto subTexture = SubTexture2D::CreateFromCoords(m_SpriteSheet, { i, row }, c_SpriteSizePixels);
+        auto subTexture = SubTexture2D::CreateFromCoords(m_SpriteSheet, { i, row }, { GetWidth(), GetHeight() });
         Ref<AnimationFrame> frame = CreateRef<AnimationFrame>(subTexture, frameIsSpriteSwap, frameDuration);
         animation->AddFrame(frame);
     }
