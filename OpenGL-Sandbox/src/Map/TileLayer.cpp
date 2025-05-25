@@ -2,9 +2,11 @@
 
 #include <cmath>
 
+#include "../Utilities/StringUtils.h"
+
 using namespace GLCore;
 
-TileLayer::TileLayer(int tileWidth, int tileHeight, int rowCount, int columnCount, const TileMap& tileMap, const TilesetList& tilesets)
+TileLayer::TileLayer(int tileWidth, int tileHeight, int rowCount, int columnCount, const TileMap& tileMap, const TilesetList& tilesets, const std::string& type)
     : m_TileWidth(tileWidth), m_TileHeight(tileHeight), m_RowCount(rowCount), m_ColumnCount(columnCount), m_TileMap(tileMap), m_Tilesets(tilesets)
 {
     // TODO : create a texture library (like the shader library) & check that first before loading
@@ -12,6 +14,7 @@ TileLayer::TileLayer(int tileWidth, int tileHeight, int rowCount, int columnCoun
     {
         m_Tilesets[i]->Texture = Texture2D::Create(m_Tilesets[i]->Source);
     }
+    m_TileLayerType = StringToType(type);
     ComputeTileTexCoords();
 }
 
@@ -46,7 +49,7 @@ void TileLayer::OnUpdate(GLCore::Timestep timestep)
 {
 }
 
-void TileLayer::OnRender()
+void TileLayer::OnRender(float zPosition)
 {
     // TODO : only issue draw calls for tiles inside camera bounds
     for (unsigned int y = 0; y < m_ColumnCount; y++)
@@ -77,7 +80,7 @@ void TileLayer::OnRender()
                 }
             } */
 
-            glm::vec3 position = glm::vec3(y, x, -0.05f); // TODO : magic number for z
+            glm::vec3 position = glm::vec3(y, x, zPosition);
             Renderer2D::DrawQuad(position, c_SpriteSize, ts->Texture, m_TileData[tileId].TexCoords);
         }
     }
@@ -90,7 +93,8 @@ bool TileLayer::CheckCollision(const glm::vec2& objPosition, float width, float 
     auto ts = m_Tilesets[0];
 
     // Convert object's bounding box to tile indices
-    int startX = std::floor(objPosition.y) - 1;
+    // TODO : way to alter this to get closer to tile that only take half a tile?
+    int startX = std::floor(objPosition.y);
     int startY = std::floor(objPosition.x);
     int endX = std::ceil(objPosition.y + (width / m_TileHeight));
     int endY = std::ceil(objPosition.x + (height / m_TileWidth));
@@ -123,4 +127,21 @@ bool TileLayer::IntersectsTile(const glm::vec2& tilePosition, const glm::vec2& o
     // collision y-axis
     bool collisionY = objPosition.y >= tilePosition.y;
     return collisionX && collisionY;
+}
+
+
+TileLayer::Type TileLayer::StringToType(const std::string& typeStr)
+{
+    static const std::unordered_map<std::string, TileLayer::Type> typeMap = {
+        {"unknown", TileLayer::Type::Unknown},
+        {"water", TileLayer::Type::Water},
+    };
+
+    std::string lowerStr = Utils::String::ToLower(typeStr);
+    auto it = typeMap.find(lowerStr);
+    if (it != typeMap.end()) {
+        return it->second;
+    }
+
+    GLCORE_ASSERT(false, "Invalid tile layer type string: " + typeStr);
 }

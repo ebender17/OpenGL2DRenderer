@@ -22,28 +22,28 @@ void PlayerController::LoadAssets()
     float frameDurationWalk = timePerTile / 2.0f; // 2 steps in each 4 frames
 
     // IDLE DOWN
-    SetupAnimation(m_IdleDown, false, 3, 1, 0.0f, 1);
+    SetupAnimation(c_IdleDown, false, 3, 1, 0.0f, 1);
 
     // WALK DOWN
-    SetupAnimation(m_WalkDown, true, 3, 4, frameDurationWalk, 4);
+    SetupAnimation(c_WalkDown, true, 3, 4, frameDurationWalk, 4);
 
     // IDLE UP
-    SetupAnimation(m_IdleUp, false, 0, 1, 0.0f, 1);
+    SetupAnimation(c_IdleUp, false, 0, 1, 0.0f, 1);
 
     // WALK UP
-    SetupAnimation(m_WalkUp, true, 0, 4, frameDurationWalk, 4);
+    SetupAnimation(c_WalkUp, true, 0, 4, frameDurationWalk, 4);
 
     // IDLE LEFT
-    SetupAnimation(m_IdleLeft, false, 2, 1, 0.0f, 1);
+    SetupAnimation(c_IdleLeft, false, 2, 1, 0.0f, 1);
 
     // WALK LEFT
-    SetupAnimation(m_WalkLeft, true, 2, 4, frameDurationWalk, 4);
+    SetupAnimation(c_WalkLeft, true, 2, 4, frameDurationWalk, 4);
 
     // IDLE RIGHT
-    SetupAnimation(m_IdleRight, false, 1, 1, 0.0f, 1);
+    SetupAnimation(c_IdleRight, false, 1, 1, 0.0f, 1);
 
     // WALK RIGHT
-    SetupAnimation(m_WalkRight, true, 1, 4, frameDurationWalk, 4);
+    SetupAnimation(c_WalkRight, true, 1, 4, frameDurationWalk, 4);
 }
 
 void PlayerController::OnUpdate(GLCore::Timestep timestep)
@@ -73,6 +73,37 @@ void PlayerController::OnRender()
 {
     auto currentFrame = m_Animator->GetCurrentFrame()->SubTexture;
     Renderer2D::DrawQuad({ m_Position.x, m_Position.y, 0.5f }, m_SpriteSize, currentFrame->GetTexture(), currentFrame->GetTexCoords());
+}
+
+void PlayerController::OnRenderReflection()
+{
+    auto currentFrame = m_Animator->GetCurrentFrame()->SubTexture;
+    auto texCoords = currentFrame->GetTexCoords();
+    const size_t quadVertexCount = 4;
+    std::array<glm::vec2, quadVertexCount> newTexCoords;
+
+    float minV = texCoords[0].y;
+    float maxV = texCoords[0].y;
+    for (int i = 1; i < quadVertexCount; i++)
+    {
+        minV = std::min(minV, texCoords[i].y);
+        maxV = std::max(maxV, texCoords[i].y);
+    }
+
+    // Flip v
+    for (int i = 0; i < quadVertexCount; i++)
+    {
+        auto texCoord = texCoords[i];
+        texCoord.y = maxV - (texCoord.y - minV); // mirrored around the midpoint
+        newTexCoords[i] = texCoord;
+    }
+
+    Renderer2D::DrawQuad(
+        { m_Position.x, m_Position.y - m_SpriteSize.y, c_ReflectionZPosition },
+        m_SpriteSize,
+        currentFrame->GetTexture(),
+        newTexCoords.data()
+    );
 }
 
 void PlayerController::ProcessPlayerInput()
@@ -170,7 +201,7 @@ void PlayerController::SetupAnimation(const char* animationName, bool isLoop, un
     bool frameIsSpriteSwap = frameDuration == 0.0f;
     for (int i = 0; i < frameCount; i++)
     {
-        auto subTexture = SubTexture2D::CreateFromCoords(m_SpriteSheet, { i, row }, m_SpriteSizePixels);
+        auto subTexture = SubTexture2D::CreateFromCoords(m_SpriteSheet, { i, row }, { GetWidth(), GetHeight() });
         Ref<AnimationFrame> frame = CreateRef<AnimationFrame>(subTexture, frameIsSpriteSwap, frameDuration);
         animation->AddFrame(frame);
     }
@@ -187,16 +218,16 @@ void PlayerController::SetActiveIdleAnimation()
     switch (m_CurrentDirection)
     {
     case Direction::South:
-        m_Animator->SetActiveAnimation(m_IdleDown);
+        m_Animator->SetActiveAnimation(c_IdleDown);
         break;
     case Direction::North:
-        m_Animator->SetActiveAnimation(m_IdleUp);
+        m_Animator->SetActiveAnimation(c_IdleUp);
         break;
     case Direction::West:
-        m_Animator->SetActiveAnimation(m_IdleLeft);
+        m_Animator->SetActiveAnimation(c_IdleLeft);
         break;
     case Direction::East:
-        m_Animator->SetActiveAnimation(m_IdleRight);
+        m_Animator->SetActiveAnimation(c_IdleRight);
         break;
     }
 }
@@ -206,16 +237,16 @@ void PlayerController::SetActiveWalkAnimation()
     switch (m_CurrentDirection)
     {
     case Direction::South:
-        m_Animator->SetActiveAnimation(m_WalkDown);
+        m_Animator->SetActiveAnimation(c_WalkDown);
         break;
     case Direction::North:
-        m_Animator->SetActiveAnimation(m_WalkUp);
+        m_Animator->SetActiveAnimation(c_WalkUp);
         break;
     case Direction::West:
-        m_Animator->SetActiveAnimation(m_WalkLeft);
+        m_Animator->SetActiveAnimation(c_WalkLeft);
         break;
     case Direction::East:
-        m_Animator->SetActiveAnimation(m_WalkRight);
+        m_Animator->SetActiveAnimation(c_WalkRight);
         break;
     }
 }

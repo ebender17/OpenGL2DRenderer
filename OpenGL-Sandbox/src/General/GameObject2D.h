@@ -16,8 +16,8 @@ public:
 
     const glm::vec3& GetPosition() const { return m_Position; }
     const glm::vec2& GetSpriteSize() const { return m_SpriteSize; }
-    float GetWidth() const { return m_Width; }
-    float GetHeight() const { return m_Height; }
+    const float GetWidth() const { return m_Width; }
+    const float GetHeight() const { return m_Height; }
 protected:
     glm::vec3 m_Position;
     glm::vec2 m_SpriteSize;

@@ -25,8 +25,9 @@ namespace GLCore {
 
         virtual const std::string& GetName() const = 0;
 
-        static Ref<Shader> Create(const std::string& filepath);
-        static Ref<Shader> Create(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource);
+        static Ref<Shader> Create(const std::string& filepath, const std::vector<std::string>& defines = {});
+        static Ref<Shader> Create(const std::string& name, const std::string& vertexSource,
+            const std::string& fragmentSource, const std::vector<std::string>& defines = {});
     };
 
     // TODO : create a template 'AssetLibrary' to replace this & ShaderLibrary

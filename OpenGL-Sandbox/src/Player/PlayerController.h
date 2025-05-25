@@ -32,6 +32,7 @@ public:
 
     void OnUpdate(GLCore::Timestep timestep);
     void OnRender();
+    void OnRenderReflection();
 private:
     void ProcessPlayerInput();
     void Move(GLCore::Timestep timestep);
@@ -59,16 +60,16 @@ private:
     float m_RemainingMoveDelay = 0.0f;
 
     // Animation Names
-    const char* m_IdleDown = "idle-down";
-    const char* m_IdleUp = "idle-up";
-    const char* m_IdleLeft = "idle-left";
-    const char* m_IdleRight = "idle-right";
+    const char* c_IdleDown = "idle-down";
+    const char* c_IdleUp = "idle-up";
+    const char* c_IdleLeft = "idle-left";
+    const char* c_IdleRight = "idle-right";
 
-    const char* m_WalkDown = "walk-down";
-    const char* m_WalkUp = "walk-up";
-    const char* m_WalkLeft = "walk-left";
-    const char* m_WalkRight = "walk-right";
+    const char* c_WalkDown = "walk-down";
+    const char* c_WalkUp = "walk-up";
+    const char* c_WalkLeft = "walk-left";
+    const char* c_WalkRight = "walk-right";
 
-    const glm::vec2 m_SpriteSizePixels = { 32, 48 };
+    const float c_ReflectionZPosition = -0.06f;
 };
 

@@ -9,8 +9,8 @@ namespace GLCore{
     class OpenGLShader : public Shader
     {
     public:
-        OpenGLShader(const std::string& filepath);
-        OpenGLShader(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource);
+        OpenGLShader(const std::string& filepath, const std::vector<std::string>& defines = {});
+        OpenGLShader(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource, const std::vector<std::string>& defines = {});
         virtual ~OpenGLShader();
 
         virtual void Bind() const override;
@@ -35,12 +35,14 @@ namespace GLCore{
         void UploadUniformMat3(const std::string& name, const glm::mat3& matrix);
         void UploadUniformMat4(const std::string& name, const glm::mat4& matrix);
     private:
+        std::string ResolveIncludes(const std::string& source, const std::string& parentDir);
         std::string ReadFile(const std::string& filepath);
         std::unordered_map<GLenum, std::string> PreProcess(const std::string& source);
         void CompileShaderProgram(const std::unordered_map<GLenum, std::string>& shaderSources);
     private:
         uint32_t m_RendererID;
         std::string m_Name;
+        std::vector<std::string> m_Defines;
     };
 
 }

@@ -20,17 +20,21 @@ namespace GLCore {
         return 0;
     }
 
-    OpenGLShader::OpenGLShader(const std::string& filepath)
+    OpenGLShader::OpenGLShader(const std::string& filepath, const std::vector<std::string>& defines)
+        : m_Defines(defines)
     {
         std::string source = ReadFile(filepath);
+        std::string parentDir = filepath.substr(0, filepath.find_last_of("/\\"));
+        source = ResolveIncludes(source, parentDir);
         auto shaderSources = PreProcess(source);
         CompileShaderProgram(shaderSources);
 
         m_Name = GLCore::Utils::ExtractNameFromFilePath(filepath);
     }
 
-    OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
-        : m_Name(name)
+    OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc, 
+        const std::vector<std::string>& defines)
+        : m_Name(name), m_Defines(defines)
     {
         std::unordered_map<GLenum, std::string> sources;
         sources[GL_VERTEX_SHADER] = vertexSrc;
@@ -41,6 +45,40 @@ namespace GLCore {
     OpenGLShader::~OpenGLShader()
     {
         glDeleteProgram(m_RendererID);
+    }
+
+    std::string OpenGLShader::ResolveIncludes(const std::string& source, const std::string& parentDir)
+    {
+        std::stringstream in(source);
+        std::string line;
+        std::string output;
+
+        while (std::getline(in, line))
+        {
+            // trim leading whitespace
+            auto firstNonWS = line.find_first_not_of(" \t");
+            if (firstNonWS != std::string::npos &&
+                line.compare(firstNonWS, 8, "#include") == 0)
+            {
+                auto start = line.find_first_of("\"<", firstNonWS + 8);
+                auto end = line.find_last_of("\">");
+                if (start != std::string::npos && end != std::string::npos && end > start)
+                {
+                    std::string includeFile = line.substr(start + 1, end - start - 1);
+                    std::string fullPath = parentDir + "/" + includeFile;
+                    std::string includedSrc = ReadFile(fullPath);
+                    // recurse so nested includes work
+                    std::string includedDir = fullPath.substr(0, fullPath.find_last_of("/\\"));
+                    output += ResolveIncludes(includedSrc, includedDir);
+                    output += "\n";
+                    continue;
+                }
+            }
+            // otherwise, just copy the line through
+            output += line + "\n";
+        }
+
+        return output;
     }
 
     std::string OpenGLShader::ReadFile(const std::string& filepath)
@@ -103,9 +141,28 @@ namespace GLCore {
         int glShaderIDIndex = 0;
         for (auto&& [type, source] : shaderSources)
         {
+            std::string defineBlock;
+            for (auto& d : m_Defines)
+            {
+                defineBlock += "#define " + d + "\n";
+            }
+
+            std::string srcWithDefines;
+            if (source.rfind("#version", 0) == 0)
+            {
+                auto eol = source.find_first_of("\r\n");
+                srcWithDefines = source.substr(0, eol + 1)
+                    + defineBlock
+                    + source.substr(eol + 1);
+            }
+            else
+            {
+                srcWithDefines = defineBlock + source;
+            }
+
             GLuint shader = glCreateShader(type);
 
-            const GLchar* sourceCStr = source.c_str();
+            const GLchar* sourceCStr = srcWithDefines.c_str();
             glShaderSource(shader, 1, &sourceCStr, 0);
 
             glCompileShader(shader);

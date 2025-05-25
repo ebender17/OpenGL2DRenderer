@@ -58,7 +58,7 @@ Ref<GameMap> MapParser::Parse(const std::string& source)
     }
 
     // Parse TileLayers
-    auto gamemap = CreateRef<GameMap>(7); // TODO : get rid of magic number
+    auto gamemap = CreateRef<GameMap>(rowCount, columnCount, 7); // TODO : get rid of magic number 7
     for (XMLElement* element = root->FirstChildElement(); element != nullptr; element = element->NextSiblingElement())
     {
         if (strcmp(element->Value(), "layer") == 0)
@@ -97,6 +97,11 @@ Ref<Tileset> MapParser::ParseTileset(XMLElement* xmlTileset)
 Ref<TileLayer> MapParser::ParseTileLayer(XMLElement* xmlLayer, TilesetList tilesets, int tileWidth, int tileHeight, int rowCount, int columnCount)
 {
     XMLElement* data;
+    const char* type = xmlLayer->Attribute("type");
+    if (!type)
+    {
+        type = "unknown";
+    }
     for (XMLElement* element = xmlLayer->FirstChildElement(); element != nullptr; element = element->NextSiblingElement())
     {
         if (strcmp(element->Value(), "data") == 0)
@@ -125,5 +130,5 @@ Ref<TileLayer> MapParser::ParseTileLayer(XMLElement* xmlLayer, TilesetList tiles
                 break;
         }
     }
-    return CreateRef<TileLayer>(tileWidth, tileHeight, rowCount, columnCount, tilemap, tilesets);
+    return CreateRef<TileLayer>(tileWidth, tileHeight, rowCount, columnCount, tilemap, tilesets, type);
 }

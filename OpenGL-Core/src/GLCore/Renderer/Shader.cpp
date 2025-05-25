@@ -6,7 +6,7 @@
 
 namespace GLCore {
 
-    Ref<Shader> Shader::Create(const std::string& filepath)
+    Ref<Shader> Shader::Create(const std::string& filepath, const std::vector<std::string>& defines)
     {
         switch (Renderer::GetAPI())
         {
@@ -14,14 +14,15 @@ namespace GLCore {
             GLCORE_ASSERT(false, "RendererAPI::None is currently not supported!");
             return nullptr;
         case RendererAPI::API::OpenGL:
-            return CreateRef<OpenGLShader>(filepath);
+            return CreateRef<OpenGLShader>(filepath, defines);
         }
 
         GLCORE_ASSERT(false, "Unknown RendererAPI!");
         return nullptr;
     }
 
-    Ref<Shader> Shader::Create(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource)
+    Ref<Shader> Shader::Create(const std::string& name, const std::string& vertexSource,
+        const std::string& fragmentSource, const std::vector<std::string>& defines)
     {
         switch (Renderer::GetAPI())
         {
