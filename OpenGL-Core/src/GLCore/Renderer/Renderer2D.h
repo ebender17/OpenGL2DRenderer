@@ -13,8 +13,7 @@ namespace GLCore {
         static void Init();
         static void Shutdown();
 
-        static void BeginScene(const OrthographicCamera& camera,
-            const GLCore::Ref<Shader>& shader = nullptr);
+        static void BeginScene(const OrthographicCamera& camera);
         static void EndScene();
         static void Flush();
         static void SetShader(const Ref<Shader>& shader = nullptr);
